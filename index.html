@@ -2,21 +2,23 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hope Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>VL Chat</title>
 <style>
 :root {
-  --bg: #0f0f15;
-  --bg-soft: #1a1a26;
-  --bg-input: #22222e;
-  --text: #e8e6e3;
-  --text-dim: #8a8a9a;
-  --accent: #c79553;
-  --border: #2a2a3a;
-  --user-bubble: #1e2a3a;
-  --ai-bubble: #16161f;
+  --bg: #ffffff;
+  --bg-soft: #f7f7f8;
+  --bg-input: #ffffff;
+  --text: #1a1a1a;
+  --text-dim: #6e6e80;
+  --accent: #d92d20;
+  --accent-soft: #fef3f2;
+  --border: #e5e5e7;
+  --user-bubble: #fef3f2;
+  --ai-bubble: #f7f7f8;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body {
   height: 100%;
   background: var(--bg);
@@ -28,42 +30,52 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
 }
 .topbar {
   padding: 12px 16px;
-  background: var(--bg-soft);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 .topbar h1 {
   font-size: 16px;
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 700;
 }
 .topbar select {
   flex: 1;
-  padding: 8px 12px;
-  background: var(--bg-input);
+  padding: 9px 12px;
+  background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text);
   font-size: 13px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .settings-btn {
-  background: var(--bg-input);
+  background: var(--bg-soft);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 12px;
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 .chat-area {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
+  -webkit-overflow-scrolling: touch;
 }
 .welcome {
   display: flex;
@@ -73,11 +85,18 @@ html, body {
   height: 100%;
   text-align: center;
   color: var(--text-dim);
+  padding: 24px;
 }
 .welcome h2 {
   color: var(--accent);
-  font-size: 28px;
-  margin-bottom: 8px;
+  font-size: 56px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  letter-spacing: -2px;
+}
+.welcome p {
+  font-size: 16px;
+  color: var(--text-dim);
 }
 .message {
   margin-bottom: 14px;
@@ -89,127 +108,153 @@ html, body {
 .bubble {
   max-width: 85%;
   padding: 12px 16px;
-  border-radius: 16px;
-  font-size: 14px;
+  border-radius: 18px;
+  font-size: 15px;
   line-height: 1.6;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 .message.user .bubble {
   background: var(--user-bubble);
+  border: 1px solid var(--accent);
   border-bottom-right-radius: 4px;
+  color: var(--text);
 }
 .message.assistant .bubble {
   background: var(--ai-bubble);
   border: 1px solid var(--border);
   border-bottom-left-radius: 4px;
+  color: var(--text);
 }
 .input-area {
-  padding: 12px 16px;
-  background: var(--bg-soft);
+  padding: 10px 12px;
+  background: var(--bg);
   border-top: 1px solid var(--border);
   display: flex;
   gap: 8px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 .input-area textarea {
   flex: 1;
-  background: var(--bg-input);
+  background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 14px;
+  padding: 12px 14px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   resize: none;
   min-height: 44px;
   max-height: 120px;
   font-family: inherit;
   outline: none;
+  line-height: 1.4;
+}
+.input-area textarea:focus {
+  border-color: var(--accent);
 }
 .input-area button {
   background: var(--accent);
   border: none;
-  color: var(--bg);
-  padding: 0 18px;
-  border-radius: 12px;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .input-area button:disabled { opacity: 0.4; }
 .modal-bg {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.5);
   display: none;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 16px;
   z-index: 100;
 }
 .modal-bg.open { display: flex; }
 .modal {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
   width: 100%;
-  max-width: 480px;
-  max-height: 85vh;
+  max-width: 520px;
+  max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .modal-header {
-  padding: 16px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
 }
-.modal-header h3 { color: var(--accent); font-size: 16px; }
+.modal-header h3 { color: var(--accent); font-size: 17px; font-weight: 700; }
 .modal-header button {
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  font-size: 22px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 18px;
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
 }
-.modal-body { padding: 16px; }
-.field { margin-bottom: 16px; }
+.modal-body { padding: 20px; }
+.field { margin-bottom: 18px; }
 .field label {
   display: block;
   font-size: 12px;
   color: var(--text-dim);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 600;
 }
 .field input, .field textarea {
   width: 100%;
-  background: var(--bg-input);
+  background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 10px;
+  padding: 12px 14px;
   color: var(--text);
-  font-size: 13px;
+  font-size: 15px;
   font-family: inherit;
   outline: none;
 }
-.field textarea { min-height: 120px; resize: vertical; }
+.field input:focus, .field textarea:focus {
+  border-color: var(--accent);
+}
+.field textarea { min-height: 140px; resize: vertical; }
 .save-btn {
   width: 100%;
   background: var(--accent);
   border: none;
-  color: var(--bg);
-  padding: 12px;
-  border-radius: 8px;
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
 }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="topbar">
-    <h1>Hope</h1>
+    <h1>VL</h1>
     <select id="modelSelect">
       <option value="openai/gpt-4o-2024-11-20">GPT-4o (Nov 2024)</option>
       <option value="openai/gpt-4.1">GPT-4.1</option>
@@ -221,14 +266,14 @@ html, body {
 
   <div class="chat-area" id="chatArea">
     <div class="welcome">
-      <h2>Hope</h2>
-      <p>Schreib einfach los.</p>
+      <h2>VL</h2>
+      <p>Moni, schön dass du da bist</p>
     </div>
   </div>
 
   <div class="input-area">
     <textarea id="input" placeholder="Schreib hier..." rows="1"></textarea>
-    <button id="sendBtn" onclick="sendMessage()">Senden</button>
+    <button id="sendBtn" onclick="sendMessage()">➤</button>
   </div>
 </div>
 
@@ -256,15 +301,15 @@ html, body {
 let messages = [];
 
 function loadSettings() {
-  const apiKey = localStorage.getItem('hope_api_key') || '';
-  const systemPrompt = localStorage.getItem('hope_system_prompt') || '';
+  const apiKey = localStorage.getItem('vl_api_key') || '';
+  const systemPrompt = localStorage.getItem('vl_system_prompt') || '';
   document.getElementById('apiKey').value = apiKey;
   document.getElementById('systemPrompt').value = systemPrompt;
 }
 
 function saveSettings() {
-  localStorage.setItem('hope_api_key', document.getElementById('apiKey').value);
-  localStorage.setItem('hope_system_prompt', document.getElementById('systemPrompt').value);
+  localStorage.setItem('vl_api_key', document.getElementById('apiKey').value);
+  localStorage.setItem('vl_system_prompt', document.getElementById('systemPrompt').value);
   closeSettings();
   alert('Gespeichert ✓');
 }
@@ -298,18 +343,19 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
   
-  const apiKey = localStorage.getItem('hope_api_key');
+  const apiKey = localStorage.getItem('vl_api_key');
   if (!apiKey) {
     alert('Bitte zuerst den API-Schlüssel in den Einstellungen eingeben.');
     return;
   }
   
-  const systemPrompt = localStorage.getItem('hope_system_prompt') || '';
+  const systemPrompt = localStorage.getItem('vl_system_prompt') || '';
   const model = document.getElementById('modelSelect').value;
   
   addMessage('user', text);
   messages.push({ role: 'user', content: text });
   input.value = '';
+  input.style.height = 'auto';
   
   const sendBtn = document.getElementById('sendBtn');
   sendBtn.disabled = true;
@@ -345,11 +391,16 @@ async function sendMessage() {
     addMessage('assistant', 'Verbindungsfehler: ' + e.message);
   } finally {
     sendBtn.disabled = false;
-    sendBtn.textContent = 'Senden';
+    sendBtn.textContent = '➤';
   }
 }
 
-document.getElementById('input').addEventListener('keydown', function(e) {
+const inputEl = document.getElementById('input');
+inputEl.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+inputEl.addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
