@@ -12,10 +12,10 @@
   --bg-input: #ffffff;
   --text: #1a1a1a;
   --text-dim: #6e6e80;
-  --accent: #d92d20;
-  --accent-soft: #fef3f2;
+  --accent: #e63946;
+  --accent-soft: #fef2f3;
   --border: #e5e5e7;
-  --user-bubble: #fef3f2;
+  --user-bubble: #fef2f3;
   --ai-bubble: #f7f7f8;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -77,27 +77,6 @@ html, body {
   padding: 16px;
   -webkit-overflow-scrolling: touch;
 }
-.welcome {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  color: var(--text-dim);
-  padding: 24px;
-}
-.welcome h2 {
-  color: var(--accent);
-  font-size: 56px;
-  font-weight: 800;
-  margin-bottom: 14px;
-  letter-spacing: -2px;
-}
-.welcome p {
-  font-size: 16px;
-  color: var(--text-dim);
-}
 .message {
   margin-bottom: 14px;
   display: flex;
@@ -125,6 +104,23 @@ html, body {
   border: 1px solid var(--border);
   border-bottom-left-radius: 4px;
   color: var(--text);
+}
+.speak-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 18px;
+  padding: 6px 8px;
+  margin-top: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+.speak-btn:active {
+  background: var(--bg-soft);
+}
+.speak-btn.speaking {
+  color: var(--accent);
 }
 .input-area {
   padding: 10px 12px;
@@ -264,12 +260,7 @@ html, body {
     <button class="settings-btn" onclick="openSettings()">⚙</button>
   </div>
 
-  <div class="chat-area" id="chatArea">
-    <div class="welcome">
-      <h2>VL</h2>
-      <p>Moni, schön dass du da bist</p>
-    </div>
-  </div>
+  <div class="chat-area" id="chatArea"></div>
 
   <div class="input-area">
     <textarea id="input" placeholder="Schreib hier..." rows="1"></textarea>
@@ -299,6 +290,7 @@ html, body {
 
 <script>
 let messages = [];
+let currentSpeakBtn = null;
 
 function loadSettings() {
   const apiKey = localStorage.getItem('vl_api_key') || '';
@@ -323,10 +315,43 @@ function closeSettings() {
   document.getElementById('settingsModal').classList.remove('open');
 }
 
+function speakText(text, btn) {
+  if (currentSpeakBtn === btn && speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    btn.classList.remove('speaking');
+    btn.textContent = '🔊';
+    currentSpeakBtn = null;
+    return;
+  }
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    if (currentSpeakBtn) {
+      currentSpeakBtn.classList.remove('speaking');
+      currentSpeakBtn.textContent = '🔊';
+    }
+  }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'de-DE';
+  utter.rate = 1.0;
+  utter.pitch = 1.0;
+  utter.onend = () => {
+    btn.classList.remove('speaking');
+    btn.textContent = '🔊';
+    currentSpeakBtn = null;
+  };
+  utter.onerror = () => {
+    btn.classList.remove('speaking');
+    btn.textContent = '🔊';
+    currentSpeakBtn = null;
+  };
+  btn.classList.add('speaking');
+  btn.textContent = '⏸';
+  currentSpeakBtn = btn;
+  speechSynthesis.speak(utter);
+}
+
 function addMessage(role, text) {
   const chatArea = document.getElementById('chatArea');
-  const welcome = chatArea.querySelector('.welcome');
-  if (welcome) welcome.remove();
   
   const msg = document.createElement('div');
   msg.className = 'message ' + role;
@@ -334,6 +359,15 @@ function addMessage(role, text) {
   bubble.className = 'bubble';
   bubble.textContent = text;
   msg.appendChild(bubble);
+  
+  if (role === 'assistant') {
+    const speakBtn = document.createElement('button');
+    speakBtn.className = 'speak-btn';
+    speakBtn.textContent = '🔊';
+    speakBtn.onclick = () => speakText(text, speakBtn);
+    msg.appendChild(speakBtn);
+  }
+  
   chatArea.appendChild(msg);
   chatArea.scrollTop = chatArea.scrollHeight;
 }
