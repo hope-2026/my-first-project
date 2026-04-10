@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hope Chat</title>
+<style>
+:root {
+  --bg: #0f0f15;
+  --bg-soft: #1a1a26;
+  --bg-input: #22222e;
+  --text: #e8e6e3;
+  --text-dim: #8a8a9a;
+  --accent: #c79553;
+  --border: #2a2a3a;
+  --user-bubble: #1e2a3a;
+  --ai-bubble: #16161f;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.topbar {
+  padding: 12px 16px;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar h1 {
+  font-size: 16px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.topbar select {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+}
+.settings-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: var(--text-dim);
+}
+.welcome h2 {
+  color: var(--accent);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+.message {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+}
+.message.user { align-items: flex-end; }
+.message.assistant { align-items: flex-start; }
+.bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.message.user .bubble {
+  background: var(--user-bubble);
+  border-bottom-right-radius: 4px;
+}
+.message.assistant .bubble {
+  background: var(--ai-bubble);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.input-area {
+  padding: 12px 16px;
+  background: var(--bg-soft);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+.input-area textarea {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text);
+  font-size: 14px;
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  font-family: inherit;
+  outline: none;
+}
+.input-area button {
+  background: var(--accent);
+  border: none;
+  color: var(--bg);
+  padding: 0 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+.input-area button:disabled { opacity: 0.4; }
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h3 { color: var(--accent); font-size: 16px; }
+.modal-header button {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 22px;
+  cursor: pointer;
+}
+.modal-body { padding: 16px; }
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field input, .field textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+.field textarea { min-height: 120px; resize: vertical; }
+.save-btn {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  color: var(--bg);
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <h1>Hope</h1>
+    <select id="modelSelect">
+      <option value="openai/gpt-4o-2024-11-20">GPT-4o (Nov 2024)</option>
+      <option value="openai/gpt-4.1">GPT-4.1</option>
+      <option value="qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B</option>
+      <option value="deepseek/deepseek-chat">DeepSeek Chat</option>
+    </select>
+    <button class="settings-btn" onclick="openSettings()">⚙</button>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="welcome">
+      <h2>Hope</h2>
+      <p>Schreib einfach los.</p>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <textarea id="input" placeholder="Schreib hier..." rows="1"></textarea>
+    <button id="sendBtn" onclick="sendMessage()">Senden</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Einstellungen</h3>
+      <button onclick="closeSettings()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>OpenRouter API-Schlüssel</label>
+        <input type="password" id="apiKey" placeholder="sk-or-v1-...">
+      </div>
+      <div class="field">
+        <label>System-Prompt</label>
+        <textarea id="systemPrompt" placeholder="Hier deinen Prompt einfügen..."></textarea>
+      </div>
+      <button class="save-btn" onclick="saveSettings()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let messages = [];
+
+function loadSettings() {
+  const apiKey = localStorage.getItem('hope_api_key') || '';
+  const systemPrompt = localStorage.getItem('hope_system_prompt') || '';
+  document.getElementById('apiKey').value = apiKey;
+  document.getElementById('systemPrompt').value = systemPrompt;
+}
+
+function saveSettings() {
+  localStorage.setItem('hope_api_key', document.getElementById('apiKey').value);
+  localStorage.setItem('hope_system_prompt', document.getElementById('systemPrompt').value);
+  closeSettings();
+  alert('Gespeichert ✓');
+}
+
+function openSettings() {
+  loadSettings();
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function addMessage(role, text) {
+  const chatArea = document.getElementById('chatArea');
+  const welcome = chatArea.querySelector('.welcome');
+  if (welcome) welcome.remove();
+  
+  const msg = document.createElement('div');
+  msg.className = 'message ' + role;
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  msg.appendChild(bubble);
+  chatArea.appendChild(msg);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  const apiKey = localStorage.getItem('hope_api_key');
+  if (!apiKey) {
+    alert('Bitte zuerst den API-Schlüssel in den Einstellungen eingeben.');
+    return;
+  }
+  
+  const systemPrompt = localStorage.getItem('hope_system_prompt') || '';
+  const model = document.getElementById('modelSelect').value;
+  
+  addMessage('user', text);
+  messages.push({ role: 'user', content: text });
+  input.value = '';
+  
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = true;
+  sendBtn.textContent = '...';
+  
+  try {
+    const apiMessages = [];
+    if (systemPrompt) apiMessages.push({ role: 'system', content: systemPrompt });
+    apiMessages.push(...messages);
+    
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey,
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: apiMessages,
+      }),
+    });
+    
+    const data = await response.json();
+    
+    if (data.error) {
+      addMessage('assistant', 'Fehler: ' + data.error.message);
+    } else {
+      const reply = data.choices[0].message.content;
+      addMessage('assistant', reply);
+      messages.push({ role: 'assistant', content: reply });
+    }
+  } catch (e) {
+    addMessage('assistant', 'Verbindungsfehler: ' + e.message);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Senden';
+  }
+}
+
+document.getElementById('input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+</script>
+</body>
+</html>
