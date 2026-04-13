@@ -69,6 +69,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .msg-action { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
 .msg-action:hover { background: var(--bg-soft); color: var(--text); }
 .msg-action.speaking { color: var(--accent); }
+.msg-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; align-self: flex-start; }
+.message.user .msg-time { align-self: flex-end; }
 
 .typing { display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--text-dim); font-size: 14px; }
 .typing-dots { display: flex; gap: 4px; }
@@ -137,8 +139,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <option value="openai/gpt-5.1-chat">GPT-5.1 Chat</option>
       </optgroup>
       <optgroup label="Anthropic">
-        <option value="anthropic/claude-opus-4.6">Claude Opus 4.6</option>
         <option value="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</option>
+        <option value="anthropic/claude-haiku-4-5">Claude Haiku 4.5</option>
+      </optgroup>
+      <optgroup label="xAI">
+        <option value="x-ai/grok-4">Grok 4</option>
+        <option value="x-ai/grok-3-mini">Grok 3 Mini</option>
       </optgroup>
       <optgroup label="Andere">
         <option value="deepseek/deepseek-v3.2">DeepSeek V3.2</option>
@@ -246,6 +252,12 @@ function renderChatList() {
   });
 }
 
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+}
+
 function renderMessages() {
   const area = document.getElementById('chatArea');
   const chat = getActiveChat();
@@ -254,31 +266,90 @@ function renderMessages() {
     return;
   }
   area.innerHTML = '';
-  chat.messages.forEach(msg => {
+  chat.messages.forEach((msg, i) => {
     const div = document.createElement('div');
     div.className = 'message ' + msg.role;
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = msg.content;
     div.appendChild(bubble);
+    if (msg.time) {
+      const timeEl = document.createElement('span');
+      timeEl.className = 'msg-time';
+      timeEl.textContent = formatTime(msg.time);
+      div.appendChild(timeEl);
+    }
     const actions = document.createElement('div');
     actions.className = 'msg-actions';
     const copyBtn = document.createElement('button');
     copyBtn.className = 'msg-action';
+    copyBtn.title = 'Kopieren';
     copyBtn.innerHTML = '📋';
     copyBtn.onclick = () => copyText(msg.content);
     actions.appendChild(copyBtn);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'msg-action';
+    delBtn.title = 'Nachricht löschen';
+    delBtn.innerHTML = '🗑️';
+    delBtn.onclick = () => deleteMessage(i);
+    actions.appendChild(delBtn);
     if (msg.role === 'assistant') {
       const speakBtn = document.createElement('button');
       speakBtn.className = 'msg-action';
+      speakBtn.title = 'Vorlesen';
       speakBtn.innerHTML = '🔊';
       speakBtn.onclick = () => speakText(msg.content, speakBtn);
       actions.appendChild(speakBtn);
+      const regenBtn = document.createElement('button');
+      regenBtn.className = 'msg-action';
+      regenBtn.title = 'Neu generieren';
+      regenBtn.innerHTML = '🔄';
+      regenBtn.onclick = () => regenerateMessage(i);
+      actions.appendChild(regenBtn);
+    }
+    if (msg.role === 'user') {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'msg-action';
+      editBtn.title = 'Nachricht bearbeiten';
+      editBtn.innerHTML = '✏️';
+      editBtn.onclick = () => editMessage(i);
+      actions.appendChild(editBtn);
     }
     div.appendChild(actions);
     area.appendChild(div);
   });
   area.scrollTop = area.scrollHeight;
+}
+
+function deleteMessage(i) {
+  const chat = getActiveChat();
+  if (!chat) return;
+  chat.messages.splice(i, 1);
+  chat.updatedAt = Date.now();
+  saveState(); renderMessages(); renderChatList();
+}
+
+function editMessage(i) {
+  if (isStreaming) return;
+  const chat = getActiveChat();
+  if (!chat) return;
+  const content = chat.messages[i].content;
+  chat.messages = chat.messages.slice(0, i);
+  chat.updatedAt = Date.now();
+  saveState(); renderMessages();
+  const input = document.getElementById('inputField');
+  input.value = content;
+  autoResize(input); updateSendBtn(); input.focus();
+}
+
+async function regenerateMessage(i) {
+  if (isStreaming) return;
+  const chat = getActiveChat();
+  if (!chat) return;
+  chat.messages = chat.messages.slice(0, i);
+  chat.updatedAt = Date.now();
+  saveState(); renderMessages();
+  await callAPI();
 }
 
 function showTyping() {
@@ -303,11 +374,19 @@ async function sendMessage() {
   const chat = getActiveChat();
   if (!chat) return;
   chat.messages.push({ role: 'user', content: text, time: Date.now() });
-  if (chat.messages.length === 1) chat.title = text.slice(0, 40) + (text.length > 40 ? '...' : '');
+  if (chat.messages.filter(m => m.role === 'user').length === 1) chat.title = text.slice(0, 40) + (text.length > 40 ? '...' : '');
   chat.model = document.getElementById('modelSelect').value;
   chat.updatedAt = Date.now();
   input.value = ''; autoResize(input); updateSendBtn();
   saveState(); renderMessages(); renderChatList();
+  await callAPI();
+}
+
+async function callAPI() {
+  const apiKey = localStorage.getItem('gpt_api_key');
+  if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); openSettings(); return; }
+  const chat = getActiveChat();
+  if (!chat) return;
   showTyping(); isStreaming = true; updateSendBtn();
   try {
     const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
