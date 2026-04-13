@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -366,10 +367,20 @@ function loadAll() {
     if (raw) chats = JSON.parse(raw);
   } catch(e) {}
   activeChatId = localStorage.getItem('vl_active_chat') || null;
-  if (!chats.length) newChat();
-  else if (!chats.find(c => c.id === activeChatId)) activeChatId = chats[0].id;
-  renderChatList();
-  renderMessages();
+  if (!chats.length) {
+    newChat();
+  } else {
+    if (!chats.find(c => c.id === activeChatId)) {
+      activeChatId = chats[0].id;
+    }
+    // FIX: Modell-Dropdown beim Laden richtig setzen
+    const chat = getActiveChat();
+    if (chat && chat.model) {
+      document.getElementById('modelSelect').value = chat.model;
+    }
+    renderChatList();
+    renderMessages();
+  }
 }
 
 function saveAll() {
@@ -379,7 +390,8 @@ function saveAll() {
 
 function newChat() {
   const id = 'c_' + Date.now();
-  chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, created: Date.now() });
+  const selectedModel = document.getElementById('modelSelect').value;
+  chats.unshift({ id, title: 'Neuer Chat', messages: [], model: selectedModel, created: Date.now() });
   activeChatId = id;
   saveAll();
   renderChatList();
@@ -402,7 +414,9 @@ function saveCurrentChat() {
 function switchChat(id) {
   activeChatId = id;
   const chat = getActiveChat();
-  if (chat && chat.model) document.getElementById('modelSelect').value = chat.model;
+  if (chat && chat.model) {
+    document.getElementById('modelSelect').value = chat.model;
+  }
   saveAll();
   renderChatList();
   renderMessages();
@@ -414,8 +428,17 @@ function deleteChat(id, e) {
   if (!confirm('Diesen Chat löschen?')) return;
   chats = chats.filter(c => c.id !== id);
   if (activeChatId === id) {
-    if (chats.length) activeChatId = chats[0].id;
-    else newChat();
+    if (chats.length) {
+      activeChatId = chats[0].id;
+      // FIX: Nach dem Löschen auch das Modell aktualisieren
+      const chat = getActiveChat();
+      if (chat && chat.model) {
+        document.getElementById('modelSelect').value = chat.model;
+      }
+    } else {
+      newChat();
+      return;
+    }
   }
   saveAll();
   renderChatList();
@@ -577,6 +600,9 @@ async function sendMessage() {
   const systemPrompt = localStorage.getItem('vl_system_prompt') || '';
   const model = document.getElementById('modelSelect').value;
   
+  // FIX: Sicherstellen, dass das Modell im Chat gespeichert wird
+  chat.model = model;
+  
   const userMsg = { role: 'user', content: text, time: Date.now() };
   chat.messages.push(userMsg);
   appendMessageDOM('user', text, userMsg.time);
@@ -636,5 +662,6 @@ inputEl.addEventListener('keydown', function(e) {
 
 loadAll();
 </script>
+
 </body>
 </html>
