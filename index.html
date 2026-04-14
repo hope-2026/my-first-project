@@ -56,8 +56,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .chat-area { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
 .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--text-muted); }
-.welcome-logo { font-size: 42px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
-.welcome-sub { font-size: 15px; line-height: 1.5; }
+.welcome-logo { font-size: 48px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+.welcome-sub { font-size: 15px; line-height: 1.6; }
 
 .message { margin-bottom: 16px; display: flex; flex-direction: column; animation: fadeIn 0.25s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -166,6 +166,15 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .backup-btn:hover { background: var(--bg-input); }
 .danger-btn { width: 100%; background: none; border: 1px solid var(--danger); color: var(--danger); padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; }
 .danger-btn:hover { background: var(--danger); color: white; }
+.add-memory-btn { background: var(--accent); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 8px; }
+.memory-item { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+.memory-item-header { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.memory-item-header input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px; }
+.memory-item-header select { background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px; }
+.memory-item-header button { background: none; border: none; color: var(--danger); font-size: 18px; cursor: pointer; padding: 4px; }
+.memory-item textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px; min-height: 60px; resize: vertical; font-family: inherit; }
+.checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.checkbox-label input { width: 18px; height: 18px; accent-color: var(--accent); }
 .test-voice-btn { background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; }
 .test-voice-btn:hover { background: var(--bg-input); }
 .save-btn { width: 100%; background: var(--accent); border: none; color: white; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; }
@@ -182,7 +191,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 <div class="app">
   <div class="topbar">
     <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <span class="topbar-title">GPT</span>
     <select class="model-select" id="modelSelect" onchange="saveCurrentChat()">
       <optgroup label="OpenAI">
         <option value="openai/gpt-4o-2024-11-20">GPT-4o (Nov 2024)</option>
@@ -207,12 +215,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button class="chat-options-btn" onclick="toggleChatOptions(event)">⋯</button>
     <div class="chat-options-popup" id="chatOptionsPopup">
       <div class="chat-menu-item" onclick="shareCurrentChat()">Teilen</div>
-      <div class="chat-menu-item" onclick="exportCurrentChat()">Exportieren</div>
+      <div class="chat-menu-item" onclick="exportCurrentChatMarkdown()">📄 Markdown exportieren</div>
+      <div class="chat-menu-item" onclick="exportCurrentChat()">📁 JSON exportieren</div>
       <div class="chat-menu-item danger" onclick="deleteCurrentChat()">Chat löschen</div>
     </div>
   </div>
   <div class="chat-area" id="chatArea">
-    <div class="welcome"><div class="welcome-logo">GPT</div><div class="welcome-sub">Wähle ein Modell und starte<br>eine Unterhaltung.</div></div>
+    <div class="welcome"><div class="welcome-logo">MM</div><div class="welcome-sub">Dein persönlicher Chat.<br>Wähle ein Modell und leg los.</div></div>
   </div>
   <div class="input-area">
     <div class="edit-banner" id="editBanner">
@@ -240,6 +249,24 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="modal-body">
       <div class="field"><label>OpenRouter API-Schlüssel</label><input type="password" id="apiKeyInput" placeholder="sk-or-v1-..."></div>
       <div class="field"><label>System-Prompt</label><textarea id="systemPromptInput" placeholder="Definiere die Persönlichkeit der KI..."></textarea></div>
+      
+      <!-- Personalisierung (einklappbar) -->
+      <div class="settings-section collapsible">
+        <div class="settings-section-header" onclick="toggleSection(this)">
+          <span class="settings-section-title">Personalisierung</span>
+          <span class="collapse-icon">▼</span>
+        </div>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>Dein Name</label>
+            <input type="text" id="userNameInput" placeholder="z.B. Moni">
+          </div>
+          <div class="field">
+            <label>Name der KI</label>
+            <input type="text" id="aiNameInput" placeholder="z.B. Tatjana">
+          </div>
+        </div>
+      </div>
       
       <!-- Sampling-Parameter (einklappbar) -->
       <div class="settings-section collapsible">
@@ -292,14 +319,34 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         </div>
         <div class="settings-section-content">
           <div class="field">
-            <label>Erinnerungen</label>
-            <textarea id="memoriesInput" placeholder="Wichtige Infos über dich, z.B.:&#10;- Mein Name ist...&#10;- Ich mag...&#10;- Wichtige Projekte..."></textarea>
-            <div class="field-hint">Diese Infos werden bei jeder Nachricht mitgeschickt</div>
+            <label>Angeheftete Erinnerungen</label>
+            <textarea id="pinnedMemoriesInput" placeholder="Diese Infos werden IMMER mitgeschickt:&#10;- Mein Name ist...&#10;- Sprich mich mit Du an..."></textarea>
+            <div class="field-hint">Werden bei JEDER Nachricht eingefügt (max. 600 Token empfohlen)</div>
           </div>
+          
+          <div class="field">
+            <label>Keyword-Erinnerungen <button class="add-memory-btn" onclick="addMemoryField()">+ Hinzufügen</button></label>
+            <div id="keywordMemoriesList"></div>
+            <div class="field-hint">Werden nur eingefügt wenn Schlüsselwörter in der Nachricht vorkommen (max. 3 gleichzeitig)</div>
+          </div>
+          
+          <div class="field">
+            <label>Max. gleichzeitige Erinnerungen: <span id="maxMemValue">3</span></label>
+            <input type="range" id="maxMemoriesInput" min="1" max="5" step="1" value="3" oninput="document.getElementById('maxMemValue').textContent=this.value">
+          </div>
+          
           <div class="field">
             <label>Max. Kontext-Nachrichten: <span id="contextValue">10</span></label>
             <input type="range" id="contextMessagesInput" min="2" max="30" step="1" value="10" oninput="document.getElementById('contextValue').textContent=this.value">
             <div class="field-hint">Wie viele vorherige Nachrichten mitgeschickt werden</div>
+          </div>
+          
+          <div class="field">
+            <label class="checkbox-label">
+              <input type="checkbox" id="autoSummarizeInput">
+              Automatische Kontextzusammenfassung
+            </label>
+            <div class="field-hint">Ältere Nachrichten werden zusammengefasst um Tokens zu sparen</div>
           </div>
         </div>
       </div>
@@ -364,12 +411,22 @@ let pendingAttachments = [];
 
 function init() {
   loadState();
+  loadKeywordMemoriesOnStart();
   if (!chats.length) newChat();
   else {
     if (!chats.find(c => c.id === activeChatId)) activeChatId = chats[0].id;
     const chat = getActiveChat();
     if (chat?.model) document.getElementById('modelSelect').value = chat.model;
     renderChatList(); renderMessages();
+  }
+}
+
+function loadKeywordMemoriesOnStart() {
+  try {
+    const saved = localStorage.getItem('gpt_keyword_memories');
+    keywordMemories = saved ? JSON.parse(saved) : [];
+  } catch(e) {
+    keywordMemories = [];
   }
 }
 
@@ -482,6 +539,32 @@ function exportCurrentChat() {
   a.click();
   URL.revokeObjectURL(url);
   showToast('Chat exportiert');
+}
+
+function exportCurrentChatMarkdown() {
+  closeChatOptions();
+  const chat = getActiveChat();
+  if (!chat) return;
+  
+  const userName = localStorage.getItem('gpt_user_name') || 'Ich';
+  const aiName = localStorage.getItem('gpt_ai_name') || 'KI';
+  
+  let markdown = `# ${chat.title}\n\n`;
+  markdown += `*Exportiert am ${new Date().toLocaleDateString('de-DE')}*\n\n---\n\n`;
+  
+  chat.messages.forEach(m => {
+    const name = m.role === 'user' ? userName : aiName;
+    markdown += `**${name}:**\n${m.content}\n\n`;
+  });
+  
+  const blob = new Blob([markdown], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (chat.title || 'chat') + '.md';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Markdown exportiert');
 }
 
 function deleteCurrentChat() {
@@ -823,7 +906,7 @@ async function regenerateMessage(idx) {
   showTyping(); isStreaming = true; updateSendBtn();
   try {
     const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
-    const memories = localStorage.getItem('gpt_memories') || '';
+    const pinnedMemories = localStorage.getItem('gpt_pinned_memories') || '';
     const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
     const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
     const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
@@ -835,11 +918,26 @@ async function regenerateMessage(idx) {
     
     const apiMessages = [];
     
-    // System-Prompt mit Memory kombinieren
+    // System-Prompt aufbauen
     let fullSystemPrompt = systemPrompt;
-    if (memories.trim()) {
-      fullSystemPrompt += '\n\n--- Erinnerungen über den Nutzer ---\n' + memories;
+    
+    // Angeheftete Erinnerungen
+    if (pinnedMemories.trim()) {
+      fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
     }
+    
+    // Keyword-Erinnerungen
+    const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
+    if (lastUserMsg) {
+      const matchingMemories = getMatchingMemories(lastUserMsg.content);
+      if (matchingMemories.length > 0) {
+        fullSystemPrompt += '\n\n--- Relevante Erinnerungen ---\n';
+        matchingMemories.forEach(mem => {
+          fullSystemPrompt += mem.content + '\n';
+        });
+      }
+    }
+    
     if (fullSystemPrompt) {
       apiMessages.push({ role: 'system', content: fullSystemPrompt });
     }
@@ -933,8 +1031,9 @@ async function sendMessage() {
   
   try {
     const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
-    const memories = localStorage.getItem('gpt_memories') || '';
+    const pinnedMemories = localStorage.getItem('gpt_pinned_memories') || '';
     const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
+    const autoSummarize = localStorage.getItem('gpt_auto_summarize') === 'true';
     const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
     const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
     const topK = parseInt(localStorage.getItem('gpt_top_k')) || 0;
@@ -945,17 +1044,38 @@ async function sendMessage() {
     
     const apiMessages = [];
     
-    // System-Prompt mit Memory kombinieren
+    // System-Prompt aufbauen
     let fullSystemPrompt = systemPrompt;
-    if (memories.trim()) {
-      fullSystemPrompt += '\n\n--- Erinnerungen über den Nutzer ---\n' + memories;
+    
+    // Angeheftete Erinnerungen (werden IMMER eingefügt)
+    if (pinnedMemories.trim()) {
+      fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
     }
+    
+    // Keyword-Erinnerungen (nur wenn Schlüsselwort matcht)
+    const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
+    if (lastUserMsg) {
+      const matchingMemories = getMatchingMemories(lastUserMsg.content);
+      if (matchingMemories.length > 0) {
+        fullSystemPrompt += '\n\n--- Relevante Erinnerungen ---\n';
+        matchingMemories.forEach(mem => {
+          fullSystemPrompt += mem.content + '\n';
+        });
+      }
+    }
+    
     if (fullSystemPrompt) {
       apiMessages.push({ role: 'system', content: fullSystemPrompt });
     }
     
-    // Nur die letzten X Nachrichten senden (Kontext-Limit)
-    const recentMessages = chat.messages.slice(-maxContext);
+    // Automatische Zusammenfassung wenn aktiviert und viele Nachrichten
+    let recentMessages = chat.messages.slice(-maxContext);
+    if (autoSummarize && chat.messages.length > maxContext + 4) {
+      const summary = await summarizeOldMessages(chat.messages.slice(0, -maxContext), apiKey, chat.model);
+      if (summary) {
+        apiMessages.push({ role: 'system', content: '--- Zusammenfassung des bisherigen Gesprächs ---\n' + summary });
+      }
+    }
     
     // Nachrichten für API aufbereiten
     recentMessages.forEach(m => {
@@ -1121,6 +1241,10 @@ function openSettings() {
   document.getElementById('apiKeyInput').value = localStorage.getItem('gpt_api_key') || ''; 
   document.getElementById('systemPromptInput').value = localStorage.getItem('gpt_system_prompt') || ''; 
   
+  // Namen laden
+  document.getElementById('userNameInput').value = localStorage.getItem('gpt_user_name') || '';
+  document.getElementById('aiNameInput').value = localStorage.getItem('gpt_ai_name') || '';
+  
   // Sampling-Parameter laden
   document.getElementById('temperatureInput').value = localStorage.getItem('gpt_temperature') || 0.7;
   document.getElementById('tempValue').textContent = localStorage.getItem('gpt_temperature') || 0.7;
@@ -1137,9 +1261,13 @@ function openSettings() {
   document.getElementById('maxTokensInput').value = localStorage.getItem('gpt_max_tokens') || 4096;
   
   // Memory laden
-  document.getElementById('memoriesInput').value = localStorage.getItem('gpt_memories') || '';
+  document.getElementById('pinnedMemoriesInput').value = localStorage.getItem('gpt_pinned_memories') || '';
+  loadKeywordMemories();
+  document.getElementById('maxMemoriesInput').value = localStorage.getItem('gpt_max_memories') || 3;
+  document.getElementById('maxMemValue').textContent = localStorage.getItem('gpt_max_memories') || 3;
   document.getElementById('contextMessagesInput').value = localStorage.getItem('gpt_context_messages') || 10;
   document.getElementById('contextValue').textContent = localStorage.getItem('gpt_context_messages') || 10;
+  document.getElementById('autoSummarizeInput').checked = localStorage.getItem('gpt_auto_summarize') === 'true';
   
   // Voice-Einstellungen laden
   loadVoiceSettings();
@@ -1156,6 +1284,10 @@ function saveSettings() {
   localStorage.setItem('gpt_api_key', document.getElementById('apiKeyInput').value.trim()); 
   localStorage.setItem('gpt_system_prompt', document.getElementById('systemPromptInput').value); 
   
+  // Namen speichern
+  localStorage.setItem('gpt_user_name', document.getElementById('userNameInput').value.trim());
+  localStorage.setItem('gpt_ai_name', document.getElementById('aiNameInput').value.trim());
+  
   // Sampling-Parameter speichern
   localStorage.setItem('gpt_temperature', document.getElementById('temperatureInput').value);
   localStorage.setItem('gpt_top_p', document.getElementById('topPInput').value);
@@ -1166,8 +1298,11 @@ function saveSettings() {
   localStorage.setItem('gpt_max_tokens', document.getElementById('maxTokensInput').value);
   
   // Memory speichern
-  localStorage.setItem('gpt_memories', document.getElementById('memoriesInput').value);
+  localStorage.setItem('gpt_pinned_memories', document.getElementById('pinnedMemoriesInput').value);
+  saveKeywordMemories();
+  localStorage.setItem('gpt_max_memories', document.getElementById('maxMemoriesInput').value);
   localStorage.setItem('gpt_context_messages', document.getElementById('contextMessagesInput').value);
+  localStorage.setItem('gpt_auto_summarize', document.getElementById('autoSummarizeInput').checked);
   
   // Voice-Einstellungen speichern
   localStorage.setItem('gpt_voice', document.getElementById('voiceSelect').value);
@@ -1251,6 +1386,118 @@ function deleteAllChats() {
   saveState();
   newChat();
   showToast('Alle Chats gelöscht');
+}
+
+// === KEYWORD-MEMORY-SYSTEM ===
+
+let keywordMemories = [];
+
+function loadKeywordMemories() {
+  try {
+    const saved = localStorage.getItem('gpt_keyword_memories');
+    keywordMemories = saved ? JSON.parse(saved) : [];
+  } catch(e) {
+    keywordMemories = [];
+  }
+  renderMemoryFields();
+}
+
+function saveKeywordMemories() {
+  // Sammle alle Memory-Felder
+  keywordMemories = [];
+  document.querySelectorAll('.memory-item').forEach(item => {
+    const keywords = item.querySelector('.memory-keywords').value.trim();
+    const content = item.querySelector('.memory-content').value.trim();
+    const priority = item.querySelector('.memory-priority').value;
+    if (keywords && content) {
+      keywordMemories.push({ keywords, content, priority });
+    }
+  });
+  localStorage.setItem('gpt_keyword_memories', JSON.stringify(keywordMemories));
+}
+
+function renderMemoryFields() {
+  const list = document.getElementById('keywordMemoriesList');
+  list.innerHTML = '';
+  keywordMemories.forEach((mem, idx) => {
+    list.appendChild(createMemoryField(mem, idx));
+  });
+}
+
+function createMemoryField(mem = {}, idx = null) {
+  const div = document.createElement('div');
+  div.className = 'memory-item';
+  div.innerHTML = `
+    <div class="memory-item-header">
+      <input type="text" class="memory-keywords" placeholder="Schlüsselwörter (kommagetrennt)" value="${escapeHtml(mem.keywords || '')}">
+      <select class="memory-priority">
+        <option value="high" ${mem.priority === 'high' ? 'selected' : ''}>Hoch</option>
+        <option value="medium" ${mem.priority === 'medium' || !mem.priority ? 'selected' : ''}>Mittel</option>
+        <option value="low" ${mem.priority === 'low' ? 'selected' : ''}>Niedrig</option>
+      </select>
+      <button onclick="this.closest('.memory-item').remove()">✕</button>
+    </div>
+    <textarea class="memory-content" placeholder="Erinnerungsinhalt...">${escapeHtml(mem.content || '')}</textarea>
+  `;
+  return div;
+}
+
+function addMemoryField() {
+  const list = document.getElementById('keywordMemoriesList');
+  list.appendChild(createMemoryField());
+}
+
+function getMatchingMemories(userMessage) {
+  const maxMemories = parseInt(localStorage.getItem('gpt_max_memories')) || 3;
+  const message = userMessage.toLowerCase();
+  
+  // Finde alle passenden Erinnerungen
+  const matches = [];
+  keywordMemories.forEach(mem => {
+    const keywords = mem.keywords.toLowerCase().split(',').map(k => k.trim());
+    const isMatch = keywords.some(kw => kw && message.includes(kw));
+    if (isMatch) {
+      matches.push(mem);
+    }
+  });
+  
+  // Sortiere nach Priorität
+  const priorityOrder = { high: 0, medium: 1, low: 2 };
+  matches.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+  
+  // Nur die ersten X zurückgeben
+  return matches.slice(0, maxMemories);
+}
+
+// === AUTOMATISCHE ZUSAMMENFASSUNG ===
+
+async function summarizeOldMessages(messages, apiKey, model) {
+  if (messages.length < 5) return null;
+  
+  const oldMessages = messages.slice(0, -4); // Alles außer die letzten 4
+  const textToSummarize = oldMessages.map(m => `${m.role === 'user' ? 'User' : 'KI'}: ${m.content}`).join('\n');
+  
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({
+        model: model,
+        messages: [{
+          role: 'user',
+          content: `Fasse dieses Gespräch in 2-3 Sätzen zusammen. Behalte wichtige Details und den emotionalen Kontext:\n\n${textToSummarize}`
+        }],
+        max_tokens: 200
+      })
+    });
+    const data = await response.json();
+    if (data.choices && data.choices[0]) {
+      return data.choices[0].message.content;
+    }
+  } catch(e) {
+    console.error('Zusammenfassung fehlgeschlagen:', e);
+  }
+  return null;
 }
 
 init();
