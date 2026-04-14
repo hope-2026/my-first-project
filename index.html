@@ -69,8 +69,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .msg-action { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
 .msg-action:hover { background: var(--bg-soft); color: var(--text); }
 .msg-action.speaking { color: var(--accent); }
-.msg-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; align-self: flex-start; }
-.message.user .msg-time { align-self: flex-end; }
+.msg-action.danger:hover { color: var(--danger); }
+.msg-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; padding: 0 4px; }
 
 .typing { display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--text-dim); font-size: 14px; }
 .typing-dots { display: flex; gap: 4px; }
@@ -140,11 +140,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       </optgroup>
       <optgroup label="Anthropic">
         <option value="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</option>
-        <option value="anthropic/claude-haiku-4-5">Claude Haiku 4.5</option>
       </optgroup>
       <optgroup label="xAI">
         <option value="x-ai/grok-4">Grok 4</option>
-        <option value="x-ai/grok-3-mini">Grok 3 Mini</option>
       </optgroup>
       <optgroup label="Andere">
         <option value="deepseek/deepseek-v3.2">DeepSeek V3.2</option>
@@ -252,12 +250,6 @@ function renderChatList() {
   });
 }
 
-function formatTime(ts) {
-  if (!ts) return '';
-  const d = new Date(ts);
-  return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
-}
-
 function renderMessages() {
   const area = document.getElementById('chatArea');
   const chat = getActiveChat();
@@ -266,90 +258,149 @@ function renderMessages() {
     return;
   }
   area.innerHTML = '';
-  chat.messages.forEach((msg, i) => {
+  chat.messages.forEach((msg, idx) => {
     const div = document.createElement('div');
     div.className = 'message ' + msg.role;
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = msg.content;
     div.appendChild(bubble);
-    if (msg.time) {
-      const timeEl = document.createElement('span');
-      timeEl.className = 'msg-time';
-      timeEl.textContent = formatTime(msg.time);
-      div.appendChild(timeEl);
-    }
+    
+    // Uhrzeit
+    const time = document.createElement('div');
+    time.className = 'msg-time';
+    time.textContent = formatTime(msg.time);
+    div.appendChild(time);
+    
+    // Actions
     const actions = document.createElement('div');
     actions.className = 'msg-actions';
+    
+    // Kopieren (für alle)
     const copyBtn = document.createElement('button');
     copyBtn.className = 'msg-action';
-    copyBtn.title = 'Kopieren';
     copyBtn.innerHTML = '📋';
+    copyBtn.title = 'Kopieren';
     copyBtn.onclick = () => copyText(msg.content);
     actions.appendChild(copyBtn);
-    const delBtn = document.createElement('button');
-    delBtn.className = 'msg-action';
-    delBtn.title = 'Nachricht löschen';
-    delBtn.innerHTML = '🗑️';
-    delBtn.onclick = () => deleteMessage(i);
-    actions.appendChild(delBtn);
+    
     if (msg.role === 'assistant') {
+      // Vorlesen
       const speakBtn = document.createElement('button');
       speakBtn.className = 'msg-action';
-      speakBtn.title = 'Vorlesen';
       speakBtn.innerHTML = '🔊';
+      speakBtn.title = 'Vorlesen';
       speakBtn.onclick = () => speakText(msg.content, speakBtn);
       actions.appendChild(speakBtn);
-      const regenBtn = document.createElement('button');
-      regenBtn.className = 'msg-action';
-      regenBtn.title = 'Neu generieren';
-      regenBtn.innerHTML = '🔄';
-      regenBtn.onclick = () => regenerateMessage(i);
-      actions.appendChild(regenBtn);
+      
+      // Neu generieren (nur letzte KI-Nachricht)
+      if (idx === chat.messages.length - 1) {
+        const regenBtn = document.createElement('button');
+        regenBtn.className = 'msg-action';
+        regenBtn.innerHTML = '🔄';
+        regenBtn.title = 'Neu generieren';
+        regenBtn.onclick = () => regenerateMessage(idx);
+        actions.appendChild(regenBtn);
+      }
     }
+    
     if (msg.role === 'user') {
+      // Bearbeiten
       const editBtn = document.createElement('button');
       editBtn.className = 'msg-action';
-      editBtn.title = 'Nachricht bearbeiten';
       editBtn.innerHTML = '✏️';
-      editBtn.onclick = () => editMessage(i);
+      editBtn.title = 'Bearbeiten';
+      editBtn.onclick = () => editMessage(idx);
       actions.appendChild(editBtn);
     }
+    
+    // Löschen (für alle)
+    const delBtn = document.createElement('button');
+    delBtn.className = 'msg-action danger';
+    delBtn.innerHTML = '🗑️';
+    delBtn.title = 'Löschen';
+    delBtn.onclick = () => deleteMessage(idx);
+    actions.appendChild(delBtn);
+    
     div.appendChild(actions);
     area.appendChild(div);
   });
   area.scrollTop = area.scrollHeight;
 }
 
-function deleteMessage(i) {
-  const chat = getActiveChat();
-  if (!chat) return;
-  chat.messages.splice(i, 1);
-  chat.updatedAt = Date.now();
-  saveState(); renderMessages(); renderChatList();
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  const now = new Date();
+  const isToday = d.toDateString() === now.toDateString();
+  const time = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  if (isToday) return 'Heute, ' + time;
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ', ' + time;
 }
 
-function editMessage(i) {
-  if (isStreaming) return;
+function deleteMessage(idx) {
   const chat = getActiveChat();
   if (!chat) return;
-  const content = chat.messages[i].content;
-  chat.messages = chat.messages.slice(0, i);
+  chat.messages.splice(idx, 1);
   chat.updatedAt = Date.now();
-  saveState(); renderMessages();
-  const input = document.getElementById('inputField');
-  input.value = content;
-  autoResize(input); updateSendBtn(); input.focus();
+  saveState();
+  renderMessages();
 }
 
-async function regenerateMessage(i) {
-  if (isStreaming) return;
+function editMessage(idx) {
   const chat = getActiveChat();
   if (!chat) return;
-  chat.messages = chat.messages.slice(0, i);
+  const msg = chat.messages[idx];
+  const newText = prompt('Nachricht bearbeiten:', msg.content);
+  if (newText !== null && newText.trim()) {
+    // Entferne alle Nachrichten ab dieser Position
+    chat.messages = chat.messages.slice(0, idx);
+    chat.updatedAt = Date.now();
+    saveState();
+    renderMessages();
+    // Setze den neuen Text ins Eingabefeld
+    document.getElementById('inputField').value = newText.trim();
+    autoResize(document.getElementById('inputField'));
+    updateSendBtn();
+    document.getElementById('inputField').focus();
+  }
+}
+
+async function regenerateMessage(idx) {
+  const chat = getActiveChat();
+  if (!chat || isStreaming) return;
+  // Entferne die letzte KI-Antwort
+  chat.messages.splice(idx, 1);
   chat.updatedAt = Date.now();
-  saveState(); renderMessages();
-  await callAPI();
+  saveState();
+  renderMessages();
+  
+  // Generiere neu
+  const apiKey = localStorage.getItem('gpt_api_key');
+  if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); return; }
+  
+  showTyping(); isStreaming = true; updateSendBtn();
+  try {
+    const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
+    const apiMessages = [];
+    if (systemPrompt) apiMessages.push({ role: 'system', content: systemPrompt });
+    chat.messages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({ model: chat.model, messages: apiMessages })
+    });
+    const data = await response.json();
+    hideTyping();
+    const reply = data.error ? 'Fehler: ' + data.error.message : data.choices[0].message.content;
+    chat.messages.push({ role: 'assistant', content: reply, time: Date.now() });
+    chat.updatedAt = Date.now();
+    saveState(); renderMessages();
+  } catch(e) {
+    hideTyping();
+    chat.messages.push({ role: 'assistant', content: 'Verbindungsfehler: ' + e.message, time: Date.now() });
+    saveState(); renderMessages();
+  } finally { isStreaming = false; updateSendBtn(); }
 }
 
 function showTyping() {
@@ -374,19 +425,11 @@ async function sendMessage() {
   const chat = getActiveChat();
   if (!chat) return;
   chat.messages.push({ role: 'user', content: text, time: Date.now() });
-  if (chat.messages.filter(m => m.role === 'user').length === 1) chat.title = text.slice(0, 40) + (text.length > 40 ? '...' : '');
+  if (chat.messages.length === 1) chat.title = text.slice(0, 40) + (text.length > 40 ? '...' : '');
   chat.model = document.getElementById('modelSelect').value;
   chat.updatedAt = Date.now();
   input.value = ''; autoResize(input); updateSendBtn();
   saveState(); renderMessages(); renderChatList();
-  await callAPI();
-}
-
-async function callAPI() {
-  const apiKey = localStorage.getItem('gpt_api_key');
-  if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); openSettings(); return; }
-  const chat = getActiveChat();
-  if (!chat) return;
   showTyping(); isStreaming = true; updateSendBtn();
   try {
     const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
@@ -457,4 +500,3 @@ function scrollToBottom() {
 </script>
 </body>
 </html>
-
