@@ -45,11 +45,14 @@
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
 .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
-.topbar { padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.topbar { padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; position: relative; }
 .menu-btn { background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; padding: 4px; }
 .topbar-title { font-size: 17px; font-weight: 700; color: var(--accent); }
 .model-select { flex: 1; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; cursor: pointer; }
 .settings-btn { background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer; padding: 4px; }
+.chat-options-btn { background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer; padding: 4px 8px; }
+.chat-options-popup { position: absolute; top: 100%; right: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); min-width: 160px; z-index: 100; display: none; overflow: hidden; }
+.chat-options-popup.open { display: block; }
 
 .chat-area { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
 .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--text-muted); }
@@ -91,9 +94,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .send-btn { background: var(--accent); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .send-btn svg { width: 22px; height: 22px; fill: white; }
-.edit-banner { display: none; padding: 8px 16px; background: var(--user-bg); color: white; font-size: 13px; justify-content: space-between; align-items: center; }
+.edit-banner { display: none; padding: 6px 12px; background: var(--user-bg); color: white; font-size: 12px; justify-content: space-between; align-items: center; border-radius: 8px; margin: 0 16px 8px 16px; }
 .edit-banner.visible { display: flex; }
-.edit-banner-close { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
+.edit-banner-close { background: none; border: none; color: white; font-size: 16px; cursor: pointer; padding: 2px 6px; }
 
 .attachments-preview { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px 0; }
 .attachment-item { position: relative; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
@@ -201,6 +204,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       </optgroup>
     </select>
     <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    <button class="chat-options-btn" onclick="toggleChatOptions(event)">⋯</button>
+    <div class="chat-options-popup" id="chatOptionsPopup">
+      <div class="chat-menu-item" onclick="shareCurrentChat()">Teilen</div>
+      <div class="chat-menu-item" onclick="exportCurrentChat()">Exportieren</div>
+      <div class="chat-menu-item danger" onclick="deleteCurrentChat()">Chat löschen</div>
+    </div>
   </div>
   <div class="chat-area" id="chatArea">
     <div class="welcome"><div class="welcome-logo">GPT</div><div class="welcome-sub">Wähle ein Modell und starte<br>eine Unterhaltung.</div></div>
@@ -247,6 +256,26 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <div class="field">
             <label>Top P: <span id="topPValue">1.0</span></label>
             <input type="range" id="topPInput" min="0" max="1" step="0.05" value="1" oninput="document.getElementById('topPValue').textContent=this.value">
+          </div>
+          <div class="field">
+            <label>Top K: <span id="topKValue">0</span></label>
+            <input type="range" id="topKInput" min="0" max="100" step="1" value="0" oninput="document.getElementById('topKValue').textContent=this.value">
+            <div class="field-hint">0 = deaktiviert</div>
+          </div>
+          <div class="field">
+            <label>Frequency Penalty: <span id="freqPenValue">0</span></label>
+            <input type="range" id="freqPenInput" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('freqPenValue').textContent=this.value">
+            <div class="field-hint">Reduziert Wortwiederholungen</div>
+          </div>
+          <div class="field">
+            <label>Presence Penalty: <span id="presPenValue">0</span></label>
+            <input type="range" id="presPenInput" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('presPenValue').textContent=this.value">
+            <div class="field-hint">Fördert neue Themen</div>
+          </div>
+          <div class="field">
+            <label>Repetition Penalty: <span id="repPenValue">1.0</span></label>
+            <input type="range" id="repPenInput" min="1" max="2" step="0.05" value="1" oninput="document.getElementById('repPenValue').textContent=this.value">
+            <div class="field-hint">1.0 = aus, 1.15 = empfohlen</div>
           </div>
           <div class="field">
             <label>Max. Tokens</label>
@@ -410,6 +439,68 @@ function saveState() {
 }
 
 function getActiveChat() { return chats.find(c => c.id === activeChatId); }
+
+function toggleChatOptions(e) {
+  e.stopPropagation();
+  const popup = document.getElementById('chatOptionsPopup');
+  popup.classList.toggle('open');
+}
+
+function closeChatOptions() {
+  document.getElementById('chatOptionsPopup').classList.remove('open');
+}
+
+function shareCurrentChat() {
+  closeChatOptions();
+  const chat = getActiveChat();
+  if (!chat) return;
+  
+  let text = chat.title + '\n\n';
+  chat.messages.forEach(m => {
+    const role = m.role === 'user' ? 'Ich' : 'KI';
+    text += role + ': ' + m.content + '\n\n';
+  });
+  
+  if (navigator.share) {
+    navigator.share({ title: chat.title, text: text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast('Chat in Zwischenablage kopiert'));
+  }
+}
+
+function exportCurrentChat() {
+  closeChatOptions();
+  const chat = getActiveChat();
+  if (!chat) return;
+  
+  const data = JSON.stringify(chat, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (chat.title || 'chat') + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Chat exportiert');
+}
+
+function deleteCurrentChat() {
+  closeChatOptions();
+  if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
+  const id = activeChatId;
+  chats = chats.filter(c => c.id !== id);
+  activeChatId = chats.length ? chats[0].id : null;
+  if (!chats.length) newChat();
+  saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
+  showToast('Chat gelöscht');
+}
+
+// Schließe Chat-Options wenn woanders geklickt
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.chat-options-btn') && !e.target.closest('.chat-options-popup')) {
+    closeChatOptions();
+  }
+});
 
 function newChat() {
   const id = 'chat_' + Date.now();
@@ -736,6 +827,10 @@ async function regenerateMessage(idx) {
     const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
     const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
     const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
+    const topK = parseInt(localStorage.getItem('gpt_top_k')) || 0;
+    const freqPen = parseFloat(localStorage.getItem('gpt_freq_pen')) || 0;
+    const presPen = parseFloat(localStorage.getItem('gpt_pres_pen')) || 0;
+    const repPen = parseFloat(localStorage.getItem('gpt_rep_pen')) || 1;
     const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
     
     const apiMessages = [];
@@ -753,16 +848,24 @@ async function regenerateMessage(idx) {
     const recentMessages = chat.messages.slice(-maxContext);
     recentMessages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
     
+    // API-Payload bauen
+    const payload = { 
+      model: chat.model, 
+      messages: apiMessages,
+      temperature: temperature,
+      top_p: topP,
+      max_tokens: maxTokens
+    };
+    
+    if (topK > 0) payload.top_k = topK;
+    if (freqPen > 0) payload.frequency_penalty = freqPen;
+    if (presPen > 0) payload.presence_penalty = presPen;
+    if (repPen !== 1) payload.repetition_penalty = repPen;
+    
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({ 
-        model: chat.model, 
-        messages: apiMessages,
-        temperature: temperature,
-        top_p: topP,
-        max_tokens: maxTokens
-      })
+      body: JSON.stringify(payload)
     });
     const data = await response.json();
     hideTyping();
@@ -834,6 +937,10 @@ async function sendMessage() {
     const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
     const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
     const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
+    const topK = parseInt(localStorage.getItem('gpt_top_k')) || 0;
+    const freqPen = parseFloat(localStorage.getItem('gpt_freq_pen')) || 0;
+    const presPen = parseFloat(localStorage.getItem('gpt_pres_pen')) || 0;
+    const repPen = parseFloat(localStorage.getItem('gpt_rep_pen')) || 1;
     const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
     
     const apiMessages = [];
@@ -867,16 +974,25 @@ async function sendMessage() {
       }
     });
     
+    // API-Payload bauen
+    const payload = { 
+      model: chat.model, 
+      messages: apiMessages,
+      temperature: temperature,
+      top_p: topP,
+      max_tokens: maxTokens
+    };
+    
+    // Optionale Parameter nur hinzufügen wenn nicht default
+    if (topK > 0) payload.top_k = topK;
+    if (freqPen > 0) payload.frequency_penalty = freqPen;
+    if (presPen > 0) payload.presence_penalty = presPen;
+    if (repPen !== 1) payload.repetition_penalty = repPen;
+    
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({ 
-        model: chat.model, 
-        messages: apiMessages,
-        temperature: temperature,
-        top_p: topP,
-        max_tokens: maxTokens
-      })
+      body: JSON.stringify(payload)
     });
     const data = await response.json();
     hideTyping();
@@ -1010,6 +1126,14 @@ function openSettings() {
   document.getElementById('tempValue').textContent = localStorage.getItem('gpt_temperature') || 0.7;
   document.getElementById('topPInput').value = localStorage.getItem('gpt_top_p') || 1;
   document.getElementById('topPValue').textContent = localStorage.getItem('gpt_top_p') || 1;
+  document.getElementById('topKInput').value = localStorage.getItem('gpt_top_k') || 0;
+  document.getElementById('topKValue').textContent = localStorage.getItem('gpt_top_k') || 0;
+  document.getElementById('freqPenInput').value = localStorage.getItem('gpt_freq_pen') || 0;
+  document.getElementById('freqPenValue').textContent = localStorage.getItem('gpt_freq_pen') || 0;
+  document.getElementById('presPenInput').value = localStorage.getItem('gpt_pres_pen') || 0;
+  document.getElementById('presPenValue').textContent = localStorage.getItem('gpt_pres_pen') || 0;
+  document.getElementById('repPenInput').value = localStorage.getItem('gpt_rep_pen') || 1;
+  document.getElementById('repPenValue').textContent = localStorage.getItem('gpt_rep_pen') || 1;
   document.getElementById('maxTokensInput').value = localStorage.getItem('gpt_max_tokens') || 4096;
   
   // Memory laden
@@ -1035,6 +1159,10 @@ function saveSettings() {
   // Sampling-Parameter speichern
   localStorage.setItem('gpt_temperature', document.getElementById('temperatureInput').value);
   localStorage.setItem('gpt_top_p', document.getElementById('topPInput').value);
+  localStorage.setItem('gpt_top_k', document.getElementById('topKInput').value);
+  localStorage.setItem('gpt_freq_pen', document.getElementById('freqPenInput').value);
+  localStorage.setItem('gpt_pres_pen', document.getElementById('presPenInput').value);
+  localStorage.setItem('gpt_rep_pen', document.getElementById('repPenInput').value);
   localStorage.setItem('gpt_max_tokens', document.getElementById('maxTokensInput').value);
   
   // Memory speichern
