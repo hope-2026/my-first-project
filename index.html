@@ -732,20 +732,19 @@ function speakText(text, btn) {
   }
   
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'de-DE';
   
   // Gespeicherte Einstellungen laden
-  const savedVoice = localStorage.getItem('gpt_voice');
+  const savedVoice = localStorage.getItem('gpt_voice') || 'Petra';
   const savedRate = parseFloat(localStorage.getItem('gpt_voice_rate')) || 1;
   const savedPitch = parseFloat(localStorage.getItem('gpt_voice_pitch')) || 1;
   
   const voices = speechSynthesis.getVoices();
-  if (savedVoice) {
-    const voice = voices.find(v => v.name === savedVoice);
-    if (voice) u.voice = voice;
+  const voice = voices.find(v => v.name.includes(savedVoice));
+  if (voice) {
+    u.voice = voice;
+    u.lang = voice.lang;
   } else {
-    const de = voices.find(v => v.lang.startsWith('de'));
-    if (de) u.voice = de;
+    u.lang = 'de-DE';
   }
   
   u.rate = savedRate;
@@ -758,16 +757,10 @@ function speakText(text, btn) {
 }
 
 function loadVoiceSettings() {
-  const savedVoice = localStorage.getItem('gpt_voice') || 'Petra';
+  const savedVoice = localStorage.getItem('gpt_voice');
   const select = document.getElementById('voiceSelect');
-  if (select) {
-    // Versuche die gespeicherte Stimme zu finden
-    for (let option of select.options) {
-      if (option.value === savedVoice) {
-        option.selected = true;
-        break;
-      }
-    }
+  if (select && savedVoice) {
+    select.value = savedVoice;
   }
 }
 
