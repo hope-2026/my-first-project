@@ -105,16 +105,24 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .sidebar-header h2 { font-size: 16px; font-weight: 700; color: var(--accent); }
 .new-chat-btn { background: var(--accent); color: white; border: none; width: 34px; height: 34px; border-radius: 10px; font-size: 20px; cursor: pointer; }
 .chat-list { flex: 1; overflow-y: auto; padding: 8px; }
-.chat-item { padding: 12px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.chat-item { padding: 12px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; position: relative; }
 .chat-item:hover { background: var(--bg-soft); }
 .chat-item.active { background: var(--accent-soft); }
 .chat-item-title { flex: 1; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chat-item.active .chat-item-title { color: var(--accent); font-weight: 600; }
-.chat-item-actions { display: flex; gap: 2px; }
-.chat-item-btn { background: none; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; padding: 4px; }
-.chat-item-btn:hover { color: var(--text); }
-.chat-item-btn.danger:hover { color: var(--danger); }
+.chat-item-menu-btn { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+.chat-item-menu-btn:hover { background: var(--bg-input); color: var(--text); }
 .chat-item-input { flex: 1; background: var(--bg-input); border: 1px solid var(--accent); border-radius: 6px; padding: 6px 10px; font-size: 14px; color: var(--text); outline: none; }
+
+.chat-menu-popup { position: absolute; right: 10px; top: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 50; min-width: 160px; overflow: hidden; display: none; }
+.chat-menu-popup.open { display: block; }
+.chat-menu-item { padding: 12px 16px; font-size: 14px; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+.chat-menu-item:hover { background: var(--bg-soft); }
+.chat-menu-item.danger { color: var(--danger); }
+.chat-menu-item.danger:hover { background: #fef2f2; }
+@media (prefers-color-scheme: dark) {
+  .chat-menu-item.danger:hover { background: #3b1c1c; }
+}
 
 .sidebar-search { padding: 12px 16px; border-bottom: 1px solid var(--border); }
 .search-input { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none; }
@@ -133,6 +141,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .field input, .field textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; }
 .field input:focus, .field textarea:focus { border-color: var(--accent); }
 .field textarea { min-height: 120px; resize: vertical; }
+.field input[type="range"] { padding: 0; height: 6px; border-radius: 3px; -webkit-appearance: none; appearance: none; background: var(--border); }
+.field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+.field-select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; cursor: pointer; }
+.field-select:focus { border-color: var(--accent); }
+.settings-section { margin: 24px 0; padding-top: 20px; border-top: 1px solid var(--border); }
+.settings-section-title { font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 16px; }
+.test-voice-btn { background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; margin-bottom: 20px; }
+.test-voice-btn:hover { background: var(--bg-input); }
 .save-btn { width: 100%; background: var(--accent); border: none; color: white; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; }
 
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 12px 20px; border-radius: 12px; font-size: 14px; opacity: 0; transition: opacity 0.25s; z-index: 300; pointer-events: none; }
@@ -195,6 +211,28 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="modal-body">
       <div class="field"><label>OpenRouter API-Schlüssel</label><input type="password" id="apiKeyInput" placeholder="sk-or-v1-..."></div>
       <div class="field"><label>System-Prompt</label><textarea id="systemPromptInput" placeholder="Definiere die Persönlichkeit der KI..."></textarea></div>
+      
+      <div class="settings-section">
+        <div class="settings-section-title">Vorlesen</div>
+        
+        <div class="field">
+          <label>Stimme</label>
+          <select id="voiceSelect" class="field-select"></select>
+        </div>
+        
+        <div class="field">
+          <label>Geschwindigkeit: <span id="rateValue">1.0</span>x</label>
+          <input type="range" id="voiceRate" min="0.5" max="2" step="0.1" value="1" oninput="updateRateValue()">
+        </div>
+        
+        <div class="field">
+          <label>Tonhöhe: <span id="pitchValue">1.0</span></label>
+          <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchValue()">
+        </div>
+        
+        <button class="test-voice-btn" onclick="testVoice()">🔊 Stimme testen</button>
+      </div>
+      
       <button class="save-btn" onclick="saveSettings()">Speichern</button>
     </div>
   </div>
@@ -301,6 +339,7 @@ function switchChat(id) {
 
 function deleteChat(id, e) {
   e.stopPropagation();
+  closeAllMenus();
   if (!confirm('Chat löschen?')) return;
   chats = chats.filter(c => c.id !== id);
   if (activeChatId === id) { activeChatId = chats.length ? chats[0].id : null; if (!chats.length) newChat(); }
@@ -320,17 +359,44 @@ function renderChatList(filter = '') {
     if (searchTerm && !chat.title.toLowerCase().includes(searchTerm)) return;
     const div = document.createElement('div');
     div.className = 'chat-item' + (chat.id === activeChatId ? ' active' : '');
-    div.onclick = (e) => { if (e.target === div || e.target.classList.contains('chat-item-title')) switchChat(chat.id); };
+    div.onclick = (e) => { 
+      if (e.target === div || e.target.classList.contains('chat-item-title')) {
+        closeAllMenus();
+        switchChat(chat.id); 
+      }
+    };
     div.innerHTML = `
       <span class="chat-item-title">${escapeHtml(chat.title)}</span>
-      <div class="chat-item-actions">
-        <button class="chat-item-btn" onclick="renameChat('${chat.id}', event)" title="Umbenennen">✏️</button>
-        <button class="chat-item-btn danger" onclick="deleteChat('${chat.id}', event)" title="Löschen">🗑️</button>
+      <button class="chat-item-menu-btn" onclick="toggleChatMenu('${chat.id}', event)">⋯</button>
+      <div class="chat-menu-popup" id="menu-${chat.id}">
+        <div class="chat-menu-item" onclick="renameChat('${chat.id}', event)">Umbenennen</div>
+        <div class="chat-menu-item danger" onclick="deleteChat('${chat.id}', event)">Löschen</div>
       </div>
     `;
     list.appendChild(div);
   });
 }
+
+function toggleChatMenu(id, e) {
+  e.stopPropagation();
+  const menu = document.getElementById('menu-' + id);
+  const wasOpen = menu.classList.contains('open');
+  closeAllMenus();
+  if (!wasOpen) {
+    menu.classList.add('open');
+  }
+}
+
+function closeAllMenus() {
+  document.querySelectorAll('.chat-menu-popup').forEach(m => m.classList.remove('open'));
+}
+
+// Menü schließen wenn woanders geklickt wird
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.chat-item-menu-btn') && !e.target.closest('.chat-menu-popup')) {
+    closeAllMenus();
+  }
+});
 
 function filterChats() {
   const search = document.getElementById('chatSearch').value;
@@ -339,10 +405,14 @@ function filterChats() {
 
 function renameChat(id, e) {
   e.stopPropagation();
+  closeAllMenus();
   const chat = chats.find(c => c.id === id);
   if (!chat) return;
   
-  const item = e.target.closest('.chat-item');
+  const item = document.querySelector(`[onclick*="switchChat('${id}'"]`)?.closest('.chat-item') 
+    || e.target.closest('.chat-item');
+  if (!item) return;
+  
   const titleSpan = item.querySelector('.chat-item-title');
   const oldTitle = chat.title;
   
@@ -361,7 +431,7 @@ function renameChat(id, e) {
     chat.title = newTitle;
     chat.updatedAt = Date.now();
     saveState();
-    renderChatList(document.getElementById('chatSearch').value);
+    renderChatList(document.getElementById('chatSearch')?.value || '');
   };
   
   input.onblur = save;
@@ -641,15 +711,106 @@ function updateSendBtn() {
 function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast('Kopiert ✓')); }
 
 function speakText(text, btn) {
-  if (currentSpeakBtn === btn && speechSynthesis.speaking) { speechSynthesis.cancel(); btn.classList.remove('speaking'); currentSpeakBtn = null; return; }
-  if (speechSynthesis.speaking) { speechSynthesis.cancel(); currentSpeakBtn?.classList.remove('speaking'); }
+  if (currentSpeakBtn === btn && speechSynthesis.speaking) { 
+    speechSynthesis.cancel(); 
+    btn.classList.remove('speaking'); 
+    currentSpeakBtn = null; 
+    return; 
+  }
+  if (speechSynthesis.speaking) { 
+    speechSynthesis.cancel(); 
+    currentSpeakBtn?.classList.remove('speaking'); 
+  }
+  
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'de-DE';
+  
+  // Gespeicherte Einstellungen laden
+  const savedVoice = localStorage.getItem('gpt_voice');
+  const savedRate = parseFloat(localStorage.getItem('gpt_voice_rate')) || 1;
+  const savedPitch = parseFloat(localStorage.getItem('gpt_voice_pitch')) || 1;
+  
   const voices = speechSynthesis.getVoices();
-  const de = voices.find(v => v.lang.startsWith('de'));
-  if (de) u.voice = de;
+  if (savedVoice) {
+    const voice = voices.find(v => v.name === savedVoice);
+    if (voice) u.voice = voice;
+  } else {
+    const de = voices.find(v => v.lang.startsWith('de'));
+    if (de) u.voice = de;
+  }
+  
+  u.rate = savedRate;
+  u.pitch = savedPitch;
+  
   u.onend = () => { btn.classList.remove('speaking'); currentSpeakBtn = null; };
-  btn.classList.add('speaking'); currentSpeakBtn = btn;
+  btn.classList.add('speaking'); 
+  currentSpeakBtn = btn;
+  speechSynthesis.speak(u);
+}
+
+function loadVoices() {
+  const select = document.getElementById('voiceSelect');
+  if (!select) return;
+  const voices = speechSynthesis.getVoices();
+  const savedVoice = localStorage.getItem('gpt_voice');
+  
+  select.innerHTML = '';
+  
+  // Deutsche Stimmen zuerst
+  const germanVoices = voices.filter(v => v.lang.startsWith('de'));
+  const otherVoices = voices.filter(v => !v.lang.startsWith('de'));
+  
+  if (germanVoices.length > 0) {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = 'Deutsch';
+    germanVoices.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.name;
+      opt.textContent = v.name;
+      if (v.name === savedVoice) opt.selected = true;
+      optgroup.appendChild(opt);
+    });
+    select.appendChild(optgroup);
+  }
+  
+  if (otherVoices.length > 0) {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = 'Andere';
+    otherVoices.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.name;
+      opt.textContent = `${v.name} (${v.lang})`;
+      if (v.name === savedVoice) opt.selected = true;
+      optgroup.appendChild(opt);
+    });
+    select.appendChild(optgroup);
+  }
+}
+
+function updateRateValue() {
+  const val = document.getElementById('voiceRate').value;
+  document.getElementById('rateValue').textContent = val;
+}
+
+function updatePitchValue() {
+  const val = document.getElementById('voicePitch').value;
+  document.getElementById('pitchValue').textContent = val;
+}
+
+function testVoice() {
+  const text = 'Hallo! So klingt diese Stimme mit den aktuellen Einstellungen.';
+  const u = new SpeechSynthesisUtterance(text);
+  
+  const voiceName = document.getElementById('voiceSelect').value;
+  const voices = speechSynthesis.getVoices();
+  const voice = voices.find(v => v.name === voiceName);
+  if (voice) u.voice = voice;
+  
+  u.rate = parseFloat(document.getElementById('voiceRate').value);
+  u.pitch = parseFloat(document.getElementById('voicePitch').value);
+  u.lang = 'de-DE';
+  
+  speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }
 
@@ -657,12 +818,40 @@ function showToast(msg) { const t = document.getElementById('toast'); t.textCont
 function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
 function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
-function openSettings() { document.getElementById('apiKeyInput').value = localStorage.getItem('gpt_api_key') || ''; document.getElementById('systemPromptInput').value = localStorage.getItem('gpt_system_prompt') || ''; document.getElementById('settingsModal').classList.add('open'); }
+
+function openSettings() { 
+  document.getElementById('apiKeyInput').value = localStorage.getItem('gpt_api_key') || ''; 
+  document.getElementById('systemPromptInput').value = localStorage.getItem('gpt_system_prompt') || ''; 
+  
+  // Voice-Einstellungen laden
+  loadVoices();
+  document.getElementById('voiceRate').value = localStorage.getItem('gpt_voice_rate') || 1;
+  document.getElementById('voicePitch').value = localStorage.getItem('gpt_voice_pitch') || 1;
+  updateRateValue();
+  updatePitchValue();
+  
+  document.getElementById('settingsModal').classList.add('open'); 
+}
 function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
-function saveSettings() { localStorage.setItem('gpt_api_key', document.getElementById('apiKeyInput').value.trim()); localStorage.setItem('gpt_system_prompt', document.getElementById('systemPromptInput').value); closeSettings(); showToast('Gespeichert ✓'); }
+
+function saveSettings() { 
+  localStorage.setItem('gpt_api_key', document.getElementById('apiKeyInput').value.trim()); 
+  localStorage.setItem('gpt_system_prompt', document.getElementById('systemPromptInput').value); 
+  
+  // Voice-Einstellungen speichern
+  localStorage.setItem('gpt_voice', document.getElementById('voiceSelect').value);
+  localStorage.setItem('gpt_voice_rate', document.getElementById('voiceRate').value);
+  localStorage.setItem('gpt_voice_pitch', document.getElementById('voicePitch').value);
+  
+  closeSettings(); 
+  showToast('Gespeichert ✓'); 
+}
 
 init();
-speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+speechSynthesis.onvoiceschanged = () => {
+  speechSynthesis.getVoices();
+  loadVoices();
+};
 
 // Scroll-Button Logik
 const chatArea = document.getElementById('chatArea');
