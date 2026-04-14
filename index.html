@@ -64,11 +64,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .message.user .bubble { background: var(--user-bg); color: var(--user-text); border-bottom-right-radius: 6px; }
 .message.assistant .bubble { background: var(--ai-bg); border: 1px solid var(--ai-border); color: var(--text); border-bottom-left-radius: 6px; box-shadow: var(--shadow); }
 
-.msg-actions { display: flex; gap: 4px; margin-top: 6px; }
-.msg-action { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
-.msg-action:hover { background: var(--bg-soft); color: var(--text); }
-.msg-action.speaking { color: var(--accent); }
-.msg-action.danger:hover { color: var(--danger); }
+.msg-actions { display: flex; gap: 8px; margin-top: 8px; }
+.msg-action { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 4px; opacity: 0.5; transition: opacity 0.2s; }
+.msg-action:hover { opacity: 1; }
+.msg-action.speaking { opacity: 1; color: var(--accent); }
 .msg-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; padding: 0 4px; }
 
 .typing { display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--text-dim); font-size: 14px; }
@@ -502,25 +501,25 @@ function renderMessages() {
     // Kopieren (für alle)
     const copyBtn = document.createElement('button');
     copyBtn.className = 'msg-action';
-    copyBtn.innerHTML = '📋';
+    copyBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
     copyBtn.title = 'Kopieren';
     copyBtn.onclick = () => copyText(msg.content);
     actions.appendChild(copyBtn);
     
     if (msg.role === 'assistant') {
-      // Vorlesen
+      // Vorlesen mit Play/Pause
       const speakBtn = document.createElement('button');
       speakBtn.className = 'msg-action';
-      speakBtn.innerHTML = '🔊';
+      speakBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>';
       speakBtn.title = 'Vorlesen';
-      speakBtn.onclick = () => speakText(msg.content, speakBtn);
+      speakBtn.onclick = () => speakTextWithToggle(msg.content, speakBtn);
       actions.appendChild(speakBtn);
       
       // Neu generieren (nur letzte KI-Nachricht)
       if (idx === chat.messages.length - 1) {
         const regenBtn = document.createElement('button');
         regenBtn.className = 'msg-action';
-        regenBtn.innerHTML = '🔄';
+        regenBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16"/></svg>';
         regenBtn.title = 'Neu generieren';
         regenBtn.onclick = () => regenerateMessage(idx);
         actions.appendChild(regenBtn);
@@ -531,19 +530,19 @@ function renderMessages() {
       // Bearbeiten
       const editBtn = document.createElement('button');
       editBtn.className = 'msg-action';
-      editBtn.innerHTML = '✏️';
+      editBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
       editBtn.title = 'Bearbeiten';
       editBtn.onclick = () => editMessage(idx);
       actions.appendChild(editBtn);
+      
+      // Löschen (nur bei User-Nachrichten)
+      const delBtn = document.createElement('button');
+      delBtn.className = 'msg-action';
+      delBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>';
+      delBtn.title = 'Löschen';
+      delBtn.onclick = () => deleteMessage(idx);
+      actions.appendChild(delBtn);
     }
-    
-    // Löschen (für alle)
-    const delBtn = document.createElement('button');
-    delBtn.className = 'msg-action danger';
-    delBtn.innerHTML = '🗑️';
-    delBtn.title = 'Löschen';
-    delBtn.onclick = () => deleteMessage(idx);
-    actions.appendChild(delBtn);
     
     div.appendChild(actions);
     area.appendChild(div);
@@ -719,21 +718,27 @@ function updateSendBtn() {
 
 function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast('Kopiert ✓')); }
 
-function speakText(text, btn) {
+const playIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>';
+const pauseIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+
+function speakTextWithToggle(text, btn) {
   if (currentSpeakBtn === btn && speechSynthesis.speaking) { 
     speechSynthesis.cancel(); 
+    btn.innerHTML = playIcon;
     btn.classList.remove('speaking'); 
     currentSpeakBtn = null; 
     return; 
   }
   if (speechSynthesis.speaking) { 
     speechSynthesis.cancel(); 
-    currentSpeakBtn?.classList.remove('speaking'); 
+    if (currentSpeakBtn) {
+      currentSpeakBtn.innerHTML = playIcon;
+      currentSpeakBtn.classList.remove('speaking');
+    }
   }
   
   const u = new SpeechSynthesisUtterance(text);
   
-  // Gespeicherte Einstellungen laden
   const savedVoice = localStorage.getItem('gpt_voice') || 'Petra';
   const savedRate = parseFloat(localStorage.getItem('gpt_voice_rate')) || 1;
   const savedPitch = parseFloat(localStorage.getItem('gpt_voice_pitch')) || 1;
@@ -750,10 +755,20 @@ function speakText(text, btn) {
   u.rate = savedRate;
   u.pitch = savedPitch;
   
-  u.onend = () => { btn.classList.remove('speaking'); currentSpeakBtn = null; };
+  u.onend = () => { 
+    btn.innerHTML = playIcon;
+    btn.classList.remove('speaking'); 
+    currentSpeakBtn = null; 
+  };
+  
+  btn.innerHTML = pauseIcon;
   btn.classList.add('speaking'); 
   currentSpeakBtn = btn;
   speechSynthesis.speak(u);
+}
+
+function speakText(text, btn) {
+  speakTextWithToggle(text, btn);
 }
 
 function loadVoiceSettings() {
