@@ -81,12 +81,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .input-area { padding: 12px 16px; background: var(--bg); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
 .input-wrapper { display: flex; gap: 10px; align-items: flex-end; }
+.attach-btn { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 8px; }
+.attach-btn:hover { color: var(--accent); }
 .input-field { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 20px; padding: 12px 18px; color: var(--text); font-size: 16px; font-family: inherit; resize: none; min-height: 48px; max-height: 150px; outline: none; line-height: 1.4; }
 .input-field:focus { border-color: var(--accent); }
 .input-field::placeholder { color: var(--text-muted); }
 .send-btn { background: var(--accent); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .send-btn svg { width: 22px; height: 22px; fill: white; }
+
+.attachments-preview { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px 0; }
+.attachment-item { position: relative; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+.attachment-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+.attachment-item .file-icon { font-size: 20px; }
+.attachment-item .file-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attachment-remove { background: var(--danger); color: white; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: absolute; top: -6px; right: -6px; }
 
 .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 300px; background: var(--bg); border-right: 1px solid var(--border); transform: translateX(-100%); transition: transform 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
 .sidebar.open { transform: translateX(0); }
@@ -102,8 +111,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .chat-item-title { flex: 1; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chat-item.active .chat-item-title { color: var(--accent); font-weight: 600; }
 .chat-item-actions { display: flex; gap: 2px; }
-.chat-item-btn { background: none; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; padding: 4px; opacity: 0; transition: opacity 0.15s; }
-.chat-item:hover .chat-item-btn { opacity: 1; }
+.chat-item-btn { background: none; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; padding: 4px; }
 .chat-item-btn:hover { color: var(--text); }
 .chat-item-btn.danger:hover { color: var(--danger); }
 .chat-item-input { flex: 1; background: var(--bg-input); border: 1px solid var(--accent); border-radius: 6px; padding: 6px 10px; font-size: 14px; color: var(--text); outline: none; }
@@ -166,7 +174,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="welcome"><div class="welcome-logo">GPT</div><div class="welcome-sub">Wähle ein Modell und starte<br>eine Unterhaltung.</div></div>
   </div>
   <div class="input-area">
+    <div class="attachments-preview" id="attachmentsPreview"></div>
     <div class="input-wrapper">
+      <button class="attach-btn" onclick="document.getElementById('fileInput').click()">📎</button>
+      <input type="file" id="fileInput" multiple accept="image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="handleFiles(this.files)">
       <textarea class="input-field" id="inputField" placeholder="Nachricht schreiben..." rows="1"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
     </div>
@@ -192,6 +203,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 <button class="scroll-btn" id="scrollBtn" onclick="scrollToBottom()">↓</button>
 <script>
 let chats = [], activeChatId = null, isStreaming = false, currentSpeakBtn = null;
+let pendingAttachments = [];
 
 function init() {
   loadState();
@@ -202,6 +214,58 @@ function init() {
     if (chat?.model) document.getElementById('modelSelect').value = chat.model;
     renderChatList(); renderMessages();
   }
+}
+
+// === FILE HANDLING ===
+function handleFiles(files) {
+  for (const file of files) {
+    if (file.size > 20 * 1024 * 1024) {
+      showToast('Datei zu groß (max 20MB)');
+      continue;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      pendingAttachments.push({
+        name: file.name,
+        type: file.type,
+        data: e.target.result
+      });
+      renderAttachments();
+      updateSendBtn();
+    };
+    if (file.type.startsWith('image/')) {
+      reader.readAsDataURL(file);
+    } else {
+      reader.readAsDataURL(file);
+    }
+  }
+  document.getElementById('fileInput').value = '';
+}
+
+function renderAttachments() {
+  const preview = document.getElementById('attachmentsPreview');
+  preview.innerHTML = '';
+  pendingAttachments.forEach((att, idx) => {
+    const div = document.createElement('div');
+    div.className = 'attachment-item';
+    if (att.type.startsWith('image/')) {
+      div.innerHTML = `<img src="${att.data}" alt="${att.name}"><span class="file-name">${att.name}</span>`;
+    } else {
+      div.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${att.name}</span>`;
+    }
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'attachment-remove';
+    removeBtn.innerHTML = '✕';
+    removeBtn.onclick = () => removeAttachment(idx);
+    div.appendChild(removeBtn);
+    preview.appendChild(div);
+  });
+}
+
+function removeAttachment(idx) {
+  pendingAttachments.splice(idx, 1);
+  renderAttachments();
+  updateSendBtn();
 }
 
 function loadState() {
@@ -318,6 +382,29 @@ function renderMessages() {
   chat.messages.forEach((msg, idx) => {
     const div = document.createElement('div');
     div.className = 'message ' + msg.role;
+    
+    // Attachments anzeigen (falls vorhanden)
+    if (msg.attachments && msg.attachments.length > 0) {
+      const attDiv = document.createElement('div');
+      attDiv.className = 'msg-attachments';
+      attDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;max-width:85%;';
+      msg.attachments.forEach(att => {
+        if (att.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.src = att.data;
+          img.style.cssText = 'max-width:200px;max-height:150px;border-radius:10px;cursor:pointer;';
+          img.onclick = () => window.open(att.data, '_blank');
+          attDiv.appendChild(img);
+        } else {
+          const fileDiv = document.createElement('div');
+          fileDiv.style.cssText = 'background:var(--bg-soft);padding:8px 12px;border-radius:8px;font-size:13px;';
+          fileDiv.textContent = '📄 ' + att.name;
+          attDiv.appendChild(fileDiv);
+        }
+      });
+      div.appendChild(attDiv);
+    }
+    
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = msg.content;
@@ -478,23 +565,52 @@ function hideTyping() { document.getElementById('typingIndicator')?.remove(); }
 async function sendMessage() {
   const input = document.getElementById('inputField');
   const text = input.value.trim();
-  if (!text || isStreaming) return;
+  const hasAttachments = pendingAttachments.length > 0;
+  if ((!text && !hasAttachments) || isStreaming) return;
   const apiKey = localStorage.getItem('gpt_api_key');
   if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); openSettings(); return; }
   const chat = getActiveChat();
   if (!chat) return;
-  chat.messages.push({ role: 'user', content: text, time: Date.now() });
+  
+  // Nachricht mit Attachments erstellen
+  const userMsg = { role: 'user', content: text, time: Date.now(), attachments: [...pendingAttachments] };
+  chat.messages.push(userMsg);
+  
   if (chat.messages.length === 1) chat.title = text.slice(0, 40) + (text.length > 40 ? '...' : '');
   chat.model = document.getElementById('modelSelect').value;
   chat.updatedAt = Date.now();
-  input.value = ''; autoResize(input); updateSendBtn();
+  
+  // Clear input
+  input.value = ''; 
+  pendingAttachments = [];
+  renderAttachments();
+  autoResize(input); 
+  updateSendBtn();
   saveState(); renderMessages(); renderChatList(document.getElementById('chatSearch')?.value || '');
   showTyping(); isStreaming = true; updateSendBtn();
+  
   try {
     const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
     const apiMessages = [];
     if (systemPrompt) apiMessages.push({ role: 'system', content: systemPrompt });
-    chat.messages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
+    
+    // Nachrichten für API aufbereiten
+    chat.messages.forEach(m => {
+      if (m.attachments && m.attachments.length > 0) {
+        // Multimodal message mit Bildern
+        const content = [];
+        if (m.content) content.push({ type: 'text', text: m.content });
+        m.attachments.forEach(att => {
+          if (att.type.startsWith('image/')) {
+            content.push({ type: 'image_url', image_url: { url: att.data } });
+          }
+        });
+        apiMessages.push({ role: m.role, content });
+      } else {
+        apiMessages.push({ role: m.role, content: m.content });
+      }
+    });
+    
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
@@ -516,7 +632,11 @@ async function sendMessage() {
 const inputField = document.getElementById('inputField');
 inputField.addEventListener('input', function() { autoResize(this); updateSendBtn(); });
 function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 150) + 'px'; }
-function updateSendBtn() { document.getElementById('sendBtn').disabled = !inputField.value.trim() || isStreaming; }
+function updateSendBtn() { 
+  const hasText = inputField.value.trim().length > 0;
+  const hasFiles = pendingAttachments.length > 0;
+  document.getElementById('sendBtn').disabled = (!hasText && !hasFiles) || isStreaming; 
+}
 
 function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast('Kopiert ✓')); }
 
