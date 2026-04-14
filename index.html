@@ -64,8 +64,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .message.user .bubble { background: var(--user-bg); color: var(--user-text); border-bottom-right-radius: 6px; }
 .message.assistant .bubble { background: var(--ai-bg); border: 1px solid var(--ai-border); color: var(--text); border-bottom-left-radius: 6px; box-shadow: var(--shadow); }
 
-.msg-actions { display: flex; gap: 4px; margin-top: 6px; opacity: 0; transition: opacity 0.2s; }
-.message:hover .msg-actions { opacity: 1; }
+.msg-actions { display: flex; gap: 4px; margin-top: 6px; }
 .msg-action { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
 .msg-action:hover { background: var(--bg-soft); color: var(--text); }
 .msg-action.speaking { color: var(--accent); }
@@ -351,19 +350,21 @@ function editMessage(idx) {
   const chat = getActiveChat();
   if (!chat) return;
   const msg = chat.messages[idx];
-  const newText = prompt('Nachricht bearbeiten:', msg.content);
-  if (newText !== null && newText.trim()) {
-    // Entferne alle Nachrichten ab dieser Position
-    chat.messages = chat.messages.slice(0, idx);
-    chat.updatedAt = Date.now();
-    saveState();
-    renderMessages();
-    // Setze den neuen Text ins Eingabefeld
-    document.getElementById('inputField').value = newText.trim();
-    autoResize(document.getElementById('inputField'));
-    updateSendBtn();
-    document.getElementById('inputField').focus();
-  }
+  
+  // Text ins Eingabefeld setzen
+  const input = document.getElementById('inputField');
+  input.value = msg.content;
+  autoResize(input);
+  updateSendBtn();
+  input.focus();
+  
+  // Alle Nachrichten ab dieser Position entfernen (inkl. dieser)
+  chat.messages = chat.messages.slice(0, idx);
+  chat.updatedAt = Date.now();
+  saveState();
+  renderMessages();
+  
+  showToast('Nachricht zum Bearbeiten geladen');
 }
 
 async function regenerateMessage(idx) {
