@@ -217,7 +217,16 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         
         <div class="field">
           <label>Stimme</label>
-          <select id="voiceSelect" class="field-select"></select>
+          <select id="voiceSelect" class="field-select" onchange="testSelectedVoice()">
+            <optgroup label="Deutsch">
+              <option value="Petra">Petra</option>
+              <option value="Anna">Anna</option>
+            </optgroup>
+            <optgroup label="English">
+              <option value="Karen">Karen</option>
+              <option value="Matilda">Matilda</option>
+            </optgroup>
+          </select>
         </div>
         
         <div class="field">
@@ -230,7 +239,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchValue()">
         </div>
         
-        <button class="test-voice-btn" onclick="testVoice()">🔊 Stimme testen</button>
+        <button class="test-voice-btn" onclick="testSelectedVoice()">🔊 Stimme testen</button>
       </div>
       
       <button class="save-btn" onclick="saveSettings()">Speichern</button>
@@ -748,43 +757,37 @@ function speakText(text, btn) {
   speechSynthesis.speak(u);
 }
 
-function loadVoices() {
+function loadVoiceSettings() {
+  const savedVoice = localStorage.getItem('gpt_voice') || 'Petra';
   const select = document.getElementById('voiceSelect');
-  if (!select) return;
+  if (select) {
+    // Versuche die gespeicherte Stimme zu finden
+    for (let option of select.options) {
+      if (option.value === savedVoice) {
+        option.selected = true;
+        break;
+      }
+    }
+  }
+}
+
+function testSelectedVoice() {
+  const voiceName = document.getElementById('voiceSelect').value;
+  const isGerman = voiceName === 'Petra' || voiceName === 'Anna';
+  const testText = isGerman ? 'Hallo, so klinge ich.' : 'Hello, this is how I sound.';
+  
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(testText);
+  
   const voices = speechSynthesis.getVoices();
-  const savedVoice = localStorage.getItem('gpt_voice');
+  const voice = voices.find(v => v.name.includes(voiceName));
+  if (voice) u.voice = voice;
   
-  select.innerHTML = '';
+  u.rate = parseFloat(document.getElementById('voiceRate').value);
+  u.pitch = parseFloat(document.getElementById('voicePitch').value);
+  u.lang = isGerman ? 'de-DE' : 'en-US';
   
-  // Deutsche Stimmen zuerst
-  const germanVoices = voices.filter(v => v.lang.startsWith('de'));
-  const otherVoices = voices.filter(v => !v.lang.startsWith('de'));
-  
-  if (germanVoices.length > 0) {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = 'Deutsch';
-    germanVoices.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v.name;
-      opt.textContent = v.name;
-      if (v.name === savedVoice) opt.selected = true;
-      optgroup.appendChild(opt);
-    });
-    select.appendChild(optgroup);
-  }
-  
-  if (otherVoices.length > 0) {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = 'Andere';
-    otherVoices.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v.name;
-      opt.textContent = `${v.name} (${v.lang})`;
-      if (v.name === savedVoice) opt.selected = true;
-      optgroup.appendChild(opt);
-    });
-    select.appendChild(optgroup);
-  }
+  speechSynthesis.speak(u);
 }
 
 function updateRateValue() {
@@ -797,23 +800,6 @@ function updatePitchValue() {
   document.getElementById('pitchValue').textContent = val;
 }
 
-function testVoice() {
-  const text = 'Hallo! So klingt diese Stimme mit den aktuellen Einstellungen.';
-  const u = new SpeechSynthesisUtterance(text);
-  
-  const voiceName = document.getElementById('voiceSelect').value;
-  const voices = speechSynthesis.getVoices();
-  const voice = voices.find(v => v.name === voiceName);
-  if (voice) u.voice = voice;
-  
-  u.rate = parseFloat(document.getElementById('voiceRate').value);
-  u.pitch = parseFloat(document.getElementById('voicePitch').value);
-  u.lang = 'de-DE';
-  
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
-
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
 function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
@@ -824,7 +810,7 @@ function openSettings() {
   document.getElementById('systemPromptInput').value = localStorage.getItem('gpt_system_prompt') || ''; 
   
   // Voice-Einstellungen laden
-  loadVoices();
+  loadVoiceSettings();
   document.getElementById('voiceRate').value = localStorage.getItem('gpt_voice_rate') || 1;
   document.getElementById('voicePitch').value = localStorage.getItem('gpt_voice_pitch') || 1;
   updateRateValue();
@@ -850,7 +836,6 @@ function saveSettings() {
 init();
 speechSynthesis.onvoiceschanged = () => {
   speechSynthesis.getVoices();
-  loadVoices();
 };
 
 // Scroll-Button Logik
