@@ -150,11 +150,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; }
 .field-select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; cursor: pointer; }
 .field-select:focus { border-color: var(--accent); }
-.settings-section { margin: 24px 0; padding-top: 20px; border-top: 1px solid var(--border); }
-.settings-section-title { font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 16px; }
-.test-voice-btn { background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; margin-bottom: 20px; }
+.settings-section { margin: 20px 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.settings-section-header { padding: 14px 16px; background: var(--bg-soft); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.settings-section-title { font-size: 14px; font-weight: 600; color: var(--accent); margin: 0; }
+.collapse-icon { color: var(--text-muted); transition: transform 0.2s; }
+.settings-section.collapsed .collapse-icon { transform: rotate(-90deg); }
+.settings-section-content { padding: 16px; display: block; }
+.settings-section.collapsed .settings-section-content { display: none; }
+.field-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.backup-buttons { display: flex; gap: 10px; margin-bottom: 12px; }
+.backup-btn { flex: 1; background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 10px; font-size: 13px; cursor: pointer; }
+.backup-btn:hover { background: var(--bg-input); }
+.danger-btn { width: 100%; background: none; border: 1px solid var(--danger); color: var(--danger); padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+.danger-btn:hover { background: var(--danger); color: white; }
+.test-voice-btn { background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; }
 .test-voice-btn:hover { background: var(--bg-input); }
-.save-btn { width: 100%; background: var(--accent); border: none; color: white; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; }
+.save-btn { width: 100%; background: var(--accent); border: none; color: white; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; }
 
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 12px 20px; border-radius: 12px; font-size: 14px; opacity: 0; transition: opacity 0.25s; z-index: 300; pointer-events: none; }
 .toast.show { opacity: 1; }
@@ -221,34 +232,95 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div class="field"><label>OpenRouter API-Schlüssel</label><input type="password" id="apiKeyInput" placeholder="sk-or-v1-..."></div>
       <div class="field"><label>System-Prompt</label><textarea id="systemPromptInput" placeholder="Definiere die Persönlichkeit der KI..."></textarea></div>
       
-      <div class="settings-section">
-        <div class="settings-section-title">Vorlesen</div>
-        
-        <div class="field">
-          <label>Stimme</label>
-          <select id="voiceSelect" class="field-select" onchange="testSelectedVoice()">
-            <optgroup label="Deutsch">
-              <option value="Petra">Petra</option>
-              <option value="Anna">Anna</option>
-            </optgroup>
-            <optgroup label="English">
-              <option value="Karen">Karen</option>
-              <option value="Matilda">Matilda</option>
-            </optgroup>
-          </select>
+      <!-- Sampling-Parameter (einklappbar) -->
+      <div class="settings-section collapsible">
+        <div class="settings-section-header" onclick="toggleSection(this)">
+          <span class="settings-section-title">Sampling-Parameter</span>
+          <span class="collapse-icon">▼</span>
         </div>
-        
-        <div class="field">
-          <label>Geschwindigkeit: <span id="rateValue">1.0</span>x</label>
-          <input type="range" id="voiceRate" min="0.5" max="2" step="0.1" value="1" oninput="updateRateValue()">
+        <div class="settings-section-content">
+          <div class="field">
+            <label>Temperature: <span id="tempValue">0.7</span></label>
+            <input type="range" id="temperatureInput" min="0" max="2" step="0.1" value="0.7" oninput="document.getElementById('tempValue').textContent=this.value">
+            <div class="field-hint">Niedrig = präziser, Hoch = kreativer</div>
+          </div>
+          <div class="field">
+            <label>Top P: <span id="topPValue">1.0</span></label>
+            <input type="range" id="topPInput" min="0" max="1" step="0.05" value="1" oninput="document.getElementById('topPValue').textContent=this.value">
+          </div>
+          <div class="field">
+            <label>Max. Tokens</label>
+            <input type="number" id="maxTokensInput" placeholder="4096" value="4096">
+          </div>
         </div>
-        
-        <div class="field">
-          <label>Tonhöhe: <span id="pitchValue">1.0</span></label>
-          <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchValue()">
+      </div>
+      
+      <!-- Memory-System (einklappbar) -->
+      <div class="settings-section collapsible">
+        <div class="settings-section-header" onclick="toggleSection(this)">
+          <span class="settings-section-title">Memory-System</span>
+          <span class="collapse-icon">▼</span>
         </div>
-        
-        <button class="test-voice-btn" onclick="testSelectedVoice()">🔊 Stimme testen</button>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>Erinnerungen</label>
+            <textarea id="memoriesInput" placeholder="Wichtige Infos über dich, z.B.:&#10;- Mein Name ist...&#10;- Ich mag...&#10;- Wichtige Projekte..."></textarea>
+            <div class="field-hint">Diese Infos werden bei jeder Nachricht mitgeschickt</div>
+          </div>
+          <div class="field">
+            <label>Max. Kontext-Nachrichten: <span id="contextValue">10</span></label>
+            <input type="range" id="contextMessagesInput" min="2" max="30" step="1" value="10" oninput="document.getElementById('contextValue').textContent=this.value">
+            <div class="field-hint">Wie viele vorherige Nachrichten mitgeschickt werden</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Vorlesen (einklappbar) -->
+      <div class="settings-section collapsible">
+        <div class="settings-section-header" onclick="toggleSection(this)">
+          <span class="settings-section-title">Vorlesen</span>
+          <span class="collapse-icon">▼</span>
+        </div>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>Stimme</label>
+            <select id="voiceSelect" class="field-select" onchange="testSelectedVoice()">
+              <optgroup label="Deutsch">
+                <option value="Petra">Petra</option>
+                <option value="Anna">Anna</option>
+              </optgroup>
+              <optgroup label="English">
+                <option value="Karen">Karen</option>
+                <option value="Matilda">Matilda</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field">
+            <label>Geschwindigkeit: <span id="rateValue">1.0</span>x</label>
+            <input type="range" id="voiceRate" min="0.5" max="2" step="0.1" value="1" oninput="updateRateValue()">
+          </div>
+          <div class="field">
+            <label>Tonhöhe: <span id="pitchValue">1.0</span></label>
+            <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchValue()">
+          </div>
+          <button class="test-voice-btn" onclick="testSelectedVoice()">🔊 Stimme testen</button>
+        </div>
+      </div>
+      
+      <!-- Daten & Backup (einklappbar) -->
+      <div class="settings-section collapsible">
+        <div class="settings-section-header" onclick="toggleSection(this)">
+          <span class="settings-section-title">Daten & Backup</span>
+          <span class="collapse-icon">▼</span>
+        </div>
+        <div class="settings-section-content">
+          <div class="backup-buttons">
+            <button class="backup-btn" onclick="exportAllChats()">📤 Alle Chats exportieren</button>
+            <button class="backup-btn" onclick="document.getElementById('importFile').click()">📥 Chats importieren</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importChats(this.files[0])">
+          </div>
+          <button class="danger-btn" onclick="deleteAllChats()">🗑️ Alle Chats löschen</button>
+        </div>
       </div>
       
       <button class="save-btn" onclick="saveSettings()">Speichern</button>
@@ -660,13 +732,37 @@ async function regenerateMessage(idx) {
   showTyping(); isStreaming = true; updateSendBtn();
   try {
     const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
+    const memories = localStorage.getItem('gpt_memories') || '';
+    const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
+    const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
+    const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
+    const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
+    
     const apiMessages = [];
-    if (systemPrompt) apiMessages.push({ role: 'system', content: systemPrompt });
-    chat.messages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
+    
+    // System-Prompt mit Memory kombinieren
+    let fullSystemPrompt = systemPrompt;
+    if (memories.trim()) {
+      fullSystemPrompt += '\n\n--- Erinnerungen über den Nutzer ---\n' + memories;
+    }
+    if (fullSystemPrompt) {
+      apiMessages.push({ role: 'system', content: fullSystemPrompt });
+    }
+    
+    // Nur die letzten X Nachrichten senden
+    const recentMessages = chat.messages.slice(-maxContext);
+    recentMessages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
+    
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({ model: chat.model, messages: apiMessages })
+      body: JSON.stringify({ 
+        model: chat.model, 
+        messages: apiMessages,
+        temperature: temperature,
+        top_p: topP,
+        max_tokens: maxTokens
+      })
     });
     const data = await response.json();
     hideTyping();
@@ -734,11 +830,28 @@ async function sendMessage() {
   
   try {
     const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
+    const memories = localStorage.getItem('gpt_memories') || '';
+    const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
+    const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
+    const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
+    const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
+    
     const apiMessages = [];
-    if (systemPrompt) apiMessages.push({ role: 'system', content: systemPrompt });
+    
+    // System-Prompt mit Memory kombinieren
+    let fullSystemPrompt = systemPrompt;
+    if (memories.trim()) {
+      fullSystemPrompt += '\n\n--- Erinnerungen über den Nutzer ---\n' + memories;
+    }
+    if (fullSystemPrompt) {
+      apiMessages.push({ role: 'system', content: fullSystemPrompt });
+    }
+    
+    // Nur die letzten X Nachrichten senden (Kontext-Limit)
+    const recentMessages = chat.messages.slice(-maxContext);
     
     // Nachrichten für API aufbereiten
-    chat.messages.forEach(m => {
+    recentMessages.forEach(m => {
       if (m.attachments && m.attachments.length > 0) {
         // Multimodal message mit Bildern
         const content = [];
@@ -757,7 +870,13 @@ async function sendMessage() {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({ model: chat.model, messages: apiMessages })
+      body: JSON.stringify({ 
+        model: chat.model, 
+        messages: apiMessages,
+        temperature: temperature,
+        top_p: topP,
+        max_tokens: maxTokens
+      })
     });
     const data = await response.json();
     hideTyping();
@@ -878,9 +997,25 @@ function escapeHtml(t) { const d = document.createElement('div'); d.textContent 
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
 function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
 
+function toggleSection(header) {
+  header.parentElement.classList.toggle('collapsed');
+}
+
 function openSettings() { 
   document.getElementById('apiKeyInput').value = localStorage.getItem('gpt_api_key') || ''; 
   document.getElementById('systemPromptInput').value = localStorage.getItem('gpt_system_prompt') || ''; 
+  
+  // Sampling-Parameter laden
+  document.getElementById('temperatureInput').value = localStorage.getItem('gpt_temperature') || 0.7;
+  document.getElementById('tempValue').textContent = localStorage.getItem('gpt_temperature') || 0.7;
+  document.getElementById('topPInput').value = localStorage.getItem('gpt_top_p') || 1;
+  document.getElementById('topPValue').textContent = localStorage.getItem('gpt_top_p') || 1;
+  document.getElementById('maxTokensInput').value = localStorage.getItem('gpt_max_tokens') || 4096;
+  
+  // Memory laden
+  document.getElementById('memoriesInput').value = localStorage.getItem('gpt_memories') || '';
+  document.getElementById('contextMessagesInput').value = localStorage.getItem('gpt_context_messages') || 10;
+  document.getElementById('contextValue').textContent = localStorage.getItem('gpt_context_messages') || 10;
   
   // Voice-Einstellungen laden
   loadVoiceSettings();
@@ -897,6 +1032,15 @@ function saveSettings() {
   localStorage.setItem('gpt_api_key', document.getElementById('apiKeyInput').value.trim()); 
   localStorage.setItem('gpt_system_prompt', document.getElementById('systemPromptInput').value); 
   
+  // Sampling-Parameter speichern
+  localStorage.setItem('gpt_temperature', document.getElementById('temperatureInput').value);
+  localStorage.setItem('gpt_top_p', document.getElementById('topPInput').value);
+  localStorage.setItem('gpt_max_tokens', document.getElementById('maxTokensInput').value);
+  
+  // Memory speichern
+  localStorage.setItem('gpt_memories', document.getElementById('memoriesInput').value);
+  localStorage.setItem('gpt_context_messages', document.getElementById('contextMessagesInput').value);
+  
   // Voice-Einstellungen speichern
   localStorage.setItem('gpt_voice', document.getElementById('voiceSelect').value);
   localStorage.setItem('gpt_voice_rate', document.getElementById('voiceRate').value);
@@ -904,6 +1048,81 @@ function saveSettings() {
   
   closeSettings(); 
   showToast('Gespeichert ✓'); 
+}
+
+// Export/Import Funktionen
+function exportAllChats() {
+  const data = {
+    chats: chats,
+    settings: {
+      systemPrompt: localStorage.getItem('gpt_system_prompt'),
+      memories: localStorage.getItem('gpt_memories'),
+      temperature: localStorage.getItem('gpt_temperature'),
+      topP: localStorage.getItem('gpt_top_p'),
+      maxTokens: localStorage.getItem('gpt_max_tokens'),
+      contextMessages: localStorage.getItem('gpt_context_messages')
+    },
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'gpt-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Backup erstellt ✓');
+}
+
+function importChats(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.chats) {
+        if (confirm('Vorhandene Chats mit Import zusammenführen?')) {
+          // Zusammenführen
+          const existingIds = chats.map(c => c.id);
+          data.chats.forEach(c => {
+            if (!existingIds.includes(c.id)) {
+              chats.push(c);
+            }
+          });
+        } else {
+          // Ersetzen
+          chats = data.chats;
+        }
+        if (!activeChatId && chats.length) activeChatId = chats[0].id;
+        saveState();
+        renderChatList();
+        renderMessages();
+        showToast('Import erfolgreich ✓');
+      }
+      // Einstellungen importieren wenn vorhanden
+      if (data.settings) {
+        if (data.settings.systemPrompt) localStorage.setItem('gpt_system_prompt', data.settings.systemPrompt);
+        if (data.settings.memories) localStorage.setItem('gpt_memories', data.settings.memories);
+        if (data.settings.temperature) localStorage.setItem('gpt_temperature', data.settings.temperature);
+        if (data.settings.topP) localStorage.setItem('gpt_top_p', data.settings.topP);
+        if (data.settings.maxTokens) localStorage.setItem('gpt_max_tokens', data.settings.maxTokens);
+        if (data.settings.contextMessages) localStorage.setItem('gpt_context_messages', data.settings.contextMessages);
+      }
+    } catch (err) {
+      showToast('Import fehlgeschlagen');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function deleteAllChats() {
+  if (!confirm('ALLE Chats unwiderruflich löschen?')) return;
+  if (!confirm('Wirklich ALLE Chats löschen? Das kann nicht rückgängig gemacht werden!')) return;
+  chats = [];
+  activeChatId = null;
+  saveState();
+  newChat();
+  showToast('Alle Chats gelöscht');
 }
 
 init();
