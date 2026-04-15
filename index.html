@@ -178,6 +178,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .checkbox-label input { width: 18px; height: 18px; accent-color: var(--accent); }
 .test-voice-btn { background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; }
 .test-voice-btn:hover { background: var(--bg-input); }
+.sync-status { padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 12px; background: var(--bg-input); color: var(--text-muted); }
+.sync-status.connected { background: var(--accent-soft); color: var(--accent); }
+.sync-status.error { background: #fef2f2; color: var(--danger); }
 .save-btn { width: 100%; background: var(--accent); border: none; color: white; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; }
 
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 12px 20px; border-radius: 12px; font-size: 14px; opacity: 0; transition: opacity 0.25s; z-index: 300; pointer-events: none; }
@@ -397,6 +400,40 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importChats(this.files[0])">
           </div>
           <button class="danger-btn" onclick="deleteAllChats()">🗑️ Alle Chats löschen</button>
+        </div>
+      </div>
+      
+      <!-- Cloud-Sync (einklappbar) -->
+      <div class="settings-section collapsible">
+        <div class="settings-section-header" onclick="toggleSection(this)">
+          <span class="settings-section-title">☁️ Cloud-Synchronisierung</span>
+          <span class="collapse-icon">▼</span>
+        </div>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>Supabase URL</label>
+            <input type="text" id="supabaseUrlInput" placeholder="https://xxx.supabase.co">
+          </div>
+          <div class="field">
+            <label>Supabase Key</label>
+            <input type="password" id="supabaseKeyInput" placeholder="sb_publishable_...">
+          </div>
+          <div class="field">
+            <label>Geräte-ID</label>
+            <input type="text" id="deviceIdInput" placeholder="z.B. iphone-moni">
+            <div class="field-hint">Eindeutiger Name für dieses Gerät</div>
+          </div>
+          <div class="sync-status" id="syncStatus">Nicht verbunden</div>
+          <div class="backup-buttons">
+            <button class="backup-btn" onclick="testSupabaseConnection()">🔗 Verbindung testen</button>
+            <button class="backup-btn" onclick="syncToCloud()">☁️ Jetzt synchronisieren</button>
+          </div>
+          <div class="field" style="margin-top: 12px;">
+            <label class="checkbox-label">
+              <input type="checkbox" id="autoSyncInput">
+              <span>Automatisch synchronisieren</span>
+            </label>
+          </div>
         </div>
       </div>
       
@@ -1285,6 +1322,12 @@ function openSettings() {
   updateRateValue();
   updatePitchValue();
   
+  // Supabase laden
+  document.getElementById('supabaseUrlInput').value = localStorage.getItem('gpt_supabase_url') || '';
+  document.getElementById('supabaseKeyInput').value = localStorage.getItem('gpt_supabase_key') || '';
+  document.getElementById('deviceIdInput').value = localStorage.getItem('gpt_device_id') || '';
+  document.getElementById('autoSyncInput').checked = localStorage.getItem('gpt_auto_sync') === 'true';
+  
   document.getElementById('settingsModal').classList.add('open'); 
 }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
@@ -1317,6 +1360,12 @@ function saveSettings() {
   localStorage.setItem('gpt_voice', document.getElementById('voiceSelect').value);
   localStorage.setItem('gpt_voice_rate', document.getElementById('voiceRate').value);
   localStorage.setItem('gpt_voice_pitch', document.getElementById('voicePitch').value);
+  
+  // Supabase speichern
+  localStorage.setItem('gpt_supabase_url', document.getElementById('supabaseUrlInput').value.trim());
+  localStorage.setItem('gpt_supabase_key', document.getElementById('supabaseKeyInput').value.trim());
+  localStorage.setItem('gpt_device_id', document.getElementById('deviceIdInput').value.trim());
+  localStorage.setItem('gpt_auto_sync', document.getElementById('autoSyncInput').checked);
   
   closeSettings(); 
   showToast('Gespeichert ✓'); 
@@ -1565,6 +1614,138 @@ chatArea.addEventListener('scroll', () => {
 
 function scrollToBottom() {
   chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
+}
+
+// ============ SUPABASE CLOUD SYNC ============
+
+function getSupabaseConfig() {
+  return {
+    url: localStorage.getItem('gpt_supabase_url') || '',
+    key: localStorage.getItem('gpt_supabase_key') || '',
+    deviceId: localStorage.getItem('gpt_device_id') || 'default-device'
+  };
+}
+
+async function supabaseRequest(method, endpoint, body = null) {
+  const config = getSupabaseConfig();
+  if (!config.url || !config.key) throw new Error('Supabase nicht konfiguriert');
+  
+  const headers = {
+    'apikey': config.key,
+    'Authorization': 'Bearer ' + config.key,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'return=representation' : undefined
+  };
+  
+  const options = { method, headers };
+  if (body) options.body = JSON.stringify(body);
+  
+  const response = await fetch(config.url + '/rest/v1/' + endpoint, options);
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error('Supabase Fehler: ' + error);
+  }
+  
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function testSupabaseConnection() {
+  const statusEl = document.getElementById('syncStatus');
+  statusEl.textContent = 'Teste Verbindung...';
+  statusEl.className = 'sync-status';
+  
+  try {
+    await supabaseRequest('GET', 'chats?select=id&limit=1');
+    statusEl.textContent = '✓ Verbunden!';
+    statusEl.className = 'sync-status connected';
+    showToast('Supabase verbunden!');
+  } catch (e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.className = 'sync-status error';
+    showToast('Verbindung fehlgeschlagen');
+  }
+}
+
+async function syncToCloud() {
+  const config = getSupabaseConfig();
+  if (!config.url || !config.key) {
+    showToast('Bitte Supabase-Daten eingeben');
+    return;
+  }
+  
+  const statusEl = document.getElementById('syncStatus');
+  statusEl.textContent = 'Synchronisiere...';
+  statusEl.className = 'sync-status';
+  
+  try {
+    // Aktuelle Daten hochladen
+    const data = {
+      user_id: config.deviceId,
+      data: {
+        chats: chats,
+        settings: {
+          systemPrompt: localStorage.getItem('gpt_system_prompt'),
+          pinnedMemories: localStorage.getItem('gpt_pinned_memories'),
+          keywordMemories: localStorage.getItem('gpt_keyword_memories')
+        }
+      },
+      updated_at: new Date().toISOString()
+    };
+    
+    // Prüfe ob schon ein Eintrag existiert
+    const existing = await supabaseRequest('GET', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId));
+    
+    if (existing && existing.length > 0) {
+      // Update
+      await supabaseRequest('PATCH', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId), data);
+    } else {
+      // Insert
+      await supabaseRequest('POST', 'chats', data);
+    }
+    
+    statusEl.textContent = '✓ Synchronisiert um ' + new Date().toLocaleTimeString('de-DE');
+    statusEl.className = 'sync-status connected';
+    showToast('Daten synchronisiert!');
+    
+  } catch (e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.className = 'sync-status error';
+    showToast('Sync fehlgeschlagen: ' + e.message);
+  }
+}
+
+async function syncFromCloud() {
+  const config = getSupabaseConfig();
+  if (!config.url || !config.key) return;
+  
+  try {
+    const result = await supabaseRequest('GET', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId));
+    
+    if (result && result.length > 0 && result[0].data) {
+      const cloudData = result[0].data;
+      
+      // Merge Chats (Cloud gewinnt bei Konflikten)
+      if (cloudData.chats && cloudData.chats.length > 0) {
+        // Einfaches Merge: Alle Cloud-Chats übernehmen
+        const cloudChatIds = new Set(cloudData.chats.map(c => c.id));
+        const localOnlyChats = chats.filter(c => !cloudChatIds.has(c.id));
+        chats = [...cloudData.chats, ...localOnlyChats];
+        saveState();
+        renderChatList();
+        renderMessages();
+      }
+      
+      showToast('Daten von Cloud geladen');
+    }
+  } catch (e) {
+    console.log('Cloud sync failed:', e);
+  }
+}
+
+// Auto-Sync beim Start wenn aktiviert
+if (localStorage.getItem('gpt_auto_sync') === 'true') {
+  setTimeout(syncFromCloud, 2000);
 }
 </script>
 </body>
