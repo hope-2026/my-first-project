@@ -491,9 +491,12 @@ let pendingAttachments = [];
 function init() {
   loadState();
   loadKeywordMemoriesOnStart();
-  // Beim Start IMMER einen neuen leeren Chat öffnen (für Privatsphäre)
+  // Beim Start: KEIN Chat aktiv, nur Willkommensbildschirm anzeigen
   // Alte Chats bleiben im Menü erhalten
-  newChat();
+  activeChatId = null;
+  saveState();
+  renderChatList();
+  renderMessages();
 }
 
 function loadKeywordMemoriesOnStart() {
@@ -647,8 +650,7 @@ function deleteCurrentChat() {
   if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
   const id = activeChatId;
   chats = chats.filter(c => c.id !== id);
-  activeChatId = chats.length ? chats[0].id : null;
-  if (!chats.length) newChat();
+  activeChatId = null;
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
   showToast('Chat gelöscht');
 }
@@ -661,9 +663,8 @@ document.addEventListener('click', (e) => {
 });
 
 function newChat() {
-  const id = 'chat_' + Date.now();
-  chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, createdAt: Date.now(), updatedAt: Date.now() });
-  activeChatId = id;
+  // Zeige nur den Willkommensbildschirm - echter Chat wird erst beim Senden erstellt
+  activeChatId = null;
   if (document.getElementById('chatSearch')) document.getElementById('chatSearch').value = '';
   saveState(); renderChatList(); renderMessages(); closeSidebar();
   document.getElementById('inputField').focus();
@@ -681,7 +682,7 @@ function deleteChat(id, e) {
   closeAllMenus();
   if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
   chats = chats.filter(c => c.id !== id);
-  if (activeChatId === id) { activeChatId = chats.length ? chats[0].id : null; if (!chats.length) newChat(); }
+  if (activeChatId === id) { activeChatId = null; }
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
   showToast('Chat gelöscht');
 }
@@ -1079,6 +1080,14 @@ async function sendMessage() {
   if ((!text && !hasAttachments) || isStreaming) return;
   const apiKey = localStorage.getItem('gpt_api_key');
   if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); openSettings(); return; }
+  
+  // Wenn kein Chat aktiv ist (Willkommensbildschirm), erstelle jetzt einen neuen
+  if (!activeChatId || !getActiveChat()) {
+    const id = 'chat_' + Date.now();
+    chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, createdAt: Date.now(), updatedAt: Date.now() });
+    activeChatId = id;
+  }
+  
   const chat = getActiveChat();
   if (!chat) return;
   
