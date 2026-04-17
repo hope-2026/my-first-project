@@ -491,13 +491,9 @@ let pendingAttachments = [];
 function init() {
   loadState();
   loadKeywordMemoriesOnStart();
-  if (!chats.length) newChat();
-  else {
-    if (!chats.find(c => c.id === activeChatId)) activeChatId = chats[0].id;
-    const chat = getActiveChat();
-    if (chat?.model) document.getElementById('modelSelect').value = chat.model;
-    renderChatList(); renderMessages();
-  }
+  // Beim Start IMMER einen neuen leeren Chat öffnen (für Privatsphäre)
+  // Alte Chats bleiben im Menü erhalten
+  newChat();
 }
 
 function loadKeywordMemoriesOnStart() {
