@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mm-chat-v1';
+const CACHE_NAME = 'mm-chat-v2';
 const urlsToCache = [
   '/my-first-project/',
   '/my-first-project/index.html',
@@ -35,7 +35,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch - Cache-First Strategie für App-Dateien, Network-First für API
+// Fetch - Network-First für App-Dateien, damit Updates sofort sichtbar sind
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   
@@ -50,30 +50,33 @@ self.addEventListener('fetch', event => {
     return;
   }
   
-  // App-Dateien: Cache-First
+  // App-Dateien: Network-First
+  // Versuche erst das Netzwerk, bei Erfolg: aktualisiere Cache und liefere neue Version
+  // Bei Netzwerkfehler: liefere Cache (Offline-Modus)
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        if (response) {
+        // Nur erfolgreiche Responses cachen
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
-        return fetch(event.request)
-          .then(response => {
-            // Nur erfolgreiche Responses cachen
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            return response;
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME)
+          .then(cache => {
+            cache.put(event.request, responseToCache);
           });
+        return response;
       })
       .catch(() => {
-        // Offline-Fallback
-        return caches.match('/my-first-project/index.html');
+        // Offline-Fallback: aus Cache liefern
+        return caches.match(event.request)
+          .then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            // Letzter Fallback: index.html
+            return caches.match('/my-first-project/index.html');
+          });
       })
   );
 });
