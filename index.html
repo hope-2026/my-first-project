@@ -216,6 +216,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <option value="openai/gpt-5.1-chat">GPT-5.1 Chat</option>
       </optgroup>
       <optgroup label="Anthropic">
+        <option value="anthropic/claude-opus-4.7">Claude Opus 4.7</option>
         <option value="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</option>
       </optgroup>
       <optgroup label="xAI">
@@ -226,7 +227,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <option value="moonshotai/kimi-k2.5">Kimi K2.5</option>
         <option value="moonshotai/kimi-k2-thinking">Kimi K2 Denken</option>
         <option value="meta-llama/llama-4-maverick">Llama 4 Maverick</option>
-        <option value="qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B</option>
+        <option value="qwen/qwen3-235b-a22b">Qwen 3.6 Plus</option>
       </optgroup>
     </select>
     <button class="settings-btn" onclick="openSettings()">⚙️</button>
@@ -491,12 +492,13 @@ let pendingAttachments = [];
 function init() {
   loadState();
   loadKeywordMemoriesOnStart();
-  // Beim Start: KEIN Chat aktiv, nur Willkommensbildschirm anzeigen
-  // Alte Chats bleiben im Menü erhalten
-  activeChatId = null;
-  saveState();
-  renderChatList();
-  renderMessages();
+  if (!chats.length) newChat();
+  else {
+    if (!chats.find(c => c.id === activeChatId)) activeChatId = chats[0].id;
+    const chat = getActiveChat();
+    if (chat?.model) document.getElementById('modelSelect').value = chat.model;
+    renderChatList(); renderMessages();
+  }
 }
 
 function loadKeywordMemoriesOnStart() {
@@ -650,7 +652,8 @@ function deleteCurrentChat() {
   if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
   const id = activeChatId;
   chats = chats.filter(c => c.id !== id);
-  activeChatId = null;
+  activeChatId = chats.length ? chats[0].id : null;
+  if (!chats.length) newChat();
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
   showToast('Chat gelöscht');
 }
@@ -663,8 +666,9 @@ document.addEventListener('click', (e) => {
 });
 
 function newChat() {
-  // Zeige nur den Willkommensbildschirm - echter Chat wird erst beim Senden erstellt
-  activeChatId = null;
+  const id = 'chat_' + Date.now();
+  chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, createdAt: Date.now(), updatedAt: Date.now() });
+  activeChatId = id;
   if (document.getElementById('chatSearch')) document.getElementById('chatSearch').value = '';
   saveState(); renderChatList(); renderMessages(); closeSidebar();
   document.getElementById('inputField').focus();
@@ -682,7 +686,7 @@ function deleteChat(id, e) {
   closeAllMenus();
   if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
   chats = chats.filter(c => c.id !== id);
-  if (activeChatId === id) { activeChatId = null; }
+  if (activeChatId === id) { activeChatId = chats.length ? chats[0].id : null; if (!chats.length) newChat(); }
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
   showToast('Chat gelöscht');
 }
@@ -1080,14 +1084,6 @@ async function sendMessage() {
   if ((!text && !hasAttachments) || isStreaming) return;
   const apiKey = localStorage.getItem('gpt_api_key');
   if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); openSettings(); return; }
-  
-  // Wenn kein Chat aktiv ist (Willkommensbildschirm), erstelle jetzt einen neuen
-  if (!activeChatId || !getActiveChat()) {
-    const id = 'chat_' + Date.now();
-    chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, createdAt: Date.now(), updatedAt: Date.now() });
-    activeChatId = id;
-  }
-  
   const chat = getActiveChat();
   if (!chat) return;
   
