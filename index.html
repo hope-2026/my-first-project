@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -21,8 +22,8 @@
   --text-muted: #94a3b8;
   --accent: #14b8a6;
   --accent-soft: #ccfbf1;
-  --user-bg: #a855f7;
-  --user-text: #ffffff;
+  --user-bg: #d8b4fe;
+  --user-text: #1e293b;
   --ai-bg: #ffffff;
   --ai-border: #e2e8f0;
   --border: #e2e8f0;
@@ -39,8 +40,8 @@
     --text-muted: #64748b;
     --accent: #2dd4bf;
     --accent-soft: #134e4a;
-    --user-bg: #a855f7;
-    --user-text: #ffffff;
+    --user-bg: #c4b5fd;
+    --user-text: #1e1b2e;
     --ai-bg: #1e293b;
     --ai-border: #334155;
     --border: #334155;
@@ -51,18 +52,18 @@
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
 .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
-.topbar { padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; position: relative; }
-.menu-btn { background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; padding: 4px; }
-.topbar-title { font-size: 17px; font-weight: 700; color: var(--accent); }
-.model-select { flex: 1; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; cursor: pointer; }
-.settings-btn { background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer; padding: 4px; }
-.chat-options-btn { background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer; padding: 4px 8px; }
-.chat-options-popup { position: absolute; top: 100%; right: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); min-width: 160px; z-index: 100; display: none; overflow: hidden; }
+.topbar { padding: 12px 16px; background: var(–bg); border-bottom: 1px solid var(–border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; position: relative; }
+.menu-btn { background: none; border: none; color: var(–text); font-size: 22px; cursor: pointer; padding: 4px; }
+.topbar-title { font-size: 17px; font-weight: 700; color: var(–accent); }
+.model-select { flex: 1; padding: 10px 14px; background: var(–bg-input); border: 1px solid var(–border); border-radius: 12px; color: var(–text); font-size: 14px; cursor: pointer; }
+.settings-btn { background: none; border: none; color: var(–text-dim); font-size: 22px; cursor: pointer; padding: 4px; }
+.chat-options-btn { background: none; border: none; color: var(–text-dim); font-size: 22px; cursor: pointer; padding: 4px 8px; }
+.chat-options-popup { position: absolute; top: 100%; right: 16px; background: var(–bg); border: 1px solid var(–border); border-radius: 12px; box-shadow: var(–shadow); min-width: 160px; z-index: 100; display: none; overflow: hidden; }
 .chat-options-popup.open { display: block; }
 
 .chat-area { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
-.welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--text-muted); }
-.welcome-logo { font-size: 48px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+.welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(–text-muted); }
+.welcome-logo { font-size: 48px; font-weight: 700; color: var(–accent); margin-bottom: 12px; }
 .welcome-sub { font-size: 15px; line-height: 1.6; }
 
 .message { margin-bottom: 16px; display: flex; flex-direction: column; animation: fadeIn 0.25s ease-out; }
@@ -70,140 +71,142 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .message.user { align-items: flex-end; }
 .message.assistant { align-items: flex-start; }
 .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; }
-.message.user .bubble { background: var(--user-bg); color: var(--user-text); border-bottom-right-radius: 6px; }
-.message.assistant .bubble { background: var(--ai-bg); border: 1px solid var(--ai-border); color: var(--text); border-bottom-left-radius: 6px; box-shadow: var(--shadow); }
+.message.user .bubble { background: var(–user-bg); color: var(–user-text); border-bottom-right-radius: 6px; }
+.message.assistant .bubble { background: var(–ai-bg); border: 1px solid var(–ai-border); color: var(–text); border-bottom-left-radius: 6px; box-shadow: var(–shadow); }
 
-.msg-actions { display: flex; gap: 8px; margin-top: 8px; }
-.msg-action { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 4px; opacity: 0.5; transition: opacity 0.2s; }
-.msg-action:hover { opacity: 1; }
-.msg-action.speaking { opacity: 1; color: var(--accent); }
-.msg-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; padding: 0 4px; }
+.msg-actions { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+.msg-action { background: var(–bg-soft); border: 1px solid var(–border); color: var(–text-dim); font-size: 13px; cursor: pointer; padding: 5px 10px; border-radius: 8px; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
+.msg-action:hover { background: var(–bg-input); color: var(–text); border-color: var(–text-muted); }
+.msg-action.speaking { background: var(–accent-soft); color: var(–accent); border-color: var(–accent); }
+.msg-action svg { width: 14px; height: 14px; flex-shrink: 0; }
+.msg-time { font-size: 11px; color: var(–text-muted); margin-top: 4px; padding: 0 4px; }
 
-.typing { display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--text-dim); font-size: 14px; }
+.typing { display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(–text-dim); font-size: 14px; }
 .typing-dots { display: flex; gap: 4px; }
-.typing-dots span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+.typing-dots span { width: 6px; height: 6px; background: var(–accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
 .typing-dots span:nth-child(1) { animation-delay: 0s; }
 .typing-dots span:nth-child(2) { animation-delay: 0.16s; }
 .typing-dots span:nth-child(3) { animation-delay: 0.32s; }
 @keyframes bounce { 0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
 
-.input-area { padding: 12px 16px; background: var(--bg); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+.input-area { padding: 12px 16px; background: var(–bg); border-top: 1px solid var(–border); flex-shrink: 0; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
 .input-wrapper { display: flex; gap: 10px; align-items: flex-end; }
-.attach-btn { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 8px; }
-.attach-btn:hover { color: var(--accent); }
-.cancel-edit-btn { background: none; border: none; color: var(--danger); font-size: 24px; cursor: pointer; padding: 8px; display: none; }
+.attach-btn { background: none; border: none; color: var(–text-muted); font-size: 24px; cursor: pointer; padding: 8px; }
+.attach-btn:hover { color: var(–accent); }
+.cancel-edit-btn { background: none; border: none; color: var(–danger); font-size: 24px; cursor: pointer; padding: 8px; display: none; }
 .cancel-edit-btn.visible { display: block; }
-.input-field { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 20px; padding: 12px 18px; color: var(--text); font-size: 16px; font-family: inherit; resize: none; min-height: 48px; max-height: 150px; outline: none; line-height: 1.4; }
-.input-field:focus { border-color: var(--accent); }
-.input-field.editing { border-color: var(--user-bg); }
-.input-field::placeholder { color: var(--text-muted); }
-.send-btn { background: var(--accent); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.input-field { flex: 1; background: var(–bg-input); border: 1px solid var(–border); border-radius: 20px; padding: 12px 18px; color: var(–text); font-size: 16px; font-family: inherit; resize: none; min-height: 48px; max-height: 150px; outline: none; line-height: 1.4; }
+.input-field:focus { border-color: var(–accent); }
+.input-field.editing { border-color: var(–user-bg); }
+.input-field::placeholder { color: var(–text-muted); }
+.send-btn { background: var(–accent); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .send-btn svg { width: 22px; height: 22px; fill: white; }
-.edit-banner { display: none; padding: 6px 12px; background: var(--user-bg); color: white; font-size: 12px; justify-content: space-between; align-items: center; border-radius: 8px; margin: 0 16px 8px 16px; }
+.edit-banner { display: none; padding: 6px 12px; background: var(–user-bg); color: var(–user-text); font-size: 12px; justify-content: space-between; align-items: center; border-radius: 8px; margin: 0 16px 8px 16px; }
 .edit-banner.visible { display: flex; }
-.edit-banner-close { background: none; border: none; color: white; font-size: 16px; cursor: pointer; padding: 2px 6px; }
+.edit-banner-close { background: none; border: none; color: var(–user-text); font-size: 16px; cursor: pointer; padding: 2px 6px; }
 
 .attachments-preview { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px 0; }
-.attachment-item { position: relative; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+.attachment-item { position: relative; background: var(–bg-soft); border: 1px solid var(–border); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(–text); }
 .attachment-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
 .attachment-item .file-icon { font-size: 20px; }
 .attachment-item .file-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.attachment-remove { background: var(--danger); color: white; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: absolute; top: -6px; right: -6px; }
+.attachment-remove { background: var(–danger); color: white; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: absolute; top: -6px; right: -6px; }
 
-.sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 300px; background: var(--bg); border-right: 1px solid var(--border); transform: translateX(-100%); transition: transform 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
+.sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 300px; background: var(–bg); border-right: 1px solid var(–border); transform: translateX(-100%); transition: transform 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
 .sidebar.open { transform: translateX(0); }
 .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
-.sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.sidebar-header h2 { font-size: 16px; font-weight: 700; color: var(--accent); }
-.new-chat-btn { background: var(--accent); color: white; border: none; width: 34px; height: 34px; border-radius: 10px; font-size: 20px; cursor: pointer; }
+.sidebar-header { padding: 16px; border-bottom: 1px solid var(–border); display: flex; align-items: center; justify-content: space-between; }
+.sidebar-header h2 { font-size: 16px; font-weight: 700; color: var(–accent); }
+.new-chat-btn { background: var(–accent); color: white; border: none; width: 34px; height: 34px; border-radius: 10px; font-size: 20px; cursor: pointer; }
 .chat-list { flex: 1; overflow-y: auto; padding: 8px; }
 .chat-item { padding: 12px 14px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; position: relative; }
-.chat-item:hover { background: var(--bg-soft); }
-.chat-item.active { background: var(--accent-soft); }
-.chat-item-title { flex: 1; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chat-item.active .chat-item-title { color: var(--accent); font-weight: 600; }
-.chat-item-menu-btn { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
-.chat-item-menu-btn:hover { background: var(--bg-input); color: var(--text); }
-.chat-item-input { flex: 1; background: var(--bg-input); border: 1px solid var(--accent); border-radius: 6px; padding: 6px 10px; font-size: 14px; color: var(--text); outline: none; }
+.chat-item:hover { background: var(–bg-soft); }
+.chat-item.active { background: var(–accent-soft); }
+.chat-item-title { flex: 1; font-size: 14px; color: var(–text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-item.active .chat-item-title { color: var(–accent); font-weight: 600; }
+.chat-item-menu-btn { background: none; border: none; color: var(–text-muted); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+.chat-item-menu-btn:hover { background: var(–bg-input); color: var(–text); }
+.chat-item-input { flex: 1; background: var(–bg-input); border: 1px solid var(–accent); border-radius: 6px; padding: 6px 10px; font-size: 14px; color: var(–text); outline: none; }
 
-.chat-menu-popup { position: absolute; right: 10px; top: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 50; min-width: 160px; overflow: hidden; display: none; }
+.chat-menu-popup { position: absolute; right: 10px; top: 100%; background: var(–bg); border: 1px solid var(–border); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 50; min-width: 160px; overflow: hidden; display: none; }
 .chat-menu-popup.open { display: block; }
-.chat-menu-item { padding: 12px 16px; font-size: 14px; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; }
-.chat-menu-item:hover { background: var(--bg-soft); }
-.chat-menu-item.danger { color: var(--danger); }
+.chat-menu-item { padding: 12px 16px; font-size: 14px; color: var(–text); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+.chat-menu-item:hover { background: var(–bg-soft); }
+.chat-menu-item.danger { color: var(–danger); }
 .chat-menu-item.danger:hover { background: #fef2f2; }
 @media (prefers-color-scheme: dark) {
-  .chat-menu-item.danger:hover { background: #3b1c1c; }
+.chat-menu-item.danger:hover { background: #3b1c1c; }
 }
 
-.sidebar-search { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-.search-input { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none; }
-.search-input:focus { border-color: var(--accent); }
-.search-input::placeholder { color: var(--text-muted); }
+.sidebar-search { padding: 12px 16px; border-bottom: 1px solid var(–border); }
+.search-input { width: 100%; background: var(–bg-input); border: 1px solid var(–border); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: var(–text); outline: none; }
+.search-input:focus { border-color: var(–accent); }
+.search-input::placeholder { color: var(–text-muted); }
 
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
 .modal-overlay.open { display: flex; }
-.modal { background: var(--bg); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
-.modal-header { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg); }
-.modal-header h3 { font-size: 17px; font-weight: 700; color: var(--accent); }
-.modal-close { background: var(--bg-soft); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; color: var(--text); }
+.modal { background: var(–bg); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+.modal-header { padding: 18px 20px; border-bottom: 1px solid var(–border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(–bg); }
+.modal-header h3 { font-size: 17px; font-weight: 700; color: var(–accent); }
+.modal-close { background: var(–bg-soft); border: 1px solid var(–border); width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; color: var(–text); }
 .modal-body { padding: 20px; }
 .field { margin-bottom: 20px; }
-.field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
-.field input, .field textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; }
-.field input:focus, .field textarea:focus { border-color: var(--accent); }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(–text-dim); margin-bottom: 8px; text-transform: uppercase; }
+.field input, .field textarea { width: 100%; background: var(–bg-input); border: 1px solid var(–border); border-radius: 12px; padding: 14px 16px; color: var(–text); font-size: 15px; font-family: inherit; outline: none; }
+.field input:focus, .field textarea:focus { border-color: var(–accent); }
 .field textarea { min-height: 120px; resize: vertical; }
-.field input[type="range"] { padding: 0; height: 6px; border-radius: 3px; -webkit-appearance: none; appearance: none; background: var(--border); }
-.field input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-.field-select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; cursor: pointer; }
-.field-select:focus { border-color: var(--accent); }
-.settings-section { margin: 20px 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-.settings-section-header { padding: 14px 16px; background: var(--bg-soft); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-.settings-section-title { font-size: 14px; font-weight: 600; color: var(--accent); margin: 0; }
-.collapse-icon { color: var(--text-muted); transition: transform 0.2s; }
+.field input[type=“range”] { padding: 0; height: 6px; border-radius: 3px; -webkit-appearance: none; appearance: none; background: var(–border); }
+.field input[type=“range”]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(–accent); cursor: pointer; }
+.field-select { width: 100%; background: var(–bg-input); border: 1px solid var(–border); border-radius: 12px; padding: 14px 16px; color: var(–text); font-size: 15px; font-family: inherit; outline: none; cursor: pointer; }
+.field-select:focus { border-color: var(–accent); }
+.settings-section { margin: 20px 0; border: 1px solid var(–border); border-radius: 12px; overflow: hidden; }
+.settings-section-header { padding: 14px 16px; background: var(–bg-soft); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.settings-section-title { font-size: 14px; font-weight: 600; color: var(–accent); margin: 0; }
+.collapse-icon { color: var(–text-muted); transition: transform 0.2s; }
 .settings-section.collapsed .collapse-icon { transform: rotate(-90deg); }
 .settings-section-content { padding: 16px; display: block; }
 .settings-section.collapsed .settings-section-content { display: none; }
-.field-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.field-hint { font-size: 12px; color: var(–text-muted); margin-top: 6px; }
 .backup-buttons { display: flex; gap: 10px; margin-bottom: 12px; }
-.backup-btn { flex: 1; background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 10px; font-size: 13px; cursor: pointer; }
-.backup-btn:hover { background: var(--bg-input); }
-.danger-btn { width: 100%; background: none; border: 1px solid var(--danger); color: var(--danger); padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; }
-.danger-btn:hover { background: var(--danger); color: white; }
-.danger-section { border-color: var(--danger); opacity: 0.7; }
-.danger-section .settings-section-title { color: var(--danger); }
+.backup-btn { flex: 1; background: var(–bg-soft); border: 1px solid var(–border); color: var(–text); padding: 12px; border-radius: 10px; font-size: 13px; cursor: pointer; }
+.backup-btn:hover { background: var(–bg-input); }
+.danger-btn { width: 100%; background: none; border: 1px solid var(–danger); color: var(–danger); padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+.danger-btn:hover { background: var(–danger); color: white; }
+.danger-section { border-color: var(–danger); opacity: 0.7; }
+.danger-section .settings-section-title { color: var(–danger); }
 .danger-section .settings-section-header { background: rgba(239, 68, 68, 0.05); }
-.danger-warning { font-size: 12px; color: var(--danger); padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; text-align: center; }
-.danger-btn-small { width: 100%; background: none; border: 1px solid var(--danger); color: var(--danger); padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; opacity: 0.5; }
+.danger-warning { font-size: 12px; color: var(–danger); padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; text-align: center; }
+.danger-btn-small { width: 100%; background: none; border: 1px solid var(–danger); color: var(–danger); padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; opacity: 0.5; }
 .danger-btn-small:disabled { cursor: not-allowed; }
 .danger-btn-small:not(:disabled) { opacity: 1; }
-.danger-btn-small:not(:disabled):hover { background: var(--danger); color: white; }
-.add-memory-btn { background: var(--accent); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 8px; }
-.memory-item { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+.danger-btn-small:not(:disabled):hover { background: var(–danger); color: white; }
+.add-memory-btn { background: var(–accent); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 8px; }
+.memory-item { background: var(–bg-soft); border: 1px solid var(–border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
 .memory-item-header { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-.memory-item-header input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px; }
-.memory-item-header select { background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px; }
-.memory-item-header button { background: none; border: none; color: var(--danger); font-size: 18px; cursor: pointer; padding: 4px; }
-.memory-item textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px; min-height: 60px; resize: vertical; font-family: inherit; }
-.memory-token-count { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+.memory-item-header input { flex: 1; background: var(–bg-input); border: 1px solid var(–border); border-radius: 6px; padding: 8px; color: var(–text); font-size: 13px; }
+.memory-item-header select { background: var(–bg-input); border: 1px solid var(–border); border-radius: 6px; padding: 8px; color: var(–text); font-size: 13px; }
+.memory-item-header button { background: none; border: none; color: var(–danger); font-size: 18px; cursor: pointer; padding: 4px; }
+.memory-item textarea { width: 100%; background: var(–bg-input); border: 1px solid var(–border); border-radius: 6px; padding: 8px; color: var(–text); font-size: 13px; min-height: 60px; resize: vertical; font-family: inherit; }
+.memory-token-count { font-size: 11px; color: var(–text-muted); text-align: right; margin-top: 4px; }
 .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.checkbox-label input { width: 18px; height: 18px; accent-color: var(--accent); }
-.test-voice-btn { background: var(--bg-soft); border: 1px solid var(--border); color: var(--text); padding: 12px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; }
-.test-voice-btn:hover { background: var(--bg-input); }
-.sync-status { padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 12px; background: var(--bg-input); color: var(--text-muted); }
-.sync-status.connected { background: var(--accent-soft); color: var(--accent); }
-.sync-status.error { background: #fef2f2; color: var(--danger); }
-.save-btn { width: 100%; background: var(--accent); border: none; color: white; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+.checkbox-label input { width: 18px; height: 18px; accent-color: var(–accent); }
+.test-voice-btn { background: var(–bg-soft); border: 1px solid var(–border); color: var(–text); padding: 12px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+.test-voice-btn:hover { background: var(–bg-input); }
+.sync-status { padding: 10px 14px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 12px; background: var(–bg-input); color: var(–text-muted); }
+.sync-status.connected { background: var(–accent-soft); color: var(–accent); }
+.sync-status.error { background: #fef2f2; color: var(–danger); }
+.save-btn { width: 100%; background: var(–accent); border: none; color: white; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; }
 
-.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 12px 20px; border-radius: 12px; font-size: 14px; opacity: 0; transition: opacity 0.25s; z-index: 300; pointer-events: none; }
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(–text); color: var(–bg); padding: 12px 20px; border-radius: 12px; font-size: 14px; opacity: 0; transition: opacity 0.25s; z-index: 300; pointer-events: none; }
 .toast.show { opacity: 1; }
 
-.scroll-btn { position: fixed; bottom: 90px; right: 20px; background: var(--accent); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 20px; box-shadow: var(--shadow); z-index: 50; transition: transform 0.2s; }
+.scroll-btn { position: fixed; bottom: 90px; right: 20px; background: var(–accent); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 20px; box-shadow: var(–shadow); z-index: 50; transition: transform 0.2s; }
 .scroll-btn:hover { transform: scale(1.1); }
 .scroll-btn.visible { display: flex; }
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -266,221 +269,224 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <div class="modal">
     <div class="modal-header"><h3>Einstellungen</h3><button class="modal-close" onclick="closeSettings()">✕</button></div>
     <div class="modal-body">
-      
-      <!-- API & Prompt (einklappbar) -->
-      <div class="settings-section collapsible collapsed">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">🔑 API & Prompt</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="field"><label>OpenRouter API-Schlüssel</label><input type="password" id="apiKeyInput" placeholder="sk-or-v1-..."></div>
-          <div class="field"><label>System-Prompt</label><textarea id="systemPromptInput" placeholder="Definiere die Persönlichkeit der KI..."></textarea></div>
-        </div>
-      </div>
-      
-      <!-- Personalisierung (einklappbar) -->
-      <div class="settings-section collapsible collapsed">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">Personalisierung</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="field">
-            <label>Dein Name</label>
-            <input type="text" id="userNameInput" placeholder="z.B. Moni">
-          </div>
-          <div class="field">
-            <label>Name der KI</label>
-            <input type="text" id="aiNameInput" placeholder="z.B. Tatjana">
-          </div>
-        </div>
-      </div>
-      
-      <!-- Sampling-Parameter (einklappbar) -->
-      <div class="settings-section collapsible collapsed">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">Sampling-Parameter</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="field">
-            <label>Temperature: <span id="tempValue">0.7</span></label>
-            <input type="range" id="temperatureInput" min="0" max="2" step="0.1" value="0.7" oninput="document.getElementById('tempValue').textContent=this.value">
-            <div class="field-hint">Niedrig = präziser, Hoch = kreativer</div>
-          </div>
-          <div class="field">
-            <label>Top P: <span id="topPValue">1.0</span></label>
-            <input type="range" id="topPInput" min="0" max="1" step="0.05" value="1" oninput="document.getElementById('topPValue').textContent=this.value">
-          </div>
-          <div class="field">
-            <label>Top K: <span id="topKValue">0</span></label>
-            <input type="range" id="topKInput" min="0" max="100" step="1" value="0" oninput="document.getElementById('topKValue').textContent=this.value">
-            <div class="field-hint">0 = deaktiviert</div>
-          </div>
-          <div class="field">
-            <label>Frequency Penalty: <span id="freqPenValue">0</span></label>
-            <input type="range" id="freqPenInput" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('freqPenValue').textContent=this.value">
-            <div class="field-hint">Reduziert Wortwiederholungen</div>
-          </div>
-          <div class="field">
-            <label>Presence Penalty: <span id="presPenValue">0</span></label>
-            <input type="range" id="presPenInput" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('presPenValue').textContent=this.value">
-            <div class="field-hint">Fördert neue Themen</div>
-          </div>
-          <div class="field">
-            <label>Repetition Penalty: <span id="repPenValue">1.0</span></label>
-            <input type="range" id="repPenInput" min="1" max="2" step="0.05" value="1" oninput="document.getElementById('repPenValue').textContent=this.value">
-            <div class="field-hint">1.0 = aus, 1.15 = empfohlen</div>
-          </div>
-          <div class="field">
-            <label>Max. Tokens</label>
-            <input type="number" id="maxTokensInput" placeholder="4096" value="4096">
-          </div>
-        </div>
-      </div>
-      
-      <!-- Memory-System (einklappbar) -->
-      <div class="settings-section collapsible collapsed">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">Memory-System</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="field">
-            <label>Angeheftete Erinnerungen</label>
-            <textarea id="pinnedMemoriesInput" placeholder="Diese Infos werden IMMER mitgeschickt:&#10;- Mein Name ist...&#10;- Sprich mich mit Du an..."></textarea>
-            <div class="field-hint">Werden bei JEDER Nachricht eingefügt (max. 600 Token empfohlen)</div>
-          </div>
-          
-          <div class="field">
-            <label>Keyword-Erinnerungen <button class="add-memory-btn" onclick="addMemoryField()">+ Hinzufügen</button></label>
-            <div id="keywordMemoriesList"></div>
-            <div class="field-hint">Werden nur eingefügt wenn Schlüsselwörter in der Nachricht vorkommen (max. 3 gleichzeitig)</div>
-          </div>
-          
-          <div class="field">
-            <label>Max. gleichzeitige Erinnerungen: <span id="maxMemValue">3</span></label>
-            <input type="range" id="maxMemoriesInput" min="1" max="5" step="1" value="3" oninput="document.getElementById('maxMemValue').textContent=this.value">
-          </div>
-          
-          <div class="field">
-            <label>Max. Kontext-Nachrichten: <span id="contextValue">10</span></label>
-            <input type="range" id="contextMessagesInput" min="2" max="30" step="1" value="10" oninput="document.getElementById('contextValue').textContent=this.value">
-            <div class="field-hint">Wie viele vorherige Nachrichten mitgeschickt werden</div>
-          </div>
-          
-          <div class="field">
-            <label class="checkbox-label">
-              <input type="checkbox" id="autoSummarizeInput">
-              Automatische Kontextzusammenfassung
-            </label>
-            <div class="field-hint">Ältere Nachrichten werden zusammengefasst um Tokens zu sparen</div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Vorlesen (einklappbar) -->
-      <div class="settings-section collapsible collapsed">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">Vorlesen</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="field">
-            <label>Stimme</label>
-            <select id="voiceSelect" class="field-select" onchange="testSelectedVoice()">
-              <optgroup label="Deutsch">
-                <option value="Petra">Petra</option>
-                <option value="Anna">Anna</option>
-              </optgroup>
-              <optgroup label="English">
-                <option value="Karen">Karen</option>
-                <option value="Matilda">Matilda</option>
-              </optgroup>
-            </select>
-          </div>
-          <div class="field">
-            <label>Geschwindigkeit: <span id="rateValue">1.0</span>x</label>
-            <input type="range" id="voiceRate" min="0.5" max="2" step="0.1" value="1" oninput="updateRateValue()">
-          </div>
-          <div class="field">
-            <label>Tonhöhe: <span id="pitchValue">1.0</span></label>
-            <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchValue()">
-          </div>
-          <button class="test-voice-btn" onclick="testSelectedVoice()">🔊 Stimme testen</button>
-        </div>
-      </div>
-      
-      <!-- Daten & Backup (einklappbar) -->
-      <div class="settings-section collapsible collapsed">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">Daten & Backup</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="backup-buttons">
-            <button class="backup-btn" onclick="exportAllChats()">📤 Alle Chats exportieren</button>
-            <button class="backup-btn" onclick="document.getElementById('importFile').click()">📥 Chats importieren</button>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importChats(this.files[0])">
-          </div>
-        </div>
-      </div>
-      
-      <!-- Cloud-Sync (einklappbar) -->
-      <div class="settings-section collapsible collapsed">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">☁️ Cloud-Synchronisierung</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="field">
-            <label>Supabase URL</label>
-            <input type="text" id="supabaseUrlInput" placeholder="https://xxx.supabase.co">
-          </div>
-          <div class="field">
-            <label>Supabase Key</label>
-            <input type="password" id="supabaseKeyInput" placeholder="sb_publishable_...">
-          </div>
-          <div class="field">
-            <label>Geräte-ID</label>
-            <input type="text" id="deviceIdInput" placeholder="z.B. iphone-moni">
-            <div class="field-hint">Eindeutiger Name für dieses Gerät</div>
-          </div>
-          <div class="sync-status" id="syncStatus">Nicht verbunden</div>
-          <div class="backup-buttons">
-            <button class="backup-btn" onclick="testSupabaseConnection()">🔗 Verbindung testen</button>
-            <button class="backup-btn" onclick="syncToCloud()">☁️ Jetzt synchronisieren</button>
-          </div>
-          <div class="field" style="margin-top: 12px;">
-            <label class="checkbox-label">
-              <input type="checkbox" id="autoSyncInput">
-              <span>Automatisch synchronisieren</span>
-            </label>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Gefahrenzone (einklappbar, ganz unten) -->
-      <div class="settings-section collapsible collapsed danger-section">
-        <div class="settings-section-header" onclick="toggleSection(this)">
-          <span class="settings-section-title">⚠️ Gefahrenzone</span>
-          <span class="collapse-icon">▼</span>
-        </div>
-        <div class="settings-section-content">
-          <div class="field">
-            <div class="danger-warning">Achtung! Diese Aktionen können nicht rückgängig gemacht werden.</div>
-          </div>
-          <div class="field">
-            <label>Zum Löschen "LÖSCHEN" eingeben:</label>
-            <input type="text" id="deleteConfirmInput" placeholder="LÖSCHEN" autocomplete="off">
-          </div>
-          <button class="danger-btn-small" id="deleteAllBtn" onclick="deleteAllChatsSecure()" disabled>Alle Chats löschen</button>
-        </div>
-      </div>
-      
-      <button class="save-btn" onclick="saveSettings()">Speichern</button>
+
+```
+  <!-- API & Prompt (einklappbar) -->
+  <div class="settings-section collapsible collapsed">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">🔑 API & Prompt</span>
+      <span class="collapse-icon">▼</span>
     </div>
+    <div class="settings-section-content">
+      <div class="field"><label>OpenRouter API-Schlüssel</label><input type="password" id="apiKeyInput" placeholder="sk-or-v1-..."></div>
+      <div class="field"><label>System-Prompt</label><textarea id="systemPromptInput" placeholder="Definiere die Persönlichkeit der KI..."></textarea></div>
+    </div>
+  </div>
+  
+  <!-- Personalisierung (einklappbar) -->
+  <div class="settings-section collapsible collapsed">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">Personalisierung</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="settings-section-content">
+      <div class="field">
+        <label>Dein Name</label>
+        <input type="text" id="userNameInput" placeholder="z.B. Moni">
+      </div>
+      <div class="field">
+        <label>Name der KI</label>
+        <input type="text" id="aiNameInput" placeholder="z.B. Tatjana">
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sampling-Parameter (einklappbar) -->
+  <div class="settings-section collapsible collapsed">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">Sampling-Parameter</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="settings-section-content">
+      <div class="field">
+        <label>Temperature: <span id="tempValue">0.7</span></label>
+        <input type="range" id="temperatureInput" min="0" max="2" step="0.1" value="0.7" oninput="document.getElementById('tempValue').textContent=this.value">
+        <div class="field-hint">Niedrig = präziser, Hoch = kreativer</div>
+      </div>
+      <div class="field">
+        <label>Top P: <span id="topPValue">1.0</span></label>
+        <input type="range" id="topPInput" min="0" max="1" step="0.05" value="1" oninput="document.getElementById('topPValue').textContent=this.value">
+      </div>
+      <div class="field">
+        <label>Top K: <span id="topKValue">0</span></label>
+        <input type="range" id="topKInput" min="0" max="100" step="1" value="0" oninput="document.getElementById('topKValue').textContent=this.value">
+        <div class="field-hint">0 = deaktiviert</div>
+      </div>
+      <div class="field">
+        <label>Frequency Penalty: <span id="freqPenValue">0</span></label>
+        <input type="range" id="freqPenInput" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('freqPenValue').textContent=this.value">
+        <div class="field-hint">Reduziert Wortwiederholungen</div>
+      </div>
+      <div class="field">
+        <label>Presence Penalty: <span id="presPenValue">0</span></label>
+        <input type="range" id="presPenInput" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('presPenValue').textContent=this.value">
+        <div class="field-hint">Fördert neue Themen</div>
+      </div>
+      <div class="field">
+        <label>Repetition Penalty: <span id="repPenValue">1.0</span></label>
+        <input type="range" id="repPenInput" min="1" max="2" step="0.05" value="1" oninput="document.getElementById('repPenValue').textContent=this.value">
+        <div class="field-hint">1.0 = aus, 1.15 = empfohlen</div>
+      </div>
+      <div class="field">
+        <label>Max. Tokens</label>
+        <input type="number" id="maxTokensInput" placeholder="4096" value="4096">
+      </div>
+    </div>
+  </div>
+  
+  <!-- Memory-System (einklappbar) -->
+  <div class="settings-section collapsible collapsed">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">Memory-System</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="settings-section-content">
+      <div class="field">
+        <label>Angeheftete Erinnerungen</label>
+        <textarea id="pinnedMemoriesInput" placeholder="Diese Infos werden IMMER mitgeschickt:&#10;- Mein Name ist...&#10;- Sprich mich mit Du an..."></textarea>
+        <div class="field-hint">Werden bei JEDER Nachricht eingefügt (max. 600 Token empfohlen)</div>
+      </div>
+      
+      <div class="field">
+        <label>Keyword-Erinnerungen <button class="add-memory-btn" onclick="addMemoryField()">+ Hinzufügen</button></label>
+        <div id="keywordMemoriesList"></div>
+        <div class="field-hint">Werden nur eingefügt wenn Schlüsselwörter in der Nachricht vorkommen (max. 3 gleichzeitig)</div>
+      </div>
+      
+      <div class="field">
+        <label>Max. gleichzeitige Erinnerungen: <span id="maxMemValue">3</span></label>
+        <input type="range" id="maxMemoriesInput" min="1" max="5" step="1" value="3" oninput="document.getElementById('maxMemValue').textContent=this.value">
+      </div>
+      
+      <div class="field">
+        <label>Max. Kontext-Nachrichten: <span id="contextValue">10</span></label>
+        <input type="range" id="contextMessagesInput" min="2" max="30" step="1" value="10" oninput="document.getElementById('contextValue').textContent=this.value">
+        <div class="field-hint">Wie viele vorherige Nachrichten mitgeschickt werden</div>
+      </div>
+      
+      <div class="field">
+        <label class="checkbox-label">
+          <input type="checkbox" id="autoSummarizeInput">
+          Automatische Kontextzusammenfassung
+        </label>
+        <div class="field-hint">Ältere Nachrichten werden zusammengefasst um Tokens zu sparen</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Vorlesen (einklappbar) -->
+  <div class="settings-section collapsible collapsed">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">Vorlesen</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="settings-section-content">
+      <div class="field">
+        <label>Stimme</label>
+        <select id="voiceSelect" class="field-select" onchange="testSelectedVoice()">
+          <optgroup label="Deutsch">
+            <option value="Petra">Petra</option>
+            <option value="Anna">Anna</option>
+          </optgroup>
+          <optgroup label="English">
+            <option value="Karen">Karen</option>
+            <option value="Matilda">Matilda</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label>Geschwindigkeit: <span id="rateValue">1.0</span>x</label>
+        <input type="range" id="voiceRate" min="0.5" max="2" step="0.1" value="1" oninput="updateRateValue()">
+      </div>
+      <div class="field">
+        <label>Tonhöhe: <span id="pitchValue">1.0</span></label>
+        <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1" oninput="updatePitchValue()">
+      </div>
+      <button class="test-voice-btn" onclick="testSelectedVoice()">🔊 Stimme testen</button>
+    </div>
+  </div>
+  
+  <!-- Daten & Backup (einklappbar) -->
+  <div class="settings-section collapsible collapsed">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">Daten & Backup</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="settings-section-content">
+      <div class="backup-buttons">
+        <button class="backup-btn" onclick="exportAllChats()">📤 Alle Chats exportieren</button>
+        <button class="backup-btn" onclick="document.getElementById('importFile').click()">📥 Chats importieren</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importChats(this.files[0])">
+      </div>
+    </div>
+  </div>
+  
+  <!-- Cloud-Sync (einklappbar) -->
+  <div class="settings-section collapsible collapsed">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">☁️ Cloud-Synchronisierung</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="settings-section-content">
+      <div class="field">
+        <label>Supabase URL</label>
+        <input type="text" id="supabaseUrlInput" placeholder="https://xxx.supabase.co">
+      </div>
+      <div class="field">
+        <label>Supabase Key</label>
+        <input type="password" id="supabaseKeyInput" placeholder="sb_publishable_...">
+      </div>
+      <div class="field">
+        <label>Geräte-ID</label>
+        <input type="text" id="deviceIdInput" placeholder="z.B. iphone-moni">
+        <div class="field-hint">Eindeutiger Name für dieses Gerät</div>
+      </div>
+      <div class="sync-status" id="syncStatus">Nicht verbunden</div>
+      <div class="backup-buttons">
+        <button class="backup-btn" onclick="testSupabaseConnection()">🔗 Verbindung testen</button>
+        <button class="backup-btn" onclick="syncToCloud()">☁️ Jetzt synchronisieren</button>
+      </div>
+      <div class="field" style="margin-top: 12px;">
+        <label class="checkbox-label">
+          <input type="checkbox" id="autoSyncInput">
+          <span>Automatisch synchronisieren</span>
+        </label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Gefahrenzone (einklappbar, ganz unten) -->
+  <div class="settings-section collapsible collapsed danger-section">
+    <div class="settings-section-header" onclick="toggleSection(this)">
+      <span class="settings-section-title">⚠️ Gefahrenzone</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="settings-section-content">
+      <div class="field">
+        <div class="danger-warning">Achtung! Diese Aktionen können nicht rückgängig gemacht werden.</div>
+      </div>
+      <div class="field">
+        <label>Zum Löschen "LÖSCHEN" eingeben:</label>
+        <input type="text" id="deleteConfirmInput" placeholder="LÖSCHEN" autocomplete="off">
+      </div>
+      <button class="danger-btn-small" id="deleteAllBtn" onclick="deleteAllChatsSecure()" disabled>Alle Chats löschen</button>
+    </div>
+  </div>
+  
+  <button class="save-btn" onclick="saveSettings()">Speichern</button>
+</div>
+```
+
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -490,1027 +496,989 @@ let chats = [], activeChatId = null, isStreaming = false, currentSpeakBtn = null
 let pendingAttachments = [];
 
 function init() {
-  loadState();
-  loadKeywordMemoriesOnStart();
-  if (!chats.length) newChat();
-  else {
-    if (!chats.find(c => c.id === activeChatId)) activeChatId = chats[0].id;
-    const chat = getActiveChat();
-    if (chat?.model) document.getElementById('modelSelect').value = chat.model;
-    renderChatList(); renderMessages();
-  }
+loadState();
+loadKeywordMemoriesOnStart();
+if (!chats.length) newChat();
+else {
+if (!chats.find(c => c.id === activeChatId)) activeChatId = chats[0].id;
+const chat = getActiveChat();
+if (chat?.model) document.getElementById(‘modelSelect’).value = chat.model;
+renderChatList(); renderMessages();
+}
 }
 
 function loadKeywordMemoriesOnStart() {
-  try {
-    const saved = localStorage.getItem('gpt_keyword_memories');
-    keywordMemories = saved ? JSON.parse(saved) : [];
-  } catch(e) {
-    keywordMemories = [];
-  }
+try {
+const saved = localStorage.getItem(‘gpt_keyword_memories’);
+keywordMemories = saved ? JSON.parse(saved) : [];
+} catch(e) {
+keywordMemories = [];
+}
 }
 
 // === FILE HANDLING ===
 function handleFiles(files) {
-  for (const file of files) {
-    if (file.size > 20 * 1024 * 1024) {
-      showToast('Datei zu groß (max 20MB)');
-      continue;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      pendingAttachments.push({
-        name: file.name,
-        type: file.type,
-        data: e.target.result
-      });
-      renderAttachments();
-      updateSendBtn();
-    };
-    if (file.type.startsWith('image/')) {
-      reader.readAsDataURL(file);
-    } else {
-      reader.readAsDataURL(file);
-    }
-  }
-  document.getElementById('fileInput').value = '';
+for (const file of files) {
+if (file.size > 20 * 1024 * 1024) {
+showToast(‘Datei zu groß (max 20MB)’);
+continue;
+}
+const reader = new FileReader();
+reader.onload = (e) => {
+pendingAttachments.push({
+name: file.name,
+type: file.type,
+data: e.target.result
+});
+renderAttachments();
+updateSendBtn();
+};
+if (file.type.startsWith(‘image/’)) {
+reader.readAsDataURL(file);
+} else {
+reader.readAsDataURL(file);
+}
+}
+document.getElementById(‘fileInput’).value = ‘’;
 }
 
 function renderAttachments() {
-  const preview = document.getElementById('attachmentsPreview');
-  preview.innerHTML = '';
-  pendingAttachments.forEach((att, idx) => {
-    const div = document.createElement('div');
-    div.className = 'attachment-item';
-    if (att.type.startsWith('image/')) {
-      div.innerHTML = `<img src="${att.data}" alt="${att.name}"><span class="file-name">${att.name}</span>`;
-    } else {
-      div.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${att.name}</span>`;
-    }
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'attachment-remove';
-    removeBtn.innerHTML = '✕';
-    removeBtn.onclick = () => removeAttachment(idx);
-    div.appendChild(removeBtn);
-    preview.appendChild(div);
-  });
+const preview = document.getElementById(‘attachmentsPreview’);
+preview.innerHTML = ‘’;
+pendingAttachments.forEach((att, idx) => {
+const div = document.createElement(‘div’);
+div.className = ‘attachment-item’;
+if (att.type.startsWith(‘image/’)) {
+div.innerHTML = `<img src="${att.data}" alt="${att.name}"><span class="file-name">${att.name}</span>`;
+} else {
+div.innerHTML = `<span class="file-icon">📄</span><span class="file-name">${att.name}</span>`;
+}
+const removeBtn = document.createElement(‘button’);
+removeBtn.className = ‘attachment-remove’;
+removeBtn.innerHTML = ‘✕’;
+removeBtn.onclick = () => removeAttachment(idx);
+div.appendChild(removeBtn);
+preview.appendChild(div);
+});
 }
 
 function removeAttachment(idx) {
-  pendingAttachments.splice(idx, 1);
-  renderAttachments();
-  updateSendBtn();
+pendingAttachments.splice(idx, 1);
+renderAttachments();
+updateSendBtn();
 }
 
 function loadState() {
-  try {
-    const saved = localStorage.getItem('gpt_chats');
-    if (saved) chats = JSON.parse(saved);
-    activeChatId = localStorage.getItem('gpt_active_chat') || null;
-  } catch(e) {}
+try {
+const saved = localStorage.getItem(‘gpt_chats’);
+if (saved) chats = JSON.parse(saved);
+activeChatId = localStorage.getItem(‘gpt_active_chat’) || null;
+} catch(e) {}
 }
 
 function saveState() {
-  localStorage.setItem('gpt_chats', JSON.stringify(chats));
-  localStorage.setItem('gpt_active_chat', activeChatId || '');
+localStorage.setItem(‘gpt_chats’, JSON.stringify(chats));
+localStorage.setItem(‘gpt_active_chat’, activeChatId || ‘’);
 }
 
 function getActiveChat() { return chats.find(c => c.id === activeChatId); }
 
 function toggleChatOptions(e) {
-  e.stopPropagation();
-  const popup = document.getElementById('chatOptionsPopup');
-  popup.classList.toggle('open');
+e.stopPropagation();
+const popup = document.getElementById(‘chatOptionsPopup’);
+popup.classList.toggle(‘open’);
 }
 
 function closeChatOptions() {
-  document.getElementById('chatOptionsPopup').classList.remove('open');
+document.getElementById(‘chatOptionsPopup’).classList.remove(‘open’);
 }
 
 function shareCurrentChat() {
-  closeChatOptions();
-  const chat = getActiveChat();
-  if (!chat) return;
-  
-  let text = chat.title + '\n\n';
-  chat.messages.forEach(m => {
-    const role = m.role === 'user' ? 'Ich' : 'KI';
-    text += role + ': ' + m.content + '\n\n';
-  });
-  
-  if (navigator.share) {
-    navigator.share({ title: chat.title, text: text });
-  } else {
-    navigator.clipboard.writeText(text).then(() => showToast('Chat in Zwischenablage kopiert'));
-  }
+closeChatOptions();
+const chat = getActiveChat();
+if (!chat) return;
+
+let text = chat.title + ‘\n\n’;
+chat.messages.forEach(m => {
+const role = m.role === ‘user’ ? ‘Ich’ : ‘KI’;
+text += role + ’: ’ + m.content + ‘\n\n’;
+});
+
+if (navigator.share) {
+navigator.share({ title: chat.title, text: text });
+} else {
+navigator.clipboard.writeText(text).then(() => showToast(‘Chat in Zwischenablage kopiert’));
+}
 }
 
 function exportCurrentChat() {
-  closeChatOptions();
-  const chat = getActiveChat();
-  if (!chat) return;
-  
-  const data = JSON.stringify(chat, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = (chat.title || 'chat') + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Chat exportiert');
+closeChatOptions();
+const chat = getActiveChat();
+if (!chat) return;
+
+const data = JSON.stringify(chat, null, 2);
+const blob = new Blob([data], { type: ‘application/json’ });
+const url = URL.createObjectURL(blob);
+const a = document.createElement(‘a’);
+a.href = url;
+a.download = (chat.title || ‘chat’) + ‘.json’;
+a.click();
+URL.revokeObjectURL(url);
+showToast(‘Chat exportiert’);
 }
 
 function exportCurrentChatMarkdown() {
-  closeChatOptions();
-  const chat = getActiveChat();
-  if (!chat) return;
-  
-  const userName = localStorage.getItem('gpt_user_name') || 'Ich';
-  const aiName = localStorage.getItem('gpt_ai_name') || 'KI';
-  
-  let markdown = `# ${chat.title}\n\n`;
-  markdown += `*Exportiert am ${new Date().toLocaleDateString('de-DE')}*\n\n---\n\n`;
-  
-  chat.messages.forEach(m => {
-    const name = m.role === 'user' ? userName : aiName;
-    markdown += `**${name}:**\n${m.content}\n\n`;
-  });
-  
-  const blob = new Blob([markdown], { type: 'text/markdown' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = (chat.title || 'chat') + '.md';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Markdown exportiert');
+closeChatOptions();
+const chat = getActiveChat();
+if (!chat) return;
+
+const userName = localStorage.getItem(‘gpt_user_name’) || ‘Ich’;
+const aiName = localStorage.getItem(‘gpt_ai_name’) || ‘KI’;
+
+let markdown = `# ${chat.title}\n\n`;
+markdown += `*Exportiert am ${new Date().toLocaleDateString('de-DE')}*\n\n---\n\n`;
+
+chat.messages.forEach(m => {
+const name = m.role === ‘user’ ? userName : aiName;
+markdown += `**${name}:**\n${m.content}\n\n`;
+});
+
+const blob = new Blob([markdown], { type: ‘text/markdown’ });
+const url = URL.createObjectURL(blob);
+const a = document.createElement(‘a’);
+a.href = url;
+a.download = (chat.title || ‘chat’) + ‘.md’;
+a.click();
+URL.revokeObjectURL(url);
+showToast(‘Markdown exportiert’);
 }
 
 function deleteCurrentChat() {
-  closeChatOptions();
-  if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
-  const id = activeChatId;
-  chats = chats.filter(c => c.id !== id);
-  activeChatId = chats.length ? chats[0].id : null;
-  if (!chats.length) newChat();
-  saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
-  showToast('Chat gelöscht');
+closeChatOptions();
+if (!confirm(‘Den gesamten Chat unwiderruflich löschen?’)) return;
+const id = activeChatId;
+chats = chats.filter(c => c.id !== id);
+activeChatId = chats.length ? chats[0].id : null;
+if (!chats.length) newChat();
+saveState(); renderChatList(document.getElementById(‘chatSearch’)?.value || ‘’); renderMessages();
+showToast(‘Chat gelöscht’);
 }
 
 // Schließe Chat-Options wenn woanders geklickt
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.chat-options-btn') && !e.target.closest('.chat-options-popup')) {
-    closeChatOptions();
-  }
+document.addEventListener(‘click’, (e) => {
+if (!e.target.closest(’.chat-options-btn’) && !e.target.closest(’.chat-options-popup’)) {
+closeChatOptions();
+}
 });
 
 function newChat() {
-  const id = 'chat_' + Date.now();
-  chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, createdAt: Date.now(), updatedAt: Date.now() });
-  activeChatId = id;
-  if (document.getElementById('chatSearch')) document.getElementById('chatSearch').value = '';
-  saveState(); renderChatList(); renderMessages(); closeSidebar();
-  document.getElementById('inputField').focus();
+const id = ‘chat_’ + Date.now();
+chats.unshift({ id, title: ‘Neuer Chat’, messages: [], model: document.getElementById(‘modelSelect’).value, createdAt: Date.now(), updatedAt: Date.now() });
+activeChatId = id;
+if (document.getElementById(‘chatSearch’)) document.getElementById(‘chatSearch’).value = ‘’;
+saveState(); renderChatList(); renderMessages(); closeSidebar();
+document.getElementById(‘inputField’).focus();
 }
 
 function switchChat(id) {
-  activeChatId = id;
-  const chat = getActiveChat();
-  if (chat?.model) document.getElementById('modelSelect').value = chat.model;
-  saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages(); closeSidebar();
+activeChatId = id;
+const chat = getActiveChat();
+if (chat?.model) document.getElementById(‘modelSelect’).value = chat.model;
+saveState(); renderChatList(document.getElementById(‘chatSearch’)?.value || ‘’); renderMessages(); closeSidebar();
 }
 
 function deleteChat(id, e) {
-  e.stopPropagation();
-  closeAllMenus();
-  if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
-  chats = chats.filter(c => c.id !== id);
-  if (activeChatId === id) { activeChatId = chats.length ? chats[0].id : null; if (!chats.length) newChat(); }
-  saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
-  showToast('Chat gelöscht');
+e.stopPropagation();
+closeAllMenus();
+if (!confirm(‘Den gesamten Chat unwiderruflich löschen?’)) return;
+chats = chats.filter(c => c.id !== id);
+if (activeChatId === id) { activeChatId = chats.length ? chats[0].id : null; if (!chats.length) newChat(); }
+saveState(); renderChatList(document.getElementById(‘chatSearch’)?.value || ‘’); renderMessages();
+showToast(‘Chat gelöscht’);
 }
 
 function exportChat(id, e) {
-  e.stopPropagation();
-  closeAllMenus();
-  const chat = chats.find(c => c.id === id);
-  if (!chat) return;
-  
-  // Als JSON exportieren
-  const data = JSON.stringify(chat, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = (chat.title || 'chat') + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Chat exportiert');
+e.stopPropagation();
+closeAllMenus();
+const chat = chats.find(c => c.id === id);
+if (!chat) return;
+
+const data = JSON.stringify(chat, null, 2);
+const blob = new Blob([data], { type: ‘application/json’ });
+const url = URL.createObjectURL(blob);
+const a = document.createElement(‘a’);
+a.href = url;
+a.download = (chat.title || ‘chat’) + ‘.json’;
+a.click();
+URL.revokeObjectURL(url);
+showToast(‘Chat exportiert’);
 }
 
 function shareChat(id, e) {
-  e.stopPropagation();
-  closeAllMenus();
-  const chat = chats.find(c => c.id === id);
-  if (!chat) return;
-  
-  // Als Text formatieren
-  let text = chat.title + '\n\n';
-  chat.messages.forEach(m => {
-    const role = m.role === 'user' ? 'Ich' : 'KI';
-    text += role + ': ' + m.content + '\n\n';
-  });
-  
-  if (navigator.share) {
-    navigator.share({ title: chat.title, text: text });
-  } else {
-    navigator.clipboard.writeText(text).then(() => showToast('Chat in Zwischenablage kopiert'));
-  }
+e.stopPropagation();
+closeAllMenus();
+const chat = chats.find(c => c.id === id);
+if (!chat) return;
+
+let text = chat.title + ‘\n\n’;
+chat.messages.forEach(m => {
+const role = m.role === ‘user’ ? ‘Ich’ : ‘KI’;
+text += role + ’: ’ + m.content + ‘\n\n’;
+});
+
+if (navigator.share) {
+navigator.share({ title: chat.title, text: text });
+} else {
+navigator.clipboard.writeText(text).then(() => showToast(‘Chat in Zwischenablage kopiert’));
+}
 }
 
 function saveCurrentChat() {
-  const chat = getActiveChat();
-  if (chat) { chat.model = document.getElementById('modelSelect').value; chat.updatedAt = Date.now(); saveState(); }
+const chat = getActiveChat();
+if (chat) { chat.model = document.getElementById(‘modelSelect’).value; chat.updatedAt = Date.now(); saveState(); }
 }
 
-function renderChatList(filter = '') {
-  const list = document.getElementById('chatList');
-  list.innerHTML = '';
-  const searchTerm = filter.toLowerCase();
-  chats.forEach(chat => {
-    if (searchTerm && !chat.title.toLowerCase().includes(searchTerm)) return;
-    const div = document.createElement('div');
-    div.className = 'chat-item' + (chat.id === activeChatId ? ' active' : '');
-    div.onclick = (e) => { 
-      if (e.target === div || e.target.classList.contains('chat-item-title')) {
-        closeAllMenus();
-        switchChat(chat.id); 
-      }
-    };
-    div.innerHTML = `
-      <span class="chat-item-title">${escapeHtml(chat.title)}</span>
-      <button class="chat-item-menu-btn" onclick="toggleChatMenu('${chat.id}', event)">⋯</button>
-      <div class="chat-menu-popup" id="menu-${chat.id}">
-        <div class="chat-menu-item" onclick="renameChat('${chat.id}', event)">Umbenennen</div>
-        <div class="chat-menu-item" onclick="exportChat('${chat.id}', event)">Exportieren</div>
-        <div class="chat-menu-item" onclick="shareChat('${chat.id}', event)">Teilen</div>
-        <div class="chat-menu-item danger" onclick="deleteChat('${chat.id}', event)">Löschen</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
+function renderChatList(filter = ‘’) {
+const list = document.getElementById(‘chatList’);
+list.innerHTML = ‘’;
+const searchTerm = filter.toLowerCase();
+chats.forEach(chat => {
+if (searchTerm && !chat.title.toLowerCase().includes(searchTerm)) return;
+const div = document.createElement(‘div’);
+div.className = ‘chat-item’ + (chat.id === activeChatId ? ’ active’ : ‘’);
+div.onclick = (e) => {
+if (e.target === div || e.target.classList.contains(‘chat-item-title’)) {
+closeAllMenus();
+switchChat(chat.id);
+}
+};
+div.innerHTML = `<span class="chat-item-title">${escapeHtml(chat.title)}</span> <button class="chat-item-menu-btn" onclick="toggleChatMenu('${chat.id}', event)">⋯</button> <div class="chat-menu-popup" id="menu-${chat.id}"> <div class="chat-menu-item" onclick="renameChat('${chat.id}', event)">Umbenennen</div> <div class="chat-menu-item" onclick="exportChat('${chat.id}', event)">Exportieren</div> <div class="chat-menu-item" onclick="shareChat('${chat.id}', event)">Teilen</div> <div class="chat-menu-item danger" onclick="deleteChat('${chat.id}', event)">Löschen</div> </div>`;
+list.appendChild(div);
+});
 }
 
 function toggleChatMenu(id, e) {
-  e.stopPropagation();
-  const menu = document.getElementById('menu-' + id);
-  const wasOpen = menu.classList.contains('open');
-  closeAllMenus();
-  if (!wasOpen) {
-    menu.classList.add('open');
-  }
+e.stopPropagation();
+const menu = document.getElementById(‘menu-’ + id);
+const wasOpen = menu.classList.contains(‘open’);
+closeAllMenus();
+if (!wasOpen) {
+menu.classList.add(‘open’);
+}
 }
 
 function closeAllMenus() {
-  document.querySelectorAll('.chat-menu-popup').forEach(m => m.classList.remove('open'));
+document.querySelectorAll(’.chat-menu-popup’).forEach(m => m.classList.remove(‘open’));
 }
 
-// Menü schließen wenn woanders geklickt wird
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.chat-item-menu-btn') && !e.target.closest('.chat-menu-popup')) {
-    closeAllMenus();
-  }
+document.addEventListener(‘click’, (e) => {
+if (!e.target.closest(’.chat-item-menu-btn’) && !e.target.closest(’.chat-menu-popup’)) {
+closeAllMenus();
+}
 });
 
 function filterChats() {
-  const search = document.getElementById('chatSearch').value;
-  renderChatList(search);
+const search = document.getElementById(‘chatSearch’).value;
+renderChatList(search);
 }
 
 function renameChat(id, e) {
-  e.stopPropagation();
-  closeAllMenus();
-  const chat = chats.find(c => c.id === id);
-  if (!chat) return;
-  
-  const item = document.querySelector(`[onclick*="switchChat('${id}'"]`)?.closest('.chat-item') 
-    || e.target.closest('.chat-item');
-  if (!item) return;
-  
-  const titleSpan = item.querySelector('.chat-item-title');
-  const oldTitle = chat.title;
-  
-  // Input erstellen
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'chat-item-input';
-  input.value = oldTitle;
-  
-  titleSpan.replaceWith(input);
-  input.focus();
-  input.select();
-  
-  const save = () => {
-    const newTitle = input.value.trim() || oldTitle;
-    chat.title = newTitle;
-    chat.updatedAt = Date.now();
-    saveState();
-    renderChatList(document.getElementById('chatSearch')?.value || '');
-  };
-  
-  input.onblur = save;
-  input.onkeydown = (ev) => {
-    if (ev.key === 'Enter') { ev.preventDefault(); save(); }
-    if (ev.key === 'Escape') { input.value = oldTitle; save(); }
-  };
+e.stopPropagation();
+closeAllMenus();
+const chat = chats.find(c => c.id === id);
+if (!chat) return;
+
+const item = document.querySelector(`[onclick*="switchChat('${id}'"]`)?.closest(’.chat-item’)
+|| e.target.closest(’.chat-item’);
+if (!item) return;
+
+const titleSpan = item.querySelector(’.chat-item-title’);
+const oldTitle = chat.title;
+
+const input = document.createElement(‘input’);
+input.type = ‘text’;
+input.className = ‘chat-item-input’;
+input.value = oldTitle;
+
+titleSpan.replaceWith(input);
+input.focus();
+input.select();
+
+const save = () => {
+const newTitle = input.value.trim() || oldTitle;
+chat.title = newTitle;
+chat.updatedAt = Date.now();
+saveState();
+renderChatList(document.getElementById(‘chatSearch’)?.value || ‘’);
+};
+
+input.onblur = save;
+input.onkeydown = (ev) => {
+if (ev.key === ‘Enter’) { ev.preventDefault(); save(); }
+if (ev.key === ‘Escape’) { input.value = oldTitle; save(); }
+};
 }
 
 function renderMessages() {
-  const area = document.getElementById('chatArea');
-  const chat = getActiveChat();
-  if (!chat || !chat.messages.length) {
-    area.innerHTML = '<div class="welcome"><div class="welcome-logo">MM</div><div class="welcome-sub">Wähle ein Modell und starte<br>eine Unterhaltung.</div></div>';
-    return;
-  }
-  area.innerHTML = '';
-  chat.messages.forEach((msg, idx) => {
-    const div = document.createElement('div');
-    div.className = 'message ' + msg.role;
-    
-    // Attachments anzeigen (falls vorhanden)
-    if (msg.attachments && msg.attachments.length > 0) {
-      const attDiv = document.createElement('div');
-      attDiv.className = 'msg-attachments';
-      attDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;max-width:85%;';
-      msg.attachments.forEach(att => {
-        if (att.type.startsWith('image/')) {
-          const img = document.createElement('img');
-          img.src = att.data;
-          img.style.cssText = 'max-width:200px;max-height:150px;border-radius:10px;cursor:pointer;';
-          img.onclick = () => window.open(att.data, '_blank');
-          attDiv.appendChild(img);
-        } else {
-          const fileDiv = document.createElement('div');
-          fileDiv.style.cssText = 'background:var(--bg-soft);padding:8px 12px;border-radius:8px;font-size:13px;';
-          fileDiv.textContent = '📄 ' + att.name;
-          attDiv.appendChild(fileDiv);
-        }
-      });
-      div.appendChild(attDiv);
+const area = document.getElementById(‘chatArea’);
+const chat = getActiveChat();
+if (!chat || !chat.messages.length) {
+area.innerHTML = ‘<div class="welcome"><div class="welcome-logo">MM</div><div class="welcome-sub">Wähle ein Modell und starte<br>eine Unterhaltung.</div></div>’;
+return;
+}
+area.innerHTML = ‘’;
+chat.messages.forEach((msg, idx) => {
+const div = document.createElement(‘div’);
+div.className = ’message ’ + msg.role;
+
+```
+// Attachments anzeigen
+if (msg.attachments && msg.attachments.length > 0) {
+  const attDiv = document.createElement('div');
+  attDiv.className = 'msg-attachments';
+  attDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;max-width:85%;';
+  msg.attachments.forEach(att => {
+    if (att.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = att.data;
+      img.style.cssText = 'max-width:200px;max-height:150px;border-radius:10px;cursor:pointer;';
+      img.onclick = () => window.open(att.data, '_blank');
+      attDiv.appendChild(img);
+    } else {
+      const fileDiv = document.createElement('div');
+      fileDiv.style.cssText = 'background:var(--bg-soft);padding:8px 12px;border-radius:8px;font-size:13px;';
+      fileDiv.textContent = '📄 ' + att.name;
+      attDiv.appendChild(fileDiv);
     }
-    
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = msg.content;
-    div.appendChild(bubble);
-    
-    // Uhrzeit
-    const time = document.createElement('div');
-    time.className = 'msg-time';
-    time.textContent = formatTime(msg.time);
-    div.appendChild(time);
-    
-    // Actions
-    const actions = document.createElement('div');
-    actions.className = 'msg-actions';
-    
-    // Kopieren (für alle)
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'msg-action';
-    copyBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
-    copyBtn.title = 'Kopieren';
-    copyBtn.onclick = () => copyText(msg.content);
-    actions.appendChild(copyBtn);
-    
-    if (msg.role === 'assistant') {
-      // Vorlesen mit Play/Pause
-      const speakBtn = document.createElement('button');
-      speakBtn.className = 'msg-action';
-      speakBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>';
-      speakBtn.title = 'Vorlesen';
-      speakBtn.onclick = () => speakTextWithToggle(msg.content, speakBtn);
-      actions.appendChild(speakBtn);
-      
-      // Neu generieren (nur letzte KI-Nachricht)
-      const regenBtn = document.createElement('button');
-      regenBtn.className = 'msg-action';
-      regenBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16"/></svg>';
-      regenBtn.title = 'Neu generieren';
-      regenBtn.onclick = () => regenerateMessage(idx);
-      actions.appendChild(regenBtn);
-    }
-    
-    if (msg.role === 'user') {
-      // Als Erinnerung speichern
-      const memBtn = document.createElement('button');
-      memBtn.className = 'msg-action';
-      memBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
-      memBtn.title = 'Als Erinnerung speichern';
-      memBtn.onclick = () => saveAsMemory(msg.content);
-      actions.appendChild(memBtn);
-      
-      // Bearbeiten
-      const editBtn = document.createElement('button');
-      editBtn.className = 'msg-action';
-      editBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-      editBtn.title = 'Bearbeiten';
-      editBtn.onclick = () => editMessage(idx);
-      actions.appendChild(editBtn);
-    }
-    
-    div.appendChild(actions);
-    area.appendChild(div);
   });
-  area.scrollTop = area.scrollHeight;
+  div.appendChild(attDiv);
+}
+
+const bubble = document.createElement('div');
+bubble.className = 'bubble';
+bubble.textContent = msg.content;
+div.appendChild(bubble);
+
+// Uhrzeit
+const time = document.createElement('div');
+time.className = 'msg-time';
+time.textContent = formatTime(msg.time);
+div.appendChild(time);
+
+// Actions - jetzt mit Text-Labels
+const actions = document.createElement('div');
+actions.className = 'msg-actions';
+
+if (msg.role === 'user') {
+  // Bearbeiten
+  const editBtn = document.createElement('button');
+  editBtn.className = 'msg-action';
+  editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Bearbeiten';
+  editBtn.onclick = () => editMessage(idx);
+  actions.appendChild(editBtn);
+  
+  // Kopieren
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'msg-action';
+  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Kopieren';
+  copyBtn.onclick = () => copyText(msg.content);
+  actions.appendChild(copyBtn);
+  
+  // Merken
+  const memBtn = document.createElement('button');
+  memBtn.className = 'msg-action';
+  memBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> Merken';
+  memBtn.onclick = () => saveAsMemory(msg.content);
+  actions.appendChild(memBtn);
+}
+
+if (msg.role === 'assistant') {
+  // Kopieren
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'msg-action';
+  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Kopieren';
+  copyBtn.onclick = () => copyText(msg.content);
+  actions.appendChild(copyBtn);
+  
+  // Vorlesen
+  const speakBtn = document.createElement('button');
+  speakBtn.className = 'msg-action';
+  speakBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Vorlesen';
+  speakBtn.onclick = () => speakTextWithToggle(msg.content, speakBtn);
+  actions.appendChild(speakBtn);
+  
+  // Neu generieren
+  const regenBtn = document.createElement('button');
+  regenBtn.className = 'msg-action';
+  regenBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16"/></svg> Neu generieren';
+  regenBtn.onclick = () => regenerateMessage(idx);
+  actions.appendChild(regenBtn);
+}
+
+div.appendChild(actions);
+area.appendChild(div);
+```
+
+});
+area.scrollTop = area.scrollHeight;
 }
 
 function formatTime(ts) {
-  if (!ts) return '';
-  const d = new Date(ts);
-  const now = new Date();
-  const isToday = d.toDateString() === now.toDateString();
-  const time = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-  if (isToday) return 'Heute, ' + time;
-  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ', ' + time;
+if (!ts) return ‘’;
+const d = new Date(ts);
+const now = new Date();
+const isToday = d.toDateString() === now.toDateString();
+const time = d.toLocaleTimeString(‘de-DE’, { hour: ‘2-digit’, minute: ‘2-digit’ });
+if (isToday) return ’Heute, ’ + time;
+return d.toLocaleDateString(‘de-DE’, { day: ‘2-digit’, month: ‘2-digit’ }) + ’, ’ + time;
 }
 
 function deleteMessage(idx) {
-  const chat = getActiveChat();
-  if (!chat) return;
-  chat.messages.splice(idx, 1);
-  chat.updatedAt = Date.now();
-  saveState();
-  renderMessages();
+const chat = getActiveChat();
+if (!chat) return;
+chat.messages.splice(idx, 1);
+chat.updatedAt = Date.now();
+saveState();
+renderMessages();
 }
 
 let editingMessageIdx = null;
 
 function editMessage(idx) {
-  const chat = getActiveChat();
-  if (!chat) return;
-  const msg = chat.messages[idx];
-  
-  editingMessageIdx = idx;
-  
-  // Text ins Eingabefeld setzen
-  const input = document.getElementById('inputField');
-  input.value = msg.content;
-  input.classList.add('editing');
-  autoResize(input);
-  updateSendBtn();
-  input.focus();
-  
-  // Edit-Banner anzeigen
-  document.getElementById('editBanner').classList.add('visible');
+const chat = getActiveChat();
+if (!chat) return;
+const msg = chat.messages[idx];
+
+editingMessageIdx = idx;
+
+const input = document.getElementById(‘inputField’);
+input.value = msg.content;
+input.classList.add(‘editing’);
+autoResize(input);
+updateSendBtn();
+input.focus();
+
+document.getElementById(‘editBanner’).classList.add(‘visible’);
 }
 
 function cancelEdit() {
-  editingMessageIdx = null;
-  const input = document.getElementById('inputField');
-  input.value = '';
-  input.classList.remove('editing');
-  autoResize(input);
-  updateSendBtn();
-  document.getElementById('editBanner').classList.remove('visible');
-  showToast('Bearbeitung abgebrochen');
+editingMessageIdx = null;
+const input = document.getElementById(‘inputField’);
+input.value = ‘’;
+input.classList.remove(‘editing’);
+autoResize(input);
+updateSendBtn();
+document.getElementById(‘editBanner’).classList.remove(‘visible’);
+showToast(‘Bearbeitung abgebrochen’);
 }
 
 async function regenerateMessage(idx) {
-  const chat = getActiveChat();
-  if (!chat || isStreaming) return;
-  // Entferne die letzte KI-Antwort
-  chat.messages.splice(idx, 1);
-  chat.updatedAt = Date.now();
-  saveState();
-  renderMessages();
-  
-  // Generiere neu
-  const apiKey = localStorage.getItem('gpt_api_key');
-  if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); return; }
-  
-  showTyping(); isStreaming = true; updateSendBtn();
-  try {
-    const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
-    const pinnedMemories = localStorage.getItem('gpt_pinned_memories') || '';
-    const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
-    const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
-    const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
-    const topK = parseInt(localStorage.getItem('gpt_top_k')) || 0;
-    const freqPen = parseFloat(localStorage.getItem('gpt_freq_pen')) || 0;
-    const presPen = parseFloat(localStorage.getItem('gpt_pres_pen')) || 0;
-    const repPen = parseFloat(localStorage.getItem('gpt_rep_pen')) || 1;
-    const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
-    
-    const apiMessages = [];
-    
-    // System-Prompt aufbauen
-    let fullSystemPrompt = systemPrompt;
-    
-    // Angeheftete Erinnerungen
-    if (pinnedMemories.trim()) {
-      fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
-    }
-    
-    // Keyword-Erinnerungen
-    const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
-    if (lastUserMsg) {
-      const matchingMemories = getMatchingMemories(lastUserMsg.content);
-      if (matchingMemories.length > 0) {
-        fullSystemPrompt += '\n\n--- Relevante Erinnerungen ---\n';
-        matchingMemories.forEach(mem => {
-          fullSystemPrompt += mem.content + '\n';
-        });
-      }
-    }
-    
-    if (fullSystemPrompt) {
-      apiMessages.push({ role: 'system', content: fullSystemPrompt });
-    }
-    
-    // Nur die letzten X Nachrichten senden
-    const recentMessages = chat.messages.slice(-maxContext);
-    recentMessages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
-    
-    // API-Payload bauen
-    const payload = { 
-      model: chat.model, 
-      messages: apiMessages,
-      temperature: temperature,
-      top_p: topP,
-      max_tokens: maxTokens
-    };
-    
-    if (topK > 0) payload.top_k = topK;
-    if (freqPen > 0) payload.frequency_penalty = freqPen;
-    if (presPen > 0) payload.presence_penalty = presPen;
-    if (repPen !== 1) payload.repetition_penalty = repPen;
-    
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify(payload)
+const chat = getActiveChat();
+if (!chat || isStreaming) return;
+chat.messages.splice(idx, 1);
+chat.updatedAt = Date.now();
+saveState();
+renderMessages();
+
+const apiKey = localStorage.getItem(‘gpt_api_key’);
+if (!apiKey) { showToast(‘Bitte API-Schlüssel eingeben’); return; }
+
+showTyping(); isStreaming = true; updateSendBtn();
+try {
+const systemPrompt = localStorage.getItem(‘gpt_system_prompt’) || ‘’;
+const pinnedMemories = localStorage.getItem(‘gpt_pinned_memories’) || ‘’;
+const maxContext = parseInt(localStorage.getItem(‘gpt_context_messages’)) || 10;
+const temperature = parseFloat(localStorage.getItem(‘gpt_temperature’)) || 0.7;
+const topP = parseFloat(localStorage.getItem(‘gpt_top_p’)) || 1;
+const topK = parseInt(localStorage.getItem(‘gpt_top_k’)) || 0;
+const freqPen = parseFloat(localStorage.getItem(‘gpt_freq_pen’)) || 0;
+const presPen = parseFloat(localStorage.getItem(‘gpt_pres_pen’)) || 0;
+const repPen = parseFloat(localStorage.getItem(‘gpt_rep_pen’)) || 1;
+const maxTokens = parseInt(localStorage.getItem(‘gpt_max_tokens’)) || 4096;
+
+```
+const apiMessages = [];
+
+let fullSystemPrompt = systemPrompt;
+
+if (pinnedMemories.trim()) {
+  fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
+}
+
+const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
+if (lastUserMsg) {
+  const matchingMemories = getMatchingMemories(lastUserMsg.content);
+  if (matchingMemories.length > 0) {
+    fullSystemPrompt += '\n\n--- Relevante Erinnerungen ---\n';
+    matchingMemories.forEach(mem => {
+      fullSystemPrompt += mem.content + '\n';
     });
-    const data = await response.json();
-    hideTyping();
-    const reply = data.error ? 'Fehler: ' + data.error.message : data.choices[0].message.content;
-    chat.messages.push({ role: 'assistant', content: reply, time: Date.now() });
-    chat.updatedAt = Date.now();
-    saveState(); renderMessages();
-  } catch(e) {
-    hideTyping();
-    chat.messages.push({ role: 'assistant', content: 'Verbindungsfehler: ' + e.message, time: Date.now() });
-    saveState(); renderMessages();
-  } finally { isStreaming = false; updateSendBtn(); }
+  }
+}
+
+if (fullSystemPrompt) {
+  apiMessages.push({ role: 'system', content: fullSystemPrompt });
+}
+
+const recentMessages = chat.messages.slice(-maxContext);
+recentMessages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
+
+const payload = { 
+  model: chat.model, 
+  messages: apiMessages,
+  temperature: temperature,
+  top_p: topP,
+  max_tokens: maxTokens
+};
+
+if (topK > 0) payload.top_k = topK;
+if (freqPen > 0) payload.frequency_penalty = freqPen;
+if (presPen > 0) payload.presence_penalty = presPen;
+if (repPen !== 1) payload.repetition_penalty = repPen;
+
+const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+  body: JSON.stringify(payload)
+});
+const data = await response.json();
+hideTyping();
+const reply = data.error ? 'Fehler: ' + data.error.message : data.choices[0].message.content;
+chat.messages.push({ role: 'assistant', content: reply, time: Date.now() });
+chat.updatedAt = Date.now();
+saveState(); renderMessages();
+```
+
+} catch(e) {
+hideTyping();
+chat.messages.push({ role: ‘assistant’, content: ’Verbindungsfehler: ’ + e.message, time: Date.now() });
+saveState(); renderMessages();
+} finally { isStreaming = false; updateSendBtn(); }
 }
 
 function showTyping() {
-  if (document.getElementById('typingIndicator')) return;
-  const area = document.getElementById('chatArea');
-  const div = document.createElement('div');
-  div.id = 'typingIndicator';
-  div.className = 'message assistant';
-  div.innerHTML = '<div class="typing"><div class="typing-dots"><span></span><span></span><span></span></div><span>denkt nach...</span></div>';
-  area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
+if (document.getElementById(‘typingIndicator’)) return;
+const area = document.getElementById(‘chatArea’);
+const div = document.createElement(‘div’);
+div.id = ‘typingIndicator’;
+div.className = ‘message assistant’;
+div.innerHTML = ‘<div class="typing"><div class="typing-dots"><span></span><span></span><span></span></div><span>denkt nach…</span></div>’;
+area.appendChild(div);
+area.scrollTop = area.scrollHeight;
 }
 
-function hideTyping() { document.getElementById('typingIndicator')?.remove(); }
+function hideTyping() { document.getElementById(‘typingIndicator’)?.remove(); }
 
 async function sendMessage() {
-  const input = document.getElementById('inputField');
-  const text = input.value.trim();
-  const hasAttachments = pendingAttachments.length > 0;
-  if ((!text && !hasAttachments) || isStreaming) return;
-  const apiKey = localStorage.getItem('gpt_api_key');
-  if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); openSettings(); return; }
-  const chat = getActiveChat();
-  if (!chat) return;
-  
-  // Edit-Modus: Nachricht aktualisieren statt neue erstellen
-  if (editingMessageIdx !== null) {
-    chat.messages[editingMessageIdx].content = text;
-    chat.messages[editingMessageIdx].time = Date.now();
-    // Alle Nachrichten nach dieser löschen und neu generieren
-    chat.messages = chat.messages.slice(0, editingMessageIdx + 1);
-    editingMessageIdx = null;
-    input.classList.remove('editing');
-    document.getElementById('editBanner').classList.remove('visible');
-  } else {
-    // Neue Nachricht erstellen
-    const userMsg = { role: 'user', content: text, time: Date.now(), attachments: [...pendingAttachments] };
-    chat.messages.push(userMsg);
+const input = document.getElementById(‘inputField’);
+const text = input.value.trim();
+const hasAttachments = pendingAttachments.length > 0;
+if ((!text && !hasAttachments) || isStreaming) return;
+const apiKey = localStorage.getItem(‘gpt_api_key’);
+if (!apiKey) { showToast(‘Bitte API-Schlüssel eingeben’); openSettings(); return; }
+const chat = getActiveChat();
+if (!chat) return;
+
+if (editingMessageIdx !== null) {
+chat.messages[editingMessageIdx].content = text;
+chat.messages[editingMessageIdx].time = Date.now();
+chat.messages = chat.messages.slice(0, editingMessageIdx + 1);
+editingMessageIdx = null;
+input.classList.remove(‘editing’);
+document.getElementById(‘editBanner’).classList.remove(‘visible’);
+} else {
+const userMsg = { role: ‘user’, content: text, time: Date.now(), attachments: […pendingAttachments] };
+chat.messages.push(userMsg);
+}
+
+if (chat.messages.length === 1) chat.title = text.slice(0, 40) + (text.length > 40 ? ‘…’ : ‘’);
+chat.model = document.getElementById(‘modelSelect’).value;
+chat.updatedAt = Date.now();
+
+input.value = ‘’;
+pendingAttachments = [];
+renderAttachments();
+autoResize(input);
+updateSendBtn();
+saveState(); renderMessages(); renderChatList(document.getElementById(‘chatSearch’)?.value || ‘’);
+showTyping(); isStreaming = true; updateSendBtn();
+
+try {
+const systemPrompt = localStorage.getItem(‘gpt_system_prompt’) || ‘’;
+const pinnedMemories = localStorage.getItem(‘gpt_pinned_memories’) || ‘’;
+const maxContext = parseInt(localStorage.getItem(‘gpt_context_messages’)) || 10;
+const autoSummarize = localStorage.getItem(‘gpt_auto_summarize’) === ‘true’;
+const temperature = parseFloat(localStorage.getItem(‘gpt_temperature’)) || 0.7;
+const topP = parseFloat(localStorage.getItem(‘gpt_top_p’)) || 1;
+const topK = parseInt(localStorage.getItem(‘gpt_top_k’)) || 0;
+const freqPen = parseFloat(localStorage.getItem(‘gpt_freq_pen’)) || 0;
+const presPen = parseFloat(localStorage.getItem(‘gpt_pres_pen’)) || 0;
+const repPen = parseFloat(localStorage.getItem(‘gpt_rep_pen’)) || 1;
+const maxTokens = parseInt(localStorage.getItem(‘gpt_max_tokens’)) || 4096;
+
+```
+const apiMessages = [];
+
+let fullSystemPrompt = systemPrompt;
+
+if (pinnedMemories.trim()) {
+  fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
+}
+
+const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
+if (lastUserMsg) {
+  const matchingMemories = getMatchingMemories(lastUserMsg.content);
+  if (matchingMemories.length > 0) {
+    fullSystemPrompt += '\n\n--- Relevante Erinnerungen ---\n';
+    matchingMemories.forEach(mem => {
+      fullSystemPrompt += mem.content + '\n';
+    });
   }
-  
-  if (chat.messages.length === 1) chat.title = text.slice(0, 40) + (text.length > 40 ? '...' : '');
-  chat.model = document.getElementById('modelSelect').value;
-  chat.updatedAt = Date.now();
-  
-  // Clear input
-  input.value = ''; 
-  pendingAttachments = [];
-  renderAttachments();
-  autoResize(input); 
-  updateSendBtn();
-  saveState(); renderMessages(); renderChatList(document.getElementById('chatSearch')?.value || '');
-  showTyping(); isStreaming = true; updateSendBtn();
-  
-  try {
-    const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
-    const pinnedMemories = localStorage.getItem('gpt_pinned_memories') || '';
-    const maxContext = parseInt(localStorage.getItem('gpt_context_messages')) || 10;
-    const autoSummarize = localStorage.getItem('gpt_auto_summarize') === 'true';
-    const temperature = parseFloat(localStorage.getItem('gpt_temperature')) || 0.7;
-    const topP = parseFloat(localStorage.getItem('gpt_top_p')) || 1;
-    const topK = parseInt(localStorage.getItem('gpt_top_k')) || 0;
-    const freqPen = parseFloat(localStorage.getItem('gpt_freq_pen')) || 0;
-    const presPen = parseFloat(localStorage.getItem('gpt_pres_pen')) || 0;
-    const repPen = parseFloat(localStorage.getItem('gpt_rep_pen')) || 1;
-    const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
-    
-    const apiMessages = [];
-    
-    // System-Prompt aufbauen
-    let fullSystemPrompt = systemPrompt;
-    
-    // Angeheftete Erinnerungen (werden IMMER eingefügt)
-    if (pinnedMemories.trim()) {
-      fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
-    }
-    
-    // Keyword-Erinnerungen (nur wenn Schlüsselwort matcht)
-    const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
-    if (lastUserMsg) {
-      const matchingMemories = getMatchingMemories(lastUserMsg.content);
-      if (matchingMemories.length > 0) {
-        fullSystemPrompt += '\n\n--- Relevante Erinnerungen ---\n';
-        matchingMemories.forEach(mem => {
-          fullSystemPrompt += mem.content + '\n';
-        });
-      }
-    }
-    
-    if (fullSystemPrompt) {
-      apiMessages.push({ role: 'system', content: fullSystemPrompt });
-    }
-    
-    // Automatische Zusammenfassung wenn aktiviert und viele Nachrichten
-    let recentMessages = chat.messages.slice(-maxContext);
-    if (autoSummarize && chat.messages.length > maxContext + 4) {
-      const summary = await summarizeOldMessages(chat.messages.slice(0, -maxContext), apiKey, chat.model);
-      if (summary) {
-        apiMessages.push({ role: 'system', content: '--- Zusammenfassung des bisherigen Gesprächs ---\n' + summary });
-      }
-    }
-    
-    // Nachrichten für API aufbereiten
-    recentMessages.forEach(m => {
-      if (m.attachments && m.attachments.length > 0) {
-        // Multimodal message mit Bildern
-        const content = [];
-        if (m.content) content.push({ type: 'text', text: m.content });
-        m.attachments.forEach(att => {
-          if (att.type.startsWith('image/')) {
-            content.push({ type: 'image_url', image_url: { url: att.data } });
-          }
-        });
-        apiMessages.push({ role: m.role, content });
-      } else {
-        apiMessages.push({ role: m.role, content: m.content });
-      }
-    });
-    
-    // API-Payload bauen
-    const payload = { 
-      model: chat.model, 
-      messages: apiMessages,
-      temperature: temperature,
-      top_p: topP,
-      max_tokens: maxTokens
-    };
-    
-    // Optionale Parameter nur hinzufügen wenn nicht default
-    if (topK > 0) payload.top_k = topK;
-    if (freqPen > 0) payload.frequency_penalty = freqPen;
-    if (presPen > 0) payload.presence_penalty = presPen;
-    if (repPen !== 1) payload.repetition_penalty = repPen;
-    
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify(payload)
-    });
-    const data = await response.json();
-    hideTyping();
-    const reply = data.error ? 'Fehler: ' + data.error.message : data.choices[0].message.content;
-    chat.messages.push({ role: 'assistant', content: reply, time: Date.now() });
-    chat.updatedAt = Date.now();
-    saveState(); renderMessages();
-  } catch(e) {
-    hideTyping();
-    chat.messages.push({ role: 'assistant', content: 'Verbindungsfehler: ' + e.message, time: Date.now() });
-    saveState(); renderMessages();
-  } finally { isStreaming = false; updateSendBtn(); }
 }
 
-const inputField = document.getElementById('inputField');
-inputField.addEventListener('input', function() { autoResize(this); updateSendBtn(); });
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 150) + 'px'; }
-function updateSendBtn() { 
-  const hasText = inputField.value.trim().length > 0;
-  const hasFiles = pendingAttachments.length > 0;
-  document.getElementById('sendBtn').disabled = (!hasText && !hasFiles) || isStreaming; 
+if (fullSystemPrompt) {
+  apiMessages.push({ role: 'system', content: fullSystemPrompt });
 }
 
-function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast('Kopiert ✓')); }
+let recentMessages = chat.messages.slice(-maxContext);
+if (autoSummarize && chat.messages.length > maxContext + 4) {
+  const summary = await summarizeOldMessages(chat.messages.slice(0, -maxContext), apiKey, chat.model);
+  if (summary) {
+    apiMessages.push({ role: 'system', content: '--- Zusammenfassung des bisherigen Gesprächs ---\n' + summary });
+  }
+}
 
-const playIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>';
-const pauseIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+recentMessages.forEach(m => {
+  if (m.attachments && m.attachments.length > 0) {
+    const content = [];
+    if (m.content) content.push({ type: 'text', text: m.content });
+    m.attachments.forEach(att => {
+      if (att.type.startsWith('image/')) {
+        content.push({ type: 'image_url', image_url: { url: att.data } });
+      }
+    });
+    apiMessages.push({ role: m.role, content });
+  } else {
+    apiMessages.push({ role: m.role, content: m.content });
+  }
+});
+
+const payload = { 
+  model: chat.model, 
+  messages: apiMessages,
+  temperature: temperature,
+  top_p: topP,
+  max_tokens: maxTokens
+};
+
+if (topK > 0) payload.top_k = topK;
+if (freqPen > 0) payload.frequency_penalty = freqPen;
+if (presPen > 0) payload.presence_penalty = presPen;
+if (repPen !== 1) payload.repetition_penalty = repPen;
+
+const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+  body: JSON.stringify(payload)
+});
+const data = await response.json();
+hideTyping();
+const reply = data.error ? 'Fehler: ' + data.error.message : data.choices[0].message.content;
+chat.messages.push({ role: 'assistant', content: reply, time: Date.now() });
+chat.updatedAt = Date.now();
+saveState(); renderMessages();
+```
+
+} catch(e) {
+hideTyping();
+chat.messages.push({ role: ‘assistant’, content: ’Verbindungsfehler: ’ + e.message, time: Date.now() });
+saveState(); renderMessages();
+} finally { isStreaming = false; updateSendBtn(); }
+}
+
+const inputField = document.getElementById(‘inputField’);
+inputField.addEventListener(‘input’, function() { autoResize(this); updateSendBtn(); });
+function autoResize(el) { el.style.height = ‘auto’; el.style.height = Math.min(el.scrollHeight, 150) + ‘px’; }
+function updateSendBtn() {
+const hasText = inputField.value.trim().length > 0;
+const hasFiles = pendingAttachments.length > 0;
+document.getElementById(‘sendBtn’).disabled = (!hasText && !hasFiles) || isStreaming;
+}
+
+function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast(‘Kopiert ✓’)); }
+
+const playIcon = ‘<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Vorlesen’;
+const pauseIcon = ‘<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Stopp’;
 
 function speakTextWithToggle(text, btn) {
-  if (currentSpeakBtn === btn && speechSynthesis.speaking) { 
-    speechSynthesis.cancel(); 
-    btn.innerHTML = playIcon;
-    btn.classList.remove('speaking'); 
-    currentSpeakBtn = null; 
-    return; 
-  }
-  if (speechSynthesis.speaking) { 
-    speechSynthesis.cancel(); 
-    if (currentSpeakBtn) {
-      currentSpeakBtn.innerHTML = playIcon;
-      currentSpeakBtn.classList.remove('speaking');
-    }
-  }
-  
-  const u = new SpeechSynthesisUtterance(text);
-  
-  const savedVoice = localStorage.getItem('gpt_voice') || 'Petra';
-  const savedRate = parseFloat(localStorage.getItem('gpt_voice_rate')) || 1;
-  const savedPitch = parseFloat(localStorage.getItem('gpt_voice_pitch')) || 1;
-  
-  const voices = speechSynthesis.getVoices();
-  const voice = voices.find(v => v.name.includes(savedVoice));
-  if (voice) {
-    u.voice = voice;
-    u.lang = voice.lang;
-  } else {
-    u.lang = 'de-DE';
-  }
-  
-  u.rate = savedRate;
-  u.pitch = savedPitch;
-  
-  u.onend = () => { 
-    btn.innerHTML = playIcon;
-    btn.classList.remove('speaking'); 
-    currentSpeakBtn = null; 
-  };
-  
-  btn.innerHTML = pauseIcon;
-  btn.classList.add('speaking'); 
-  currentSpeakBtn = btn;
-  speechSynthesis.speak(u);
+if (currentSpeakBtn === btn && speechSynthesis.speaking) {
+speechSynthesis.cancel();
+btn.innerHTML = playIcon;
+btn.classList.remove(‘speaking’);
+currentSpeakBtn = null;
+return;
+}
+if (speechSynthesis.speaking) {
+speechSynthesis.cancel();
+if (currentSpeakBtn) {
+currentSpeakBtn.innerHTML = playIcon;
+currentSpeakBtn.classList.remove(‘speaking’);
+}
+}
+
+const u = new SpeechSynthesisUtterance(text);
+
+const savedVoice = localStorage.getItem(‘gpt_voice’) || ‘Petra’;
+const savedRate = parseFloat(localStorage.getItem(‘gpt_voice_rate’)) || 1;
+const savedPitch = parseFloat(localStorage.getItem(‘gpt_voice_pitch’)) || 1;
+
+const voices = speechSynthesis.getVoices();
+const voice = voices.find(v => v.name.includes(savedVoice));
+if (voice) {
+u.voice = voice;
+u.lang = voice.lang;
+} else {
+u.lang = ‘de-DE’;
+}
+
+u.rate = savedRate;
+u.pitch = savedPitch;
+
+u.onend = () => {
+btn.innerHTML = playIcon;
+btn.classList.remove(‘speaking’);
+currentSpeakBtn = null;
+};
+
+btn.innerHTML = pauseIcon;
+btn.classList.add(‘speaking’);
+currentSpeakBtn = btn;
+speechSynthesis.speak(u);
 }
 
 function speakText(text, btn) {
-  speakTextWithToggle(text, btn);
+speakTextWithToggle(text, btn);
 }
 
 function loadVoiceSettings() {
-  const savedVoice = localStorage.getItem('gpt_voice');
-  const select = document.getElementById('voiceSelect');
-  if (select && savedVoice) {
-    select.value = savedVoice;
-  }
+const savedVoice = localStorage.getItem(‘gpt_voice’);
+const select = document.getElementById(‘voiceSelect’);
+if (select && savedVoice) {
+select.value = savedVoice;
+}
 }
 
 function testSelectedVoice() {
-  const voiceName = document.getElementById('voiceSelect').value;
-  const isGerman = voiceName === 'Petra' || voiceName === 'Anna';
-  const testText = isGerman ? 'Hallo, so klinge ich.' : 'Hello, this is how I sound.';
-  
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(testText);
-  
-  const voices = speechSynthesis.getVoices();
-  const voice = voices.find(v => v.name.includes(voiceName));
-  if (voice) u.voice = voice;
-  
-  u.rate = parseFloat(document.getElementById('voiceRate').value);
-  u.pitch = parseFloat(document.getElementById('voicePitch').value);
-  u.lang = isGerman ? 'de-DE' : 'en-US';
-  
-  speechSynthesis.speak(u);
+const voiceName = document.getElementById(‘voiceSelect’).value;
+const isGerman = voiceName === ‘Petra’ || voiceName === ‘Anna’;
+const testText = isGerman ? ‘Hallo, so klinge ich.’ : ‘Hello, this is how I sound.’;
+
+speechSynthesis.cancel();
+const u = new SpeechSynthesisUtterance(testText);
+
+const voices = speechSynthesis.getVoices();
+const voice = voices.find(v => v.name.includes(voiceName));
+if (voice) u.voice = voice;
+
+u.rate = parseFloat(document.getElementById(‘voiceRate’).value);
+u.pitch = parseFloat(document.getElementById(‘voicePitch’).value);
+u.lang = isGerman ? ‘de-DE’ : ‘en-US’;
+
+speechSynthesis.speak(u);
 }
 
 function updateRateValue() {
-  const val = document.getElementById('voiceRate').value;
-  document.getElementById('rateValue').textContent = val;
+const val = document.getElementById(‘voiceRate’).value;
+document.getElementById(‘rateValue’).textContent = val;
 }
 
 function updatePitchValue() {
-  const val = document.getElementById('voicePitch').value;
-  document.getElementById('pitchValue').textContent = val;
+const val = document.getElementById(‘voicePitch’).value;
+document.getElementById(‘pitchValue’).textContent = val;
 }
 
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
-function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
-function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+function showToast(msg) { const t = document.getElementById(‘toast’); t.textContent = msg; t.classList.add(‘show’); setTimeout(() => t.classList.remove(‘show’), 2000); }
+function escapeHtml(t) { const d = document.createElement(‘div’); d.textContent = t; return d.innerHTML; }
+function toggleSidebar() { document.getElementById(‘sidebar’).classList.toggle(‘open’); document.getElementById(‘sidebarOverlay’).classList.toggle(‘open’); }
+function closeSidebar() { document.getElementById(‘sidebar’).classList.remove(‘open’); document.getElementById(‘sidebarOverlay’).classList.remove(‘open’); }
 
 function toggleSection(header) {
-  header.parentElement.classList.toggle('collapsed');
+header.parentElement.classList.toggle(‘collapsed’);
 }
 
-function openSettings() { 
-  document.getElementById('apiKeyInput').value = localStorage.getItem('gpt_api_key') || ''; 
-  document.getElementById('systemPromptInput').value = localStorage.getItem('gpt_system_prompt') || ''; 
-  
-  // Namen laden
-  document.getElementById('userNameInput').value = localStorage.getItem('gpt_user_name') || '';
-  document.getElementById('aiNameInput').value = localStorage.getItem('gpt_ai_name') || '';
-  
-  // Sampling-Parameter laden
-  document.getElementById('temperatureInput').value = localStorage.getItem('gpt_temperature') || 0.7;
-  document.getElementById('tempValue').textContent = localStorage.getItem('gpt_temperature') || 0.7;
-  document.getElementById('topPInput').value = localStorage.getItem('gpt_top_p') || 1;
-  document.getElementById('topPValue').textContent = localStorage.getItem('gpt_top_p') || 1;
-  document.getElementById('topKInput').value = localStorage.getItem('gpt_top_k') || 0;
-  document.getElementById('topKValue').textContent = localStorage.getItem('gpt_top_k') || 0;
-  document.getElementById('freqPenInput').value = localStorage.getItem('gpt_freq_pen') || 0;
-  document.getElementById('freqPenValue').textContent = localStorage.getItem('gpt_freq_pen') || 0;
-  document.getElementById('presPenInput').value = localStorage.getItem('gpt_pres_pen') || 0;
-  document.getElementById('presPenValue').textContent = localStorage.getItem('gpt_pres_pen') || 0;
-  document.getElementById('repPenInput').value = localStorage.getItem('gpt_rep_pen') || 1;
-  document.getElementById('repPenValue').textContent = localStorage.getItem('gpt_rep_pen') || 1;
-  document.getElementById('maxTokensInput').value = localStorage.getItem('gpt_max_tokens') || 4096;
-  
-  // Memory laden
-  document.getElementById('pinnedMemoriesInput').value = localStorage.getItem('gpt_pinned_memories') || '';
-  loadKeywordMemories();
-  document.getElementById('maxMemoriesInput').value = localStorage.getItem('gpt_max_memories') || 3;
-  document.getElementById('maxMemValue').textContent = localStorage.getItem('gpt_max_memories') || 3;
-  document.getElementById('contextMessagesInput').value = localStorage.getItem('gpt_context_messages') || 10;
-  document.getElementById('contextValue').textContent = localStorage.getItem('gpt_context_messages') || 10;
-  document.getElementById('autoSummarizeInput').checked = localStorage.getItem('gpt_auto_summarize') === 'true';
-  
-  // Voice-Einstellungen laden
-  loadVoiceSettings();
-  document.getElementById('voiceRate').value = localStorage.getItem('gpt_voice_rate') || 1;
-  document.getElementById('voicePitch').value = localStorage.getItem('gpt_voice_pitch') || 1;
-  updateRateValue();
-  updatePitchValue();
-  
-  // Supabase laden
-  document.getElementById('supabaseUrlInput').value = localStorage.getItem('gpt_supabase_url') || '';
-  document.getElementById('supabaseKeyInput').value = localStorage.getItem('gpt_supabase_key') || '';
-  document.getElementById('deviceIdInput').value = localStorage.getItem('gpt_device_id') || '';
-  document.getElementById('autoSyncInput').checked = localStorage.getItem('gpt_auto_sync') === 'true';
-  
-  document.getElementById('settingsModal').classList.add('open'); 
-}
-function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+function openSettings() {
+document.getElementById(‘apiKeyInput’).value = localStorage.getItem(‘gpt_api_key’) || ‘’;
+document.getElementById(‘systemPromptInput’).value = localStorage.getItem(‘gpt_system_prompt’) || ‘’;
 
-function saveSettings() { 
-  localStorage.setItem('gpt_api_key', document.getElementById('apiKeyInput').value.trim()); 
-  localStorage.setItem('gpt_system_prompt', document.getElementById('systemPromptInput').value); 
-  
-  // Namen speichern
-  localStorage.setItem('gpt_user_name', document.getElementById('userNameInput').value.trim());
-  localStorage.setItem('gpt_ai_name', document.getElementById('aiNameInput').value.trim());
-  
-  // Sampling-Parameter speichern
-  localStorage.setItem('gpt_temperature', document.getElementById('temperatureInput').value);
-  localStorage.setItem('gpt_top_p', document.getElementById('topPInput').value);
-  localStorage.setItem('gpt_top_k', document.getElementById('topKInput').value);
-  localStorage.setItem('gpt_freq_pen', document.getElementById('freqPenInput').value);
-  localStorage.setItem('gpt_pres_pen', document.getElementById('presPenInput').value);
-  localStorage.setItem('gpt_rep_pen', document.getElementById('repPenInput').value);
-  localStorage.setItem('gpt_max_tokens', document.getElementById('maxTokensInput').value);
-  
-  // Memory speichern
-  localStorage.setItem('gpt_pinned_memories', document.getElementById('pinnedMemoriesInput').value);
-  saveKeywordMemories();
-  localStorage.setItem('gpt_max_memories', document.getElementById('maxMemoriesInput').value);
-  localStorage.setItem('gpt_context_messages', document.getElementById('contextMessagesInput').value);
-  localStorage.setItem('gpt_auto_summarize', document.getElementById('autoSummarizeInput').checked);
-  
-  // Voice-Einstellungen speichern
-  localStorage.setItem('gpt_voice', document.getElementById('voiceSelect').value);
-  localStorage.setItem('gpt_voice_rate', document.getElementById('voiceRate').value);
-  localStorage.setItem('gpt_voice_pitch', document.getElementById('voicePitch').value);
-  
-  // Supabase speichern
-  localStorage.setItem('gpt_supabase_url', document.getElementById('supabaseUrlInput').value.trim());
-  localStorage.setItem('gpt_supabase_key', document.getElementById('supabaseKeyInput').value.trim());
-  localStorage.setItem('gpt_device_id', document.getElementById('deviceIdInput').value.trim());
-  localStorage.setItem('gpt_auto_sync', document.getElementById('autoSyncInput').checked);
-  
-  closeSettings(); 
-  showToast('Gespeichert ✓'); 
+document.getElementById(‘userNameInput’).value = localStorage.getItem(‘gpt_user_name’) || ‘’;
+document.getElementById(‘aiNameInput’).value = localStorage.getItem(‘gpt_ai_name’) || ‘’;
+
+document.getElementById(‘temperatureInput’).value = localStorage.getItem(‘gpt_temperature’) || 0.7;
+document.getElementById(‘tempValue’).textContent = localStorage.getItem(‘gpt_temperature’) || 0.7;
+document.getElementById(‘topPInput’).value = localStorage.getItem(‘gpt_top_p’) || 1;
+document.getElementById(‘topPValue’).textContent = localStorage.getItem(‘gpt_top_p’) || 1;
+document.getElementById(‘topKInput’).value = localStorage.getItem(‘gpt_top_k’) || 0;
+document.getElementById(‘topKValue’).textContent = localStorage.getItem(‘gpt_top_k’) || 0;
+document.getElementById(‘freqPenInput’).value = localStorage.getItem(‘gpt_freq_pen’) || 0;
+document.getElementById(‘freqPenValue’).textContent = localStorage.getItem(‘gpt_freq_pen’) || 0;
+document.getElementById(‘presPenInput’).value = localStorage.getItem(‘gpt_pres_pen’) || 0;
+document.getElementById(‘presPenValue’).textContent = localStorage.getItem(‘gpt_pres_pen’) || 0;
+document.getElementById(‘repPenInput’).value = localStorage.getItem(‘gpt_rep_pen’) || 1;
+document.getElementById(‘repPenValue’).textContent = localStorage.getItem(‘gpt_rep_pen’) || 1;
+document.getElementById(‘maxTokensInput’).value = localStorage.getItem(‘gpt_max_tokens’) || 4096;
+
+document.getElementById(‘pinnedMemoriesInput’).value = localStorage.getItem(‘gpt_pinned_memories’) || ‘’;
+loadKeywordMemories();
+document.getElementById(‘maxMemoriesInput’).value = localStorage.getItem(‘gpt_max_memories’) || 3;
+document.getElementById(‘maxMemValue’).textContent = localStorage.getItem(‘gpt_max_memories’) || 3;
+document.getElementById(‘contextMessagesInput’).value = localStorage.getItem(‘gpt_context_messages’) || 10;
+document.getElementById(‘contextValue’).textContent = localStorage.getItem(‘gpt_context_messages’) || 10;
+document.getElementById(‘autoSummarizeInput’).checked = localStorage.getItem(‘gpt_auto_summarize’) === ‘true’;
+
+loadVoiceSettings();
+document.getElementById(‘voiceRate’).value = localStorage.getItem(‘gpt_voice_rate’) || 1;
+document.getElementById(‘voicePitch’).value = localStorage.getItem(‘gpt_voice_pitch’) || 1;
+updateRateValue();
+updatePitchValue();
+
+document.getElementById(‘supabaseUrlInput’).value = localStorage.getItem(‘gpt_supabase_url’) || ‘’;
+document.getElementById(‘supabaseKeyInput’).value = localStorage.getItem(‘gpt_supabase_key’) || ‘’;
+document.getElementById(‘deviceIdInput’).value = localStorage.getItem(‘gpt_device_id’) || ‘’;
+document.getElementById(‘autoSyncInput’).checked = localStorage.getItem(‘gpt_auto_sync’) === ‘true’;
+
+document.getElementById(‘settingsModal’).classList.add(‘open’);
+}
+function closeSettings() { document.getElementById(‘settingsModal’).classList.remove(‘open’); }
+
+function saveSettings() {
+localStorage.setItem(‘gpt_api_key’, document.getElementById(‘apiKeyInput’).value.trim());
+localStorage.setItem(‘gpt_system_prompt’, document.getElementById(‘systemPromptInput’).value);
+
+localStorage.setItem(‘gpt_user_name’, document.getElementById(‘userNameInput’).value.trim());
+localStorage.setItem(‘gpt_ai_name’, document.getElementById(‘aiNameInput’).value.trim());
+
+localStorage.setItem(‘gpt_temperature’, document.getElementById(‘temperatureInput’).value);
+localStorage.setItem(‘gpt_top_p’, document.getElementById(‘topPInput’).value);
+localStorage.setItem(‘gpt_top_k’, document.getElementById(‘topKInput’).value);
+localStorage.setItem(‘gpt_freq_pen’, document.getElementById(‘freqPenInput’).value);
+localStorage.setItem(‘gpt_pres_pen’, document.getElementById(‘presPenInput’).value);
+localStorage.setItem(‘gpt_rep_pen’, document.getElementById(‘repPenInput’).value);
+localStorage.setItem(‘gpt_max_tokens’, document.getElementById(‘maxTokensInput’).value);
+
+localStorage.setItem(‘gpt_pinned_memories’, document.getElementById(‘pinnedMemoriesInput’).value);
+saveKeywordMemories();
+localStorage.setItem(‘gpt_max_memories’, document.getElementById(‘maxMemoriesInput’).value);
+localStorage.setItem(‘gpt_context_messages’, document.getElementById(‘contextMessagesInput’).value);
+localStorage.setItem(‘gpt_auto_summarize’, document.getElementById(‘autoSummarizeInput’).checked);
+
+localStorage.setItem(‘gpt_voice’, document.getElementById(‘voiceSelect’).value);
+localStorage.setItem(‘gpt_voice_rate’, document.getElementById(‘voiceRate’).value);
+localStorage.setItem(‘gpt_voice_pitch’, document.getElementById(‘voicePitch’).value);
+
+localStorage.setItem(‘gpt_supabase_url’, document.getElementById(‘supabaseUrlInput’).value.trim());
+localStorage.setItem(‘gpt_supabase_key’, document.getElementById(‘supabaseKeyInput’).value.trim());
+localStorage.setItem(‘gpt_device_id’, document.getElementById(‘deviceIdInput’).value.trim());
+localStorage.setItem(‘gpt_auto_sync’, document.getElementById(‘autoSyncInput’).checked);
+
+closeSettings();
+showToast(‘Gespeichert ✓’);
 }
 
-// Export/Import Funktionen
 function exportAllChats() {
-  const data = {
-    chats: chats,
-    settings: {
-      systemPrompt: localStorage.getItem('gpt_system_prompt'),
-      memories: localStorage.getItem('gpt_memories'),
-      temperature: localStorage.getItem('gpt_temperature'),
-      topP: localStorage.getItem('gpt_top_p'),
-      maxTokens: localStorage.getItem('gpt_max_tokens'),
-      contextMessages: localStorage.getItem('gpt_context_messages')
-    },
-    exportedAt: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'gpt-backup-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Backup erstellt ✓');
+const data = {
+chats: chats,
+settings: {
+systemPrompt: localStorage.getItem(‘gpt_system_prompt’),
+memories: localStorage.getItem(‘gpt_memories’),
+temperature: localStorage.getItem(‘gpt_temperature’),
+topP: localStorage.getItem(‘gpt_top_p’),
+maxTokens: localStorage.getItem(‘gpt_max_tokens’),
+contextMessages: localStorage.getItem(‘gpt_context_messages’)
+},
+exportedAt: new Date().toISOString()
+};
+const blob = new Blob([JSON.stringify(data, null, 2)], { type: ‘application/json’ });
+const url = URL.createObjectURL(blob);
+const a = document.createElement(‘a’);
+a.href = url;
+a.download = ‘gpt-backup-’ + new Date().toISOString().slice(0,10) + ‘.json’;
+a.click();
+URL.revokeObjectURL(url);
+showToast(‘Backup erstellt ✓’);
 }
 
 function importChats(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.chats) {
-        if (confirm('Vorhandene Chats mit Import zusammenführen?')) {
-          // Zusammenführen
-          const existingIds = chats.map(c => c.id);
-          data.chats.forEach(c => {
-            if (!existingIds.includes(c.id)) {
-              chats.push(c);
-            }
-          });
-        } else {
-          // Ersetzen
-          chats = data.chats;
-        }
-        if (!activeChatId && chats.length) activeChatId = chats[0].id;
-        saveState();
-        renderChatList();
-        renderMessages();
-        showToast('Import erfolgreich ✓');
-      }
-      // Einstellungen importieren wenn vorhanden
-      if (data.settings) {
-        if (data.settings.systemPrompt) localStorage.setItem('gpt_system_prompt', data.settings.systemPrompt);
-        if (data.settings.memories) localStorage.setItem('gpt_memories', data.settings.memories);
-        if (data.settings.temperature) localStorage.setItem('gpt_temperature', data.settings.temperature);
-        if (data.settings.topP) localStorage.setItem('gpt_top_p', data.settings.topP);
-        if (data.settings.maxTokens) localStorage.setItem('gpt_max_tokens', data.settings.maxTokens);
-        if (data.settings.contextMessages) localStorage.setItem('gpt_context_messages', data.settings.contextMessages);
-      }
-    } catch (err) {
-      showToast('Import fehlgeschlagen');
-    }
-  };
-  reader.readAsText(file);
+if (!file) return;
+const reader = new FileReader();
+reader.onload = (e) => {
+try {
+const data = JSON.parse(e.target.result);
+if (data.chats) {
+if (confirm(‘Vorhandene Chats mit Import zusammenführen?’)) {
+const existingIds = chats.map(c => c.id);
+data.chats.forEach(c => {
+if (!existingIds.includes(c.id)) {
+chats.push(c);
+}
+});
+} else {
+chats = data.chats;
+}
+if (!activeChatId && chats.length) activeChatId = chats[0].id;
+saveState();
+renderChatList();
+renderMessages();
+showToast(‘Import erfolgreich ✓’);
+}
+if (data.settings) {
+if (data.settings.systemPrompt) localStorage.setItem(‘gpt_system_prompt’, data.settings.systemPrompt);
+if (data.settings.memories) localStorage.setItem(‘gpt_memories’, data.settings.memories);
+if (data.settings.temperature) localStorage.setItem(‘gpt_temperature’, data.settings.temperature);
+if (data.settings.topP) localStorage.setItem(‘gpt_top_p’, data.settings.topP);
+if (data.settings.maxTokens) localStorage.setItem(‘gpt_max_tokens’, data.settings.maxTokens);
+if (data.settings.contextMessages) localStorage.setItem(‘gpt_context_messages’, data.settings.contextMessages);
+}
+} catch (err) {
+showToast(‘Import fehlgeschlagen’);
+}
+};
+reader.readAsText(file);
 }
 
 function deleteAllChats() {
-  if (!confirm('ALLE Chats unwiderruflich löschen?')) return;
-  if (!confirm('Wirklich ALLE Chats löschen? Das kann nicht rückgängig gemacht werden!')) return;
-  chats = [];
-  activeChatId = null;
-  saveState();
-  newChat();
-  showToast('Alle Chats gelöscht');
+if (!confirm(‘ALLE Chats unwiderruflich löschen?’)) return;
+if (!confirm(‘Wirklich ALLE Chats löschen? Das kann nicht rückgängig gemacht werden!’)) return;
+chats = [];
+activeChatId = null;
+saveState();
+newChat();
+showToast(‘Alle Chats gelöscht’);
 }
 
 function deleteAllChatsSecure() {
-  const input = document.getElementById('deleteConfirmInput');
-  if (input.value !== 'LÖSCHEN') {
-    showToast('Bitte "LÖSCHEN" eingeben');
-    return;
-  }
-  chats = [];
-  activeChatId = null;
-  saveState();
-  newChat();
-  input.value = '';
-  document.getElementById('deleteAllBtn').disabled = true;
-  closeSettings();
-  showToast('Alle Chats gelöscht');
+const input = document.getElementById(‘deleteConfirmInput’);
+if (input.value !== ‘LÖSCHEN’) {
+showToast(‘Bitte “LÖSCHEN” eingeben’);
+return;
+}
+chats = [];
+activeChatId = null;
+saveState();
+newChat();
+input.value = ‘’;
+document.getElementById(‘deleteAllBtn’).disabled = true;
+closeSettings();
+showToast(‘Alle Chats gelöscht’);
 }
 
-// Event Listener für Lösch-Bestätigung
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('deleteConfirmInput');
-  const btn = document.getElementById('deleteAllBtn');
-  if (input && btn) {
-    input.addEventListener('input', () => {
-      btn.disabled = input.value !== 'LÖSCHEN';
-    });
-  }
+document.addEventListener(‘DOMContentLoaded’, () => {
+const input = document.getElementById(‘deleteConfirmInput’);
+const btn = document.getElementById(‘deleteAllBtn’);
+if (input && btn) {
+input.addEventListener(‘input’, () => {
+btn.disabled = input.value !== ‘LÖSCHEN’;
+});
+}
 });
 
 // === KEYWORD-MEMORY-SYSTEM ===
@@ -1518,311 +1486,290 @@ document.addEventListener('DOMContentLoaded', () => {
 let keywordMemories = [];
 
 function loadKeywordMemories() {
-  try {
-    const saved = localStorage.getItem('gpt_keyword_memories');
-    keywordMemories = saved ? JSON.parse(saved) : [];
-  } catch(e) {
-    keywordMemories = [];
-  }
-  renderMemoryFields();
+try {
+const saved = localStorage.getItem(‘gpt_keyword_memories’);
+keywordMemories = saved ? JSON.parse(saved) : [];
+} catch(e) {
+keywordMemories = [];
+}
+renderMemoryFields();
 }
 
 function saveKeywordMemories() {
-  // Sammle alle Memory-Felder
-  keywordMemories = [];
-  document.querySelectorAll('.memory-item').forEach(item => {
-    const keywords = item.querySelector('.memory-keywords').value.trim();
-    const content = item.querySelector('.memory-content').value.trim();
-    const priority = item.querySelector('.memory-priority').value;
-    if (keywords && content) {
-      keywordMemories.push({ keywords, content, priority });
-    }
-  });
-  localStorage.setItem('gpt_keyword_memories', JSON.stringify(keywordMemories));
+keywordMemories = [];
+document.querySelectorAll(’.memory-item’).forEach(item => {
+const keywords = item.querySelector(’.memory-keywords’).value.trim();
+const content = item.querySelector(’.memory-content’).value.trim();
+const priority = item.querySelector(’.memory-priority’).value;
+if (keywords && content) {
+keywordMemories.push({ keywords, content, priority });
+}
+});
+localStorage.setItem(‘gpt_keyword_memories’, JSON.stringify(keywordMemories));
 }
 
 function renderMemoryFields() {
-  const list = document.getElementById('keywordMemoriesList');
-  list.innerHTML = '';
-  keywordMemories.forEach((mem, idx) => {
-    list.appendChild(createMemoryField(mem, idx));
-  });
+const list = document.getElementById(‘keywordMemoriesList’);
+list.innerHTML = ‘’;
+keywordMemories.forEach((mem, idx) => {
+list.appendChild(createMemoryField(mem, idx));
+});
 }
 
 function createMemoryField(mem = {}, idx = null) {
-  const div = document.createElement('div');
-  div.className = 'memory-item';
-  div.innerHTML = `
-    <div class="memory-item-header">
-      <input type="text" class="memory-keywords" placeholder="Schlüsselwörter (kommagetrennt)" value="${escapeHtml(mem.keywords || '')}">
-      <select class="memory-priority">
-        <option value="high" ${mem.priority === 'high' ? 'selected' : ''}>Hoch</option>
-        <option value="medium" ${mem.priority === 'medium' || !mem.priority ? 'selected' : ''}>Mittel</option>
-        <option value="low" ${mem.priority === 'low' ? 'selected' : ''}>Niedrig</option>
-      </select>
-      <button onclick="this.closest('.memory-item').remove()">✕</button>
-    </div>
-    <textarea class="memory-content" placeholder="Erinnerungsinhalt..." oninput="updateTokenCount(this)">${escapeHtml(mem.content || '')}</textarea>
-    <div class="memory-token-count">~${estimateTokens(mem.content || '')} Tokens</div>
-  `;
-  return div;
+const div = document.createElement(‘div’);
+div.className = ‘memory-item’;
+div.innerHTML = `<div class="memory-item-header"> <input type="text" class="memory-keywords" placeholder="Schlüsselwörter (kommagetrennt)" value="${escapeHtml(mem.keywords || '')}"> <select class="memory-priority"> <option value="high" ${mem.priority === 'high' ? 'selected' : ''}>Hoch</option> <option value="medium" ${mem.priority === 'medium' || !mem.priority ? 'selected' : ''}>Mittel</option> <option value="low" ${mem.priority === 'low' ? 'selected' : ''}>Niedrig</option> </select> <button onclick="this.closest('.memory-item').remove()">✕</button> </div> <textarea class="memory-content" placeholder="Erinnerungsinhalt..." oninput="updateTokenCount(this)">${escapeHtml(mem.content || '')}</textarea> <div class="memory-token-count">~${estimateTokens(mem.content || '')} Tokens</div>`;
+return div;
 }
 
 function estimateTokens(text) {
-  // Grobe Schätzung: ~4 Zeichen pro Token (für Deutsch etwas mehr)
-  return Math.ceil((text || '').length / 3.5);
+return Math.ceil((text || ‘’).length / 3.5);
 }
 
 function updateTokenCount(textarea) {
-  const count = estimateTokens(textarea.value);
-  const countDiv = textarea.parentElement.querySelector('.memory-token-count');
-  if (countDiv) {
-    countDiv.textContent = '~' + count + ' Tokens';
-    countDiv.style.color = count > 600 ? 'var(--danger)' : 'var(--text-muted)';
-  }
+const count = estimateTokens(textarea.value);
+const countDiv = textarea.parentElement.querySelector(’.memory-token-count’);
+if (countDiv) {
+countDiv.textContent = ‘~’ + count + ’ Tokens’;
+countDiv.style.color = count > 600 ? ‘var(–danger)’ : ‘var(–text-muted)’;
+}
 }
 
 function addMemoryField() {
-  const list = document.getElementById('keywordMemoriesList');
-  list.appendChild(createMemoryField());
+const list = document.getElementById(‘keywordMemoriesList’);
+list.appendChild(createMemoryField());
 }
 
 function saveAsMemory(content) {
-  // Öffne Einstellungen und füge neue Erinnerung hinzu
-  openSettings();
-  
-  // Kurze Verzögerung damit Modal geladen ist
-  setTimeout(() => {
-    // Scrolle zur Memory-Sektion
-    const memorySection = document.querySelector('#keywordMemoriesList')?.closest('.settings-section');
-    if (memorySection) {
-      memorySection.classList.remove('collapsed');
-    }
-    
-    // Füge neue Erinnerung mit dem Inhalt hinzu
-    const newMem = { keywords: '', content: content, priority: 'medium' };
-    const list = document.getElementById('keywordMemoriesList');
-    list.appendChild(createMemoryField(newMem));
-    
-    // Scrolle zum neuen Feld
-    list.lastChild.scrollIntoView({ behavior: 'smooth' });
-    list.lastChild.querySelector('.memory-keywords').focus();
-    
-    showToast('Erinnerung hinzugefügt – bitte Schlüsselwörter eingeben');
-  }, 100);
+openSettings();
+
+setTimeout(() => {
+const memorySection = document.querySelector(’#keywordMemoriesList’)?.closest(’.settings-section’);
+if (memorySection) {
+memorySection.classList.remove(‘collapsed’);
+}
+
+```
+const newMem = { keywords: '', content: content, priority: 'medium' };
+const list = document.getElementById('keywordMemoriesList');
+list.appendChild(createMemoryField(newMem));
+
+list.lastChild.scrollIntoView({ behavior: 'smooth' });
+list.lastChild.querySelector('.memory-keywords').focus();
+
+showToast('Erinnerung hinzugefügt – bitte Schlüsselwörter eingeben');
+```
+
+}, 100);
 }
 
 function getMatchingMemories(userMessage) {
-  const maxMemories = parseInt(localStorage.getItem('gpt_max_memories')) || 3;
-  const message = userMessage.toLowerCase();
-  
-  // Finde alle passenden Erinnerungen
-  const matches = [];
-  keywordMemories.forEach(mem => {
-    const keywords = mem.keywords.toLowerCase().split(',').map(k => k.trim());
-    const isMatch = keywords.some(kw => kw && message.includes(kw));
-    if (isMatch) {
-      matches.push(mem);
-    }
-  });
-  
-  // Sortiere nach Priorität
-  const priorityOrder = { high: 0, medium: 1, low: 2 };
-  matches.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-  
-  // Nur die ersten X zurückgeben
-  return matches.slice(0, maxMemories);
+const maxMemories = parseInt(localStorage.getItem(‘gpt_max_memories’)) || 3;
+const message = userMessage.toLowerCase();
+
+const matches = [];
+keywordMemories.forEach(mem => {
+const keywords = mem.keywords.toLowerCase().split(’,’).map(k => k.trim());
+const isMatch = keywords.some(kw => kw && message.includes(kw));
+if (isMatch) {
+matches.push(mem);
+}
+});
+
+const priorityOrder = { high: 0, medium: 1, low: 2 };
+matches.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+return matches.slice(0, maxMemories);
 }
 
 // === AUTOMATISCHE ZUSAMMENFASSUNG ===
 
 async function summarizeOldMessages(messages, apiKey, model) {
-  if (messages.length < 5) return null;
-  
-  const oldMessages = messages.slice(0, -4); // Alles außer die letzten 4
-  const textToSummarize = oldMessages.map(m => `${m.role === 'user' ? 'User' : 'KI'}: ${m.content}`).join('\n');
-  
-  try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({
-        model: model,
-        messages: [{
-          role: 'user',
-          content: `Fasse dieses Gespräch in 2-3 Sätzen zusammen. Behalte wichtige Details und den emotionalen Kontext:\n\n${textToSummarize}`
-        }],
-        max_tokens: 200
-      })
-    });
-    const data = await response.json();
-    if (data.choices && data.choices[0]) {
-      return data.choices[0].message.content;
-    }
-  } catch(e) {
-    console.error('Zusammenfassung fehlgeschlagen:', e);
-  }
-  return null;
+if (messages.length < 5) return null;
+
+const oldMessages = messages.slice(0, -4);
+const textToSummarize = oldMessages.map(m => `${m.role === 'user' ? 'User' : 'KI'}: ${m.content}`).join(’\n’);
+
+try {
+const response = await fetch(‘https://openrouter.ai/api/v1/chat/completions’, {
+method: ‘POST’,
+headers: { ‘Content-Type’: ‘application/json’, ‘Authorization’: ’Bearer ’ + apiKey },
+body: JSON.stringify({
+model: model,
+messages: [{
+role: ‘user’,
+content: `Fasse dieses Gespräch in 2-3 Sätzen zusammen. Behalte wichtige Details und den emotionalen Kontext:\n\n${textToSummarize}`
+}],
+max_tokens: 200
+})
+});
+const data = await response.json();
+if (data.choices && data.choices[0]) {
+return data.choices[0].message.content;
+}
+} catch(e) {
+console.error(‘Zusammenfassung fehlgeschlagen:’, e);
+}
+return null;
 }
 
 init();
 speechSynthesis.onvoiceschanged = () => {
-  speechSynthesis.getVoices();
+speechSynthesis.getVoices();
 };
 
 // Scroll-Button Logik
-const chatArea = document.getElementById('chatArea');
-const scrollBtn = document.getElementById('scrollBtn');
+const chatArea = document.getElementById(‘chatArea’);
+const scrollBtn = document.getElementById(‘scrollBtn’);
 
-chatArea.addEventListener('scroll', () => {
-  const isNearBottom = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 100;
-  scrollBtn.classList.toggle('visible', !isNearBottom);
+chatArea.addEventListener(‘scroll’, () => {
+const isNearBottom = chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 100;
+scrollBtn.classList.toggle(‘visible’, !isNearBottom);
 });
 
 function scrollToBottom() {
-  chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
+chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: ‘smooth’ });
 }
 
 // ============ SUPABASE CLOUD SYNC ============
 
 function getSupabaseConfig() {
-  return {
-    url: localStorage.getItem('gpt_supabase_url') || '',
-    key: localStorage.getItem('gpt_supabase_key') || '',
-    deviceId: localStorage.getItem('gpt_device_id') || 'default-device'
-  };
+return {
+url: localStorage.getItem(‘gpt_supabase_url’) || ‘’,
+key: localStorage.getItem(‘gpt_supabase_key’) || ‘’,
+deviceId: localStorage.getItem(‘gpt_device_id’) || ‘default-device’
+};
 }
 
 async function supabaseRequest(method, endpoint, body = null) {
-  const config = getSupabaseConfig();
-  if (!config.url || !config.key) throw new Error('Supabase nicht konfiguriert');
-  
-  const headers = {
-    'apikey': config.key,
-    'Authorization': 'Bearer ' + config.key,
-    'Content-Type': 'application/json',
-    'Prefer': method === 'POST' ? 'return=representation' : undefined
-  };
-  
-  const options = { method, headers };
-  if (body) options.body = JSON.stringify(body);
-  
-  const response = await fetch(config.url + '/rest/v1/' + endpoint, options);
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error('Supabase Fehler: ' + error);
-  }
-  
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
+const config = getSupabaseConfig();
+if (!config.url || !config.key) throw new Error(‘Supabase nicht konfiguriert’);
+
+const headers = {
+‘apikey’: config.key,
+‘Authorization’: ’Bearer ’ + config.key,
+‘Content-Type’: ‘application/json’,
+‘Prefer’: method === ‘POST’ ? ‘return=representation’ : undefined
+};
+
+const options = { method, headers };
+if (body) options.body = JSON.stringify(body);
+
+const response = await fetch(config.url + ‘/rest/v1/’ + endpoint, options);
+if (!response.ok) {
+const error = await response.text();
+throw new Error(’Supabase Fehler: ’ + error);
+}
+
+const text = await response.text();
+return text ? JSON.parse(text) : null;
 }
 
 async function testSupabaseConnection() {
-  const statusEl = document.getElementById('syncStatus');
-  statusEl.textContent = 'Teste Verbindung...';
-  statusEl.className = 'sync-status';
-  
-  try {
-    await supabaseRequest('GET', 'chats?select=id&limit=1');
-    statusEl.textContent = '✓ Verbunden!';
-    statusEl.className = 'sync-status connected';
-    showToast('Supabase verbunden!');
-  } catch (e) {
-    statusEl.textContent = '✗ ' + e.message;
-    statusEl.className = 'sync-status error';
-    showToast('Verbindung fehlgeschlagen');
-  }
+const statusEl = document.getElementById(‘syncStatus’);
+statusEl.textContent = ‘Teste Verbindung…’;
+statusEl.className = ‘sync-status’;
+
+try {
+await supabaseRequest(‘GET’, ‘chats?select=id&limit=1’);
+statusEl.textContent = ‘✓ Verbunden!’;
+statusEl.className = ‘sync-status connected’;
+showToast(‘Supabase verbunden!’);
+} catch (e) {
+statusEl.textContent = ’✗ ’ + e.message;
+statusEl.className = ‘sync-status error’;
+showToast(‘Verbindung fehlgeschlagen’);
+}
 }
 
 async function syncToCloud() {
-  const config = getSupabaseConfig();
-  if (!config.url || !config.key) {
-    showToast('Bitte Supabase-Daten eingeben');
-    return;
-  }
-  
-  const statusEl = document.getElementById('syncStatus');
-  statusEl.textContent = 'Synchronisiere...';
-  statusEl.className = 'sync-status';
-  
-  try {
-    // Aktuelle Daten hochladen
-    const data = {
-      user_id: config.deviceId,
-      data: {
-        chats: chats,
-        settings: {
-          systemPrompt: localStorage.getItem('gpt_system_prompt'),
-          pinnedMemories: localStorage.getItem('gpt_pinned_memories'),
-          keywordMemories: localStorage.getItem('gpt_keyword_memories')
-        }
-      },
-      updated_at: new Date().toISOString()
-    };
-    
-    // Prüfe ob schon ein Eintrag existiert
-    const existing = await supabaseRequest('GET', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId));
-    
-    if (existing && existing.length > 0) {
-      // Update
-      await supabaseRequest('PATCH', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId), data);
-    } else {
-      // Insert
-      await supabaseRequest('POST', 'chats', data);
-    }
-    
-    statusEl.textContent = '✓ Synchronisiert um ' + new Date().toLocaleTimeString('de-DE');
-    statusEl.className = 'sync-status connected';
-    showToast('Daten synchronisiert!');
-    
-  } catch (e) {
-    statusEl.textContent = '✗ ' + e.message;
-    statusEl.className = 'sync-status error';
-    showToast('Sync fehlgeschlagen: ' + e.message);
-  }
+const config = getSupabaseConfig();
+if (!config.url || !config.key) {
+showToast(‘Bitte Supabase-Daten eingeben’);
+return;
+}
+
+const statusEl = document.getElementById(‘syncStatus’);
+statusEl.textContent = ‘Synchronisiere…’;
+statusEl.className = ‘sync-status’;
+
+try {
+const data = {
+user_id: config.deviceId,
+data: {
+chats: chats,
+settings: {
+systemPrompt: localStorage.getItem(‘gpt_system_prompt’),
+pinnedMemories: localStorage.getItem(‘gpt_pinned_memories’),
+keywordMemories: localStorage.getItem(‘gpt_keyword_memories’)
+}
+},
+updated_at: new Date().toISOString()
+};
+
+```
+const existing = await supabaseRequest('GET', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId));
+
+if (existing && existing.length > 0) {
+  await supabaseRequest('PATCH', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId), data);
+} else {
+  await supabaseRequest('POST', 'chats', data);
+}
+
+statusEl.textContent = '✓ Synchronisiert um ' + new Date().toLocaleTimeString('de-DE');
+statusEl.className = 'sync-status connected';
+showToast('Daten synchronisiert!');
+```
+
+} catch (e) {
+statusEl.textContent = ’✗ ’ + e.message;
+statusEl.className = ‘sync-status error’;
+showToast(’Sync fehlgeschlagen: ’ + e.message);
+}
 }
 
 async function syncFromCloud() {
-  const config = getSupabaseConfig();
-  if (!config.url || !config.key) return;
+const config = getSupabaseConfig();
+if (!config.url || !config.key) return;
+
+try {
+const result = await supabaseRequest(‘GET’, ‘chats?user_id=eq.’ + encodeURIComponent(config.deviceId));
+
+```
+if (result && result.length > 0 && result[0].data) {
+  const cloudData = result[0].data;
   
-  try {
-    const result = await supabaseRequest('GET', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId));
-    
-    if (result && result.length > 0 && result[0].data) {
-      const cloudData = result[0].data;
-      
-      // Merge Chats (Cloud gewinnt bei Konflikten)
-      if (cloudData.chats && cloudData.chats.length > 0) {
-        // Einfaches Merge: Alle Cloud-Chats übernehmen
-        const cloudChatIds = new Set(cloudData.chats.map(c => c.id));
-        const localOnlyChats = chats.filter(c => !cloudChatIds.has(c.id));
-        chats = [...cloudData.chats, ...localOnlyChats];
-        saveState();
-        renderChatList();
-        renderMessages();
-      }
-      
-      showToast('Daten von Cloud geladen');
-    }
-  } catch (e) {
-    console.log('Cloud sync failed:', e);
+  if (cloudData.chats && cloudData.chats.length > 0) {
+    const cloudChatIds = new Set(cloudData.chats.map(c => c.id));
+    const localOnlyChats = chats.filter(c => !cloudChatIds.has(c.id));
+    chats = [...cloudData.chats, ...localOnlyChats];
+    saveState();
+    renderChatList();
+    renderMessages();
   }
+  
+  showToast('Daten von Cloud geladen');
+}
+```
+
+} catch (e) {
+console.log(‘Cloud sync failed:’, e);
+}
 }
 
-// Auto-Sync beim Start wenn aktiviert
-if (localStorage.getItem('gpt_auto_sync') === 'true') {
-  setTimeout(syncFromCloud, 2000);
+if (localStorage.getItem(‘gpt_auto_sync’) === ‘true’) {
+setTimeout(syncFromCloud, 2000);
 }
 
-// Service Worker für Offline-Funktionalität registrieren
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('Service Worker registriert'))
-      .catch(err => console.log('Service Worker Fehler:', err));
-  });
+if (‘serviceWorker’ in navigator) {
+window.addEventListener(‘load’, () => {
+navigator.serviceWorker.register(‘sw.js’)
+.then(reg => console.log(‘Service Worker registriert’))
+.catch(err => console.log(‘Service Worker Fehler:’, err));
+});
 }
 </script>
+
 </body>
 </html>
