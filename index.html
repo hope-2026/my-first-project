@@ -22,8 +22,8 @@
   --text-muted: #94a3b8;
   --accent: #14b8a6;
   --accent-soft: #ccfbf1;
-  --user-bg: #d8b4fe;
-  --user-text: #1e293b;
+  --user-bg: #a855f7;
+  --user-text: #ffffff;
   --ai-bg: #ffffff;
   --ai-border: #e2e8f0;
   --border: #e2e8f0;
@@ -40,8 +40,8 @@
     --text-muted: #64748b;
     --accent: #2dd4bf;
     --accent-soft: #134e4a;
-    --user-bg: #c4b5fd;
-    --user-text: #1e1b2e;
+    --user-bg: #a855f7;
+    --user-text: #ffffff;
     --ai-bg: #1e293b;
     --ai-border: #334155;
     --border: #334155;
@@ -74,11 +74,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .message.user .bubble { background: var(–user-bg); color: var(–user-text); border-bottom-right-radius: 6px; }
 .message.assistant .bubble { background: var(–ai-bg); border: 1px solid var(–ai-border); color: var(–text); border-bottom-left-radius: 6px; box-shadow: var(–shadow); }
 
-.msg-actions { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
-.msg-action { background: var(–bg-soft); border: 1px solid var(–border); color: var(–text-dim); font-size: 13px; cursor: pointer; padding: 5px 10px; border-radius: 8px; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
-.msg-action:hover { background: var(–bg-input); color: var(–text); border-color: var(–text-muted); }
-.msg-action.speaking { background: var(–accent-soft); color: var(–accent); border-color: var(–accent); }
-.msg-action svg { width: 14px; height: 14px; flex-shrink: 0; }
+.msg-actions { display: flex; gap: 8px; margin-top: 8px; }
+.msg-action { background: none; border: none; color: var(–text-muted); font-size: 18px; cursor: pointer; padding: 4px; opacity: 0.5; transition: opacity 0.2s; }
+.msg-action:hover { opacity: 1; }
+.msg-action.speaking { opacity: 1; color: var(–accent); }
 .msg-time { font-size: 11px; color: var(–text-muted); margin-top: 4px; padding: 0 4px; }
 
 .typing { display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(–text-dim); font-size: 14px; }
@@ -102,9 +101,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .send-btn { background: var(–accent); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .send-btn svg { width: 22px; height: 22px; fill: white; }
-.edit-banner { display: none; padding: 6px 12px; background: var(–user-bg); color: var(–user-text); font-size: 12px; justify-content: space-between; align-items: center; border-radius: 8px; margin: 0 16px 8px 16px; }
+.edit-banner { display: none; padding: 6px 12px; background: var(–user-bg); color: white; font-size: 12px; justify-content: space-between; align-items: center; border-radius: 8px; margin: 0 16px 8px 16px; }
 .edit-banner.visible { display: flex; }
-.edit-banner-close { background: none; border: none; color: var(–user-text); font-size: 16px; cursor: pointer; padding: 2px 6px; }
+.edit-banner-close { background: none; border: none; color: white; font-size: 16px; cursor: pointer; padding: 2px 6px; }
 
 .attachments-preview { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px 0; }
 .attachment-item { position: relative; background: var(–bg-soft); border: 1px solid var(–border); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(–text); }
@@ -340,6 +339,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div class="field">
         <label>Max. Tokens</label>
         <input type="number" id="maxTokensInput" placeholder="4096" value="4096">
+      </div>
+      <div class="field">
+        <label class="checkbox-label">
+          <input type="checkbox" id="webSearchInput">
+          Internet-Suche aktivieren
+        </label>
+        <div class="field-hint">Erlaubt dem Modell aktuelle Infos aus dem Internet zu suchen (kostet mehr Tokens)</div>
       </div>
     </div>
   </div>
@@ -703,6 +709,7 @@ closeAllMenus();
 const chat = chats.find(c => c.id === id);
 if (!chat) return;
 
+// Als JSON exportieren
 const data = JSON.stringify(chat, null, 2);
 const blob = new Blob([data], { type: ‘application/json’ });
 const url = URL.createObjectURL(blob);
@@ -720,6 +727,7 @@ closeAllMenus();
 const chat = chats.find(c => c.id === id);
 if (!chat) return;
 
+// Als Text formatieren
 let text = chat.title + ‘\n\n’;
 chat.messages.forEach(m => {
 const role = m.role === ‘user’ ? ‘Ich’ : ‘KI’;
@@ -771,6 +779,7 @@ function closeAllMenus() {
 document.querySelectorAll(’.chat-menu-popup’).forEach(m => m.classList.remove(‘open’));
 }
 
+// Menü schließen wenn woanders geklickt wird
 document.addEventListener(‘click’, (e) => {
 if (!e.target.closest(’.chat-item-menu-btn’) && !e.target.closest(’.chat-menu-popup’)) {
 closeAllMenus();
@@ -795,6 +804,7 @@ if (!item) return;
 const titleSpan = item.querySelector(’.chat-item-title’);
 const oldTitle = chat.title;
 
+// Input erstellen
 const input = document.createElement(‘input’);
 input.type = ‘text’;
 input.className = ‘chat-item-input’;
@@ -832,7 +842,7 @@ const div = document.createElement(‘div’);
 div.className = ’message ’ + msg.role;
 
 ```
-// Attachments anzeigen
+// Attachments anzeigen (falls vorhanden)
 if (msg.attachments && msg.attachments.length > 0) {
   const attDiv = document.createElement('div');
   attDiv.className = 'msg-attachments';
@@ -865,54 +875,52 @@ time.className = 'msg-time';
 time.textContent = formatTime(msg.time);
 div.appendChild(time);
 
-// Actions - jetzt mit Text-Labels
+// Actions
 const actions = document.createElement('div');
 actions.className = 'msg-actions';
 
-if (msg.role === 'user') {
-  // Bearbeiten
-  const editBtn = document.createElement('button');
-  editBtn.className = 'msg-action';
-  editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Bearbeiten';
-  editBtn.onclick = () => editMessage(idx);
-  actions.appendChild(editBtn);
-  
-  // Kopieren
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'msg-action';
-  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Kopieren';
-  copyBtn.onclick = () => copyText(msg.content);
-  actions.appendChild(copyBtn);
-  
-  // Merken
-  const memBtn = document.createElement('button');
-  memBtn.className = 'msg-action';
-  memBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> Merken';
-  memBtn.onclick = () => saveAsMemory(msg.content);
-  actions.appendChild(memBtn);
-}
+// Kopieren (für alle)
+const copyBtn = document.createElement('button');
+copyBtn.className = 'msg-action';
+copyBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+copyBtn.title = 'Kopieren';
+copyBtn.onclick = () => copyText(msg.content);
+actions.appendChild(copyBtn);
 
 if (msg.role === 'assistant') {
-  // Kopieren
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'msg-action';
-  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Kopieren';
-  copyBtn.onclick = () => copyText(msg.content);
-  actions.appendChild(copyBtn);
-  
-  // Vorlesen
+  // Vorlesen mit Play/Pause
   const speakBtn = document.createElement('button');
   speakBtn.className = 'msg-action';
-  speakBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Vorlesen';
+  speakBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>';
+  speakBtn.title = 'Vorlesen';
   speakBtn.onclick = () => speakTextWithToggle(msg.content, speakBtn);
   actions.appendChild(speakBtn);
   
-  // Neu generieren
+  // Neu generieren (nur letzte KI-Nachricht)
   const regenBtn = document.createElement('button');
   regenBtn.className = 'msg-action';
-  regenBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16"/></svg> Neu generieren';
+  regenBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16"/></svg>';
+  regenBtn.title = 'Neu generieren';
   regenBtn.onclick = () => regenerateMessage(idx);
   actions.appendChild(regenBtn);
+}
+
+if (msg.role === 'user') {
+  // Als Erinnerung speichern
+  const memBtn = document.createElement('button');
+  memBtn.className = 'msg-action';
+  memBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
+  memBtn.title = 'Als Erinnerung speichern';
+  memBtn.onclick = () => saveAsMemory(msg.content);
+  actions.appendChild(memBtn);
+  
+  // Bearbeiten
+  const editBtn = document.createElement('button');
+  editBtn.className = 'msg-action';
+  editBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  editBtn.title = 'Bearbeiten';
+  editBtn.onclick = () => editMessage(idx);
+  actions.appendChild(editBtn);
 }
 
 div.appendChild(actions);
@@ -951,6 +959,7 @@ const msg = chat.messages[idx];
 
 editingMessageIdx = idx;
 
+// Text ins Eingabefeld setzen
 const input = document.getElementById(‘inputField’);
 input.value = msg.content;
 input.classList.add(‘editing’);
@@ -958,6 +967,7 @@ autoResize(input);
 updateSendBtn();
 input.focus();
 
+// Edit-Banner anzeigen
 document.getElementById(‘editBanner’).classList.add(‘visible’);
 }
 
@@ -975,11 +985,13 @@ showToast(‘Bearbeitung abgebrochen’);
 async function regenerateMessage(idx) {
 const chat = getActiveChat();
 if (!chat || isStreaming) return;
+// Entferne die letzte KI-Antwort
 chat.messages.splice(idx, 1);
 chat.updatedAt = Date.now();
 saveState();
 renderMessages();
 
+// Generiere neu
 const apiKey = localStorage.getItem(‘gpt_api_key’);
 if (!apiKey) { showToast(‘Bitte API-Schlüssel eingeben’); return; }
 
@@ -995,16 +1007,20 @@ const freqPen = parseFloat(localStorage.getItem(‘gpt_freq_pen’)) || 0;
 const presPen = parseFloat(localStorage.getItem(‘gpt_pres_pen’)) || 0;
 const repPen = parseFloat(localStorage.getItem(‘gpt_rep_pen’)) || 1;
 const maxTokens = parseInt(localStorage.getItem(‘gpt_max_tokens’)) || 4096;
+const webSearch = localStorage.getItem(‘gpt_web_search’) === ‘true’;
 
 ```
 const apiMessages = [];
 
+// System-Prompt aufbauen
 let fullSystemPrompt = systemPrompt;
 
+// Angeheftete Erinnerungen
 if (pinnedMemories.trim()) {
   fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
 }
 
+// Keyword-Erinnerungen
 const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
 if (lastUserMsg) {
   const matchingMemories = getMatchingMemories(lastUserMsg.content);
@@ -1020,9 +1036,11 @@ if (fullSystemPrompt) {
   apiMessages.push({ role: 'system', content: fullSystemPrompt });
 }
 
+// Nur die letzten X Nachrichten senden
 const recentMessages = chat.messages.slice(-maxContext);
 recentMessages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
 
+// API-Payload bauen
 const payload = { 
   model: chat.model, 
   messages: apiMessages,
@@ -1035,6 +1053,7 @@ if (topK > 0) payload.top_k = topK;
 if (freqPen > 0) payload.frequency_penalty = freqPen;
 if (presPen > 0) payload.presence_penalty = presPen;
 if (repPen !== 1) payload.repetition_penalty = repPen;
+if (webSearch) payload.plugins = [{ id: 'web' }];
 
 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
   method: 'POST',
@@ -1079,14 +1098,17 @@ if (!apiKey) { showToast(‘Bitte API-Schlüssel eingeben’); openSettings(); r
 const chat = getActiveChat();
 if (!chat) return;
 
+// Edit-Modus: Nachricht aktualisieren statt neue erstellen
 if (editingMessageIdx !== null) {
 chat.messages[editingMessageIdx].content = text;
 chat.messages[editingMessageIdx].time = Date.now();
+// Alle Nachrichten nach dieser löschen und neu generieren
 chat.messages = chat.messages.slice(0, editingMessageIdx + 1);
 editingMessageIdx = null;
 input.classList.remove(‘editing’);
 document.getElementById(‘editBanner’).classList.remove(‘visible’);
 } else {
+// Neue Nachricht erstellen
 const userMsg = { role: ‘user’, content: text, time: Date.now(), attachments: […pendingAttachments] };
 chat.messages.push(userMsg);
 }
@@ -1095,6 +1117,7 @@ if (chat.messages.length === 1) chat.title = text.slice(0, 40) + (text.length > 
 chat.model = document.getElementById(‘modelSelect’).value;
 chat.updatedAt = Date.now();
 
+// Clear input
 input.value = ‘’;
 pendingAttachments = [];
 renderAttachments();
@@ -1115,16 +1138,20 @@ const freqPen = parseFloat(localStorage.getItem(‘gpt_freq_pen’)) || 0;
 const presPen = parseFloat(localStorage.getItem(‘gpt_pres_pen’)) || 0;
 const repPen = parseFloat(localStorage.getItem(‘gpt_rep_pen’)) || 1;
 const maxTokens = parseInt(localStorage.getItem(‘gpt_max_tokens’)) || 4096;
+const webSearch = localStorage.getItem(‘gpt_web_search’) === ‘true’;
 
 ```
 const apiMessages = [];
 
+// System-Prompt aufbauen
 let fullSystemPrompt = systemPrompt;
 
+// Angeheftete Erinnerungen (werden IMMER eingefügt)
 if (pinnedMemories.trim()) {
   fullSystemPrompt += '\n\n--- Wichtige Informationen ---\n' + pinnedMemories;
 }
 
+// Keyword-Erinnerungen (nur wenn Schlüsselwort matcht)
 const lastUserMsg = chat.messages.filter(m => m.role === 'user').pop();
 if (lastUserMsg) {
   const matchingMemories = getMatchingMemories(lastUserMsg.content);
@@ -1140,6 +1167,7 @@ if (fullSystemPrompt) {
   apiMessages.push({ role: 'system', content: fullSystemPrompt });
 }
 
+// Automatische Zusammenfassung wenn aktiviert und viele Nachrichten
 let recentMessages = chat.messages.slice(-maxContext);
 if (autoSummarize && chat.messages.length > maxContext + 4) {
   const summary = await summarizeOldMessages(chat.messages.slice(0, -maxContext), apiKey, chat.model);
@@ -1148,8 +1176,10 @@ if (autoSummarize && chat.messages.length > maxContext + 4) {
   }
 }
 
+// Nachrichten für API aufbereiten
 recentMessages.forEach(m => {
   if (m.attachments && m.attachments.length > 0) {
+    // Multimodal message mit Bildern
     const content = [];
     if (m.content) content.push({ type: 'text', text: m.content });
     m.attachments.forEach(att => {
@@ -1163,6 +1193,7 @@ recentMessages.forEach(m => {
   }
 });
 
+// API-Payload bauen
 const payload = { 
   model: chat.model, 
   messages: apiMessages,
@@ -1171,10 +1202,12 @@ const payload = {
   max_tokens: maxTokens
 };
 
+// Optionale Parameter nur hinzufügen wenn nicht default
 if (topK > 0) payload.top_k = topK;
 if (freqPen > 0) payload.frequency_penalty = freqPen;
 if (presPen > 0) payload.presence_penalty = presPen;
 if (repPen !== 1) payload.repetition_penalty = repPen;
+if (webSearch) payload.plugins = [{ id: 'web' }];
 
 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
   method: 'POST',
@@ -1207,8 +1240,8 @@ document.getElementById(‘sendBtn’).disabled = (!hasText && !hasFiles) || isS
 
 function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast(‘Kopiert ✓’)); }
 
-const playIcon = ‘<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Vorlesen’;
-const pauseIcon = ‘<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Stopp’;
+const playIcon = ‘<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>’;
+const pauseIcon = ‘<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>’;
 
 function speakTextWithToggle(text, btn) {
 if (currentSpeakBtn === btn && speechSynthesis.speaking) {
@@ -1310,9 +1343,11 @@ function openSettings() {
 document.getElementById(‘apiKeyInput’).value = localStorage.getItem(‘gpt_api_key’) || ‘’;
 document.getElementById(‘systemPromptInput’).value = localStorage.getItem(‘gpt_system_prompt’) || ‘’;
 
+// Namen laden
 document.getElementById(‘userNameInput’).value = localStorage.getItem(‘gpt_user_name’) || ‘’;
 document.getElementById(‘aiNameInput’).value = localStorage.getItem(‘gpt_ai_name’) || ‘’;
 
+// Sampling-Parameter laden
 document.getElementById(‘temperatureInput’).value = localStorage.getItem(‘gpt_temperature’) || 0.7;
 document.getElementById(‘tempValue’).textContent = localStorage.getItem(‘gpt_temperature’) || 0.7;
 document.getElementById(‘topPInput’).value = localStorage.getItem(‘gpt_top_p’) || 1;
@@ -1326,7 +1361,9 @@ document.getElementById(‘presPenValue’).textContent = localStorage.getItem(�
 document.getElementById(‘repPenInput’).value = localStorage.getItem(‘gpt_rep_pen’) || 1;
 document.getElementById(‘repPenValue’).textContent = localStorage.getItem(‘gpt_rep_pen’) || 1;
 document.getElementById(‘maxTokensInput’).value = localStorage.getItem(‘gpt_max_tokens’) || 4096;
+document.getElementById(‘webSearchInput’).checked = localStorage.getItem(‘gpt_web_search’) === ‘true’;
 
+// Memory laden
 document.getElementById(‘pinnedMemoriesInput’).value = localStorage.getItem(‘gpt_pinned_memories’) || ‘’;
 loadKeywordMemories();
 document.getElementById(‘maxMemoriesInput’).value = localStorage.getItem(‘gpt_max_memories’) || 3;
@@ -1335,12 +1372,14 @@ document.getElementById(‘contextMessagesInput’).value = localStorage.getItem
 document.getElementById(‘contextValue’).textContent = localStorage.getItem(‘gpt_context_messages’) || 10;
 document.getElementById(‘autoSummarizeInput’).checked = localStorage.getItem(‘gpt_auto_summarize’) === ‘true’;
 
+// Voice-Einstellungen laden
 loadVoiceSettings();
 document.getElementById(‘voiceRate’).value = localStorage.getItem(‘gpt_voice_rate’) || 1;
 document.getElementById(‘voicePitch’).value = localStorage.getItem(‘gpt_voice_pitch’) || 1;
 updateRateValue();
 updatePitchValue();
 
+// Supabase laden
 document.getElementById(‘supabaseUrlInput’).value = localStorage.getItem(‘gpt_supabase_url’) || ‘’;
 document.getElementById(‘supabaseKeyInput’).value = localStorage.getItem(‘gpt_supabase_key’) || ‘’;
 document.getElementById(‘deviceIdInput’).value = localStorage.getItem(‘gpt_device_id’) || ‘’;
@@ -1354,9 +1393,11 @@ function saveSettings() {
 localStorage.setItem(‘gpt_api_key’, document.getElementById(‘apiKeyInput’).value.trim());
 localStorage.setItem(‘gpt_system_prompt’, document.getElementById(‘systemPromptInput’).value);
 
+// Namen speichern
 localStorage.setItem(‘gpt_user_name’, document.getElementById(‘userNameInput’).value.trim());
 localStorage.setItem(‘gpt_ai_name’, document.getElementById(‘aiNameInput’).value.trim());
 
+// Sampling-Parameter speichern
 localStorage.setItem(‘gpt_temperature’, document.getElementById(‘temperatureInput’).value);
 localStorage.setItem(‘gpt_top_p’, document.getElementById(‘topPInput’).value);
 localStorage.setItem(‘gpt_top_k’, document.getElementById(‘topKInput’).value);
@@ -1364,17 +1405,21 @@ localStorage.setItem(‘gpt_freq_pen’, document.getElementById(‘freqPenInput
 localStorage.setItem(‘gpt_pres_pen’, document.getElementById(‘presPenInput’).value);
 localStorage.setItem(‘gpt_rep_pen’, document.getElementById(‘repPenInput’).value);
 localStorage.setItem(‘gpt_max_tokens’, document.getElementById(‘maxTokensInput’).value);
+localStorage.setItem(‘gpt_web_search’, document.getElementById(‘webSearchInput’).checked);
 
+// Memory speichern
 localStorage.setItem(‘gpt_pinned_memories’, document.getElementById(‘pinnedMemoriesInput’).value);
 saveKeywordMemories();
 localStorage.setItem(‘gpt_max_memories’, document.getElementById(‘maxMemoriesInput’).value);
 localStorage.setItem(‘gpt_context_messages’, document.getElementById(‘contextMessagesInput’).value);
 localStorage.setItem(‘gpt_auto_summarize’, document.getElementById(‘autoSummarizeInput’).checked);
 
+// Voice-Einstellungen speichern
 localStorage.setItem(‘gpt_voice’, document.getElementById(‘voiceSelect’).value);
 localStorage.setItem(‘gpt_voice_rate’, document.getElementById(‘voiceRate’).value);
 localStorage.setItem(‘gpt_voice_pitch’, document.getElementById(‘voicePitch’).value);
 
+// Supabase speichern
 localStorage.setItem(‘gpt_supabase_url’, document.getElementById(‘supabaseUrlInput’).value.trim());
 localStorage.setItem(‘gpt_supabase_key’, document.getElementById(‘supabaseKeyInput’).value.trim());
 localStorage.setItem(‘gpt_device_id’, document.getElementById(‘deviceIdInput’).value.trim());
@@ -1384,6 +1429,7 @@ closeSettings();
 showToast(‘Gespeichert ✓’);
 }
 
+// Export/Import Funktionen
 function exportAllChats() {
 const data = {
 chats: chats,
@@ -1415,6 +1461,7 @@ try {
 const data = JSON.parse(e.target.result);
 if (data.chats) {
 if (confirm(‘Vorhandene Chats mit Import zusammenführen?’)) {
+// Zusammenführen
 const existingIds = chats.map(c => c.id);
 data.chats.forEach(c => {
 if (!existingIds.includes(c.id)) {
@@ -1422,6 +1469,7 @@ chats.push(c);
 }
 });
 } else {
+// Ersetzen
 chats = data.chats;
 }
 if (!activeChatId && chats.length) activeChatId = chats[0].id;
@@ -1430,6 +1478,7 @@ renderChatList();
 renderMessages();
 showToast(‘Import erfolgreich ✓’);
 }
+// Einstellungen importieren wenn vorhanden
 if (data.settings) {
 if (data.settings.systemPrompt) localStorage.setItem(‘gpt_system_prompt’, data.settings.systemPrompt);
 if (data.settings.memories) localStorage.setItem(‘gpt_memories’, data.settings.memories);
@@ -1471,6 +1520,7 @@ closeSettings();
 showToast(‘Alle Chats gelöscht’);
 }
 
+// Event Listener für Lösch-Bestätigung
 document.addEventListener(‘DOMContentLoaded’, () => {
 const input = document.getElementById(‘deleteConfirmInput’);
 const btn = document.getElementById(‘deleteAllBtn’);
@@ -1496,6 +1546,7 @@ renderMemoryFields();
 }
 
 function saveKeywordMemories() {
+// Sammle alle Memory-Felder
 keywordMemories = [];
 document.querySelectorAll(’.memory-item’).forEach(item => {
 const keywords = item.querySelector(’.memory-keywords’).value.trim();
@@ -1524,6 +1575,7 @@ return div;
 }
 
 function estimateTokens(text) {
+// Grobe Schätzung: ~4 Zeichen pro Token (für Deutsch etwas mehr)
 return Math.ceil((text || ‘’).length / 3.5);
 }
 
@@ -1542,19 +1594,24 @@ list.appendChild(createMemoryField());
 }
 
 function saveAsMemory(content) {
+// Öffne Einstellungen und füge neue Erinnerung hinzu
 openSettings();
 
+// Kurze Verzögerung damit Modal geladen ist
 setTimeout(() => {
+// Scrolle zur Memory-Sektion
 const memorySection = document.querySelector(’#keywordMemoriesList’)?.closest(’.settings-section’);
 if (memorySection) {
 memorySection.classList.remove(‘collapsed’);
 }
 
 ```
+// Füge neue Erinnerung mit dem Inhalt hinzu
 const newMem = { keywords: '', content: content, priority: 'medium' };
 const list = document.getElementById('keywordMemoriesList');
 list.appendChild(createMemoryField(newMem));
 
+// Scrolle zum neuen Feld
 list.lastChild.scrollIntoView({ behavior: 'smooth' });
 list.lastChild.querySelector('.memory-keywords').focus();
 
@@ -1568,6 +1625,7 @@ function getMatchingMemories(userMessage) {
 const maxMemories = parseInt(localStorage.getItem(‘gpt_max_memories’)) || 3;
 const message = userMessage.toLowerCase();
 
+// Finde alle passenden Erinnerungen
 const matches = [];
 keywordMemories.forEach(mem => {
 const keywords = mem.keywords.toLowerCase().split(’,’).map(k => k.trim());
@@ -1577,9 +1635,11 @@ matches.push(mem);
 }
 });
 
+// Sortiere nach Priorität
 const priorityOrder = { high: 0, medium: 1, low: 2 };
 matches.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 
+// Nur die ersten X zurückgeben
 return matches.slice(0, maxMemories);
 }
 
@@ -1588,7 +1648,7 @@ return matches.slice(0, maxMemories);
 async function summarizeOldMessages(messages, apiKey, model) {
 if (messages.length < 5) return null;
 
-const oldMessages = messages.slice(0, -4);
+const oldMessages = messages.slice(0, -4); // Alles außer die letzten 4
 const textToSummarize = oldMessages.map(m => `${m.role === 'user' ? 'User' : 'KI'}: ${m.content}`).join(’\n’);
 
 try {
@@ -1695,6 +1755,7 @@ statusEl.textContent = ‘Synchronisiere…’;
 statusEl.className = ‘sync-status’;
 
 try {
+// Aktuelle Daten hochladen
 const data = {
 user_id: config.deviceId,
 data: {
@@ -1709,11 +1770,14 @@ updated_at: new Date().toISOString()
 };
 
 ```
+// Prüfe ob schon ein Eintrag existiert
 const existing = await supabaseRequest('GET', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId));
 
 if (existing && existing.length > 0) {
+  // Update
   await supabaseRequest('PATCH', 'chats?user_id=eq.' + encodeURIComponent(config.deviceId), data);
 } else {
+  // Insert
   await supabaseRequest('POST', 'chats', data);
 }
 
@@ -1740,7 +1804,9 @@ const result = await supabaseRequest(‘GET’, ‘chats?user_id=eq.’ + encode
 if (result && result.length > 0 && result[0].data) {
   const cloudData = result[0].data;
   
+  // Merge Chats (Cloud gewinnt bei Konflikten)
   if (cloudData.chats && cloudData.chats.length > 0) {
+    // Einfaches Merge: Alle Cloud-Chats übernehmen
     const cloudChatIds = new Set(cloudData.chats.map(c => c.id));
     const localOnlyChats = chats.filter(c => !cloudChatIds.has(c.id));
     chats = [...cloudData.chats, ...localOnlyChats];
@@ -1758,10 +1824,12 @@ console.log(‘Cloud sync failed:’, e);
 }
 }
 
+// Auto-Sync beim Start wenn aktiviert
 if (localStorage.getItem(‘gpt_auto_sync’) === ‘true’) {
 setTimeout(syncFromCloud, 2000);
 }
 
+// Service Worker für Offline-Funktionalität registrieren
 if (‘serviceWorker’ in navigator) {
 window.addEventListener(‘load’, () => {
 navigator.serviceWorker.register(‘sw.js’)
