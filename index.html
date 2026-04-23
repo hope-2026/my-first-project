@@ -216,17 +216,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <option value="openai/gpt-5.1-chat">GPT-5.1 Chat</option>
       </optgroup>
       <optgroup label="Anthropic">
-        <option value="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</option>
+        <option value="anthropic/claude-opus-4">Claude Opus 4.5</option>
       </optgroup>
       <optgroup label="xAI">
-        <option value="x-ai/grok-4">Grok 4</option>
+        <option value="x-ai/grok-4-0312">Grok 4.2</option>
+      </optgroup>
+      <optgroup label="Google">
+        <option value="google/gemini-2.5-pro-preview">Gemini 2.5 Plus</option>
       </optgroup>
       <optgroup label="Andere">
-        <option value="deepseek/deepseek-v3.2">DeepSeek V3.2</option>
-        <option value="moonshotai/kimi-k2.5">Kimi K2.5</option>
-        <option value="moonshotai/kimi-k2-thinking">Kimi K2 Denken</option>
-        <option value="meta-llama/llama-4-maverick">Llama 4 Maverick</option>
-        <option value="qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B</option>
+        <option value="qwen/qwen3-235b-a22b">Qwen 3.6 Plus</option>
+        <option value="mistralai/mistral-small-3.1-24b-instruct">Mistral Small 4</option>
       </optgroup>
     </select>
     <button class="settings-btn" onclick="openSettings()">⚙️</button>
@@ -335,6 +335,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <div class="field">
             <label>Max. Tokens</label>
             <input type="number" id="maxTokensInput" placeholder="4096" value="4096">
+          </div>
+          <div class="field">
+            <label class="checkbox-label">
+              <input type="checkbox" id="webSearchInput">
+              Internet-Suche aktivieren
+            </label>
+            <div class="field-hint">Erlaubt dem Modell aktuelle Infos aus dem Internet zu suchen (kostet mehr Tokens)</div>
           </div>
         </div>
       </div>
@@ -491,12 +498,13 @@ let pendingAttachments = [];
 function init() {
   loadState();
   loadKeywordMemoriesOnStart();
-  // Beim Start: KEIN Chat aktiv, nur Willkommensbildschirm anzeigen
-  // Alte Chats bleiben im Menü erhalten
-  activeChatId = null;
-  saveState();
-  renderChatList();
-  renderMessages();
+  if (!chats.length) newChat();
+  else {
+    if (!chats.find(c => c.id === activeChatId)) activeChatId = chats[0].id;
+    const chat = getActiveChat();
+    if (chat?.model) document.getElementById('modelSelect').value = chat.model;
+    renderChatList(); renderMessages();
+  }
 }
 
 function loadKeywordMemoriesOnStart() {
@@ -650,7 +658,8 @@ function deleteCurrentChat() {
   if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
   const id = activeChatId;
   chats = chats.filter(c => c.id !== id);
-  activeChatId = null;
+  activeChatId = chats.length ? chats[0].id : null;
+  if (!chats.length) newChat();
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
   showToast('Chat gelöscht');
 }
@@ -663,8 +672,9 @@ document.addEventListener('click', (e) => {
 });
 
 function newChat() {
-  // Zeige nur den Willkommensbildschirm - echter Chat wird erst beim Senden erstellt
-  activeChatId = null;
+  const id = 'chat_' + Date.now();
+  chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, createdAt: Date.now(), updatedAt: Date.now() });
+  activeChatId = id;
   if (document.getElementById('chatSearch')) document.getElementById('chatSearch').value = '';
   saveState(); renderChatList(); renderMessages(); closeSidebar();
   document.getElementById('inputField').focus();
@@ -682,7 +692,7 @@ function deleteChat(id, e) {
   closeAllMenus();
   if (!confirm('Den gesamten Chat unwiderruflich löschen?')) return;
   chats = chats.filter(c => c.id !== id);
-  if (activeChatId === id) { activeChatId = null; }
+  if (activeChatId === id) { activeChatId = chats.length ? chats[0].id : null; if (!chats.length) newChat(); }
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
   showToast('Chat gelöscht');
 }
@@ -997,6 +1007,7 @@ async function regenerateMessage(idx) {
     const presPen = parseFloat(localStorage.getItem('gpt_pres_pen')) || 0;
     const repPen = parseFloat(localStorage.getItem('gpt_rep_pen')) || 1;
     const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
+    const webSearch = localStorage.getItem('gpt_web_search') === 'true';
     
     const apiMessages = [];
     
@@ -1041,6 +1052,7 @@ async function regenerateMessage(idx) {
     if (freqPen > 0) payload.frequency_penalty = freqPen;
     if (presPen > 0) payload.presence_penalty = presPen;
     if (repPen !== 1) payload.repetition_penalty = repPen;
+    if (webSearch) payload.plugins = [{ id: 'web' }];
     
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -1080,14 +1092,6 @@ async function sendMessage() {
   if ((!text && !hasAttachments) || isStreaming) return;
   const apiKey = localStorage.getItem('gpt_api_key');
   if (!apiKey) { showToast('Bitte API-Schlüssel eingeben'); openSettings(); return; }
-  
-  // Wenn kein Chat aktiv ist (Willkommensbildschirm), erstelle jetzt einen neuen
-  if (!activeChatId || !getActiveChat()) {
-    const id = 'chat_' + Date.now();
-    chats.unshift({ id, title: 'Neuer Chat', messages: [], model: document.getElementById('modelSelect').value, createdAt: Date.now(), updatedAt: Date.now() });
-    activeChatId = id;
-  }
-  
   const chat = getActiveChat();
   if (!chat) return;
   
@@ -1131,6 +1135,7 @@ async function sendMessage() {
     const presPen = parseFloat(localStorage.getItem('gpt_pres_pen')) || 0;
     const repPen = parseFloat(localStorage.getItem('gpt_rep_pen')) || 1;
     const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
+    const webSearch = localStorage.getItem('gpt_web_search') === 'true';
     
     const apiMessages = [];
     
@@ -1198,6 +1203,7 @@ async function sendMessage() {
     if (freqPen > 0) payload.frequency_penalty = freqPen;
     if (presPen > 0) payload.presence_penalty = presPen;
     if (repPen !== 1) payload.repetition_penalty = repPen;
+    if (webSearch) payload.plugins = [{ id: 'web' }];
     
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -1349,6 +1355,7 @@ function openSettings() {
   document.getElementById('repPenInput').value = localStorage.getItem('gpt_rep_pen') || 1;
   document.getElementById('repPenValue').textContent = localStorage.getItem('gpt_rep_pen') || 1;
   document.getElementById('maxTokensInput').value = localStorage.getItem('gpt_max_tokens') || 4096;
+  document.getElementById('webSearchInput').checked = localStorage.getItem('gpt_web_search') === 'true';
   
   // Memory laden
   document.getElementById('pinnedMemoriesInput').value = localStorage.getItem('gpt_pinned_memories') || '';
@@ -1392,6 +1399,7 @@ function saveSettings() {
   localStorage.setItem('gpt_pres_pen', document.getElementById('presPenInput').value);
   localStorage.setItem('gpt_rep_pen', document.getElementById('repPenInput').value);
   localStorage.setItem('gpt_max_tokens', document.getElementById('maxTokensInput').value);
+  localStorage.setItem('gpt_web_search', document.getElementById('webSearchInput').checked);
   
   // Memory speichern
   localStorage.setItem('gpt_pinned_memories', document.getElementById('pinnedMemoriesInput').value);
