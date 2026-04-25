@@ -1085,6 +1085,43 @@ function showTyping() {
 
 function hideTyping() { document.getElementById('typingIndicator')?.remove(); }
 
+// URL-Fetch Funktion - Webseiten-Inhalte abrufen
+async function fetchUrlContent(url) {
+  try {
+    // Nutze einen CORS-Proxy um Webseiten abzurufen
+    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+    const response = await fetch(proxyUrl);
+    if (!response.ok) throw new Error('Seite nicht erreichbar');
+    const html = await response.text();
+    
+    // HTML zu Text konvertieren (einfache Variante)
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Script und Style Elemente entfernen
+    tempDiv.querySelectorAll('script, style, nav, header, footer, aside').forEach(el => el.remove());
+    
+    // Text extrahieren und bereinigen
+    let text = tempDiv.textContent || tempDiv.innerText || '';
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    // Auf 4000 Zeichen begrenzen um Token zu sparen
+    if (text.length > 4000) {
+      text = text.substring(0, 4000) + '... [gekürzt]';
+    }
+    
+    return text;
+  } catch (error) {
+    return null;
+  }
+}
+
+// URLs in Nachricht erkennen
+function extractUrls(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.match(urlRegex) || [];
+}
+
 async function sendMessage() {
   const input = document.getElementById('inputField');
   const text = input.value.trim();
@@ -1137,10 +1174,28 @@ async function sendMessage() {
     const maxTokens = parseInt(localStorage.getItem('gpt_max_tokens')) || 4096;
     const webSearch = localStorage.getItem('gpt_web_search') === 'true';
     
+    // URLs in der Nachricht erkennen und Inhalte abrufen
+    let urlContext = '';
+    const urls = extractUrls(text);
+    if (urls.length > 0) {
+      showToast('Lade Webseite...');
+      for (const url of urls.slice(0, 2)) { // Max 2 URLs
+        const content = await fetchUrlContent(url);
+        if (content) {
+          urlContext += `\n\n--- Inhalt von ${url} ---\n${content}\n`;
+        }
+      }
+    }
+    
     const apiMessages = [];
     
     // System-Prompt aufbauen
     let fullSystemPrompt = systemPrompt;
+    
+    // URL-Kontext hinzufügen wenn vorhanden
+    if (urlContext) {
+      fullSystemPrompt += urlContext;
+    }
     
     // Angeheftete Erinnerungen (werden IMMER eingefügt)
     if (pinnedMemories.trim()) {
