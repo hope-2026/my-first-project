@@ -212,6 +212,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <select class="model-select" id="modelSelect" onchange="saveCurrentChat()">
       <optgroup label="OpenAI">
         <option value="openai/gpt-4o-2024-11-20">GPT-4o (Nov 2024)</option>
+        <option value="openai/gpt-4o-mini">GPT-4o Mini (Lehrling)</option>
         <option value="openai/gpt-4.1">GPT-4.1</option>
         <option value="openai/gpt-5.1-chat">GPT-5.1 Chat</option>
       </optgroup>
@@ -429,6 +430,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
             <button class="backup-btn" onclick="exportAllChats()">📤 Alle Chats exportieren</button>
             <button class="backup-btn" onclick="document.getElementById('importFile').click()">📥 Chats importieren</button>
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importChats(this.files[0])">
+          </div>
+          <div class="field" style="margin-top: 16px;">
+            <label>ChatGPT-Verlauf importieren</label>
+            <div class="field-hint" style="margin-bottom: 8px;">Importiere deine alten ChatGPT-Gespräche (conversations.json) in den Vector-Speicher</div>
+            <button class="backup-btn" onclick="document.getElementById('chatgptImportFile').click()" style="width: 100%;">🧠 ChatGPT-Chats in Vector laden</button>
+            <input type="file" id="chatgptImportFile" accept=".json" style="display:none" onchange="importChatGPTToVector(this.files[0])">
           </div>
         </div>
       </div>
@@ -661,6 +668,12 @@ function deleteCurrentChat() {
   activeChatId = chats.length ? chats[0].id : null;
   if (!chats.length) newChat();
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
+  
+  // Auch aus Cloud löschen wenn Sync aktiv
+  if (localStorage.getItem('gpt_auto_sync') === 'true') {
+    syncToCloud();
+  }
+  
   showToast('Chat gelöscht');
 }
 
@@ -694,6 +707,12 @@ function deleteChat(id, e) {
   chats = chats.filter(c => c.id !== id);
   if (activeChatId === id) { activeChatId = chats.length ? chats[0].id : null; if (!chats.length) newChat(); }
   saveState(); renderChatList(document.getElementById('chatSearch')?.value || ''); renderMessages();
+  
+  // Auch aus Cloud löschen wenn Sync aktiv
+  if (localStorage.getItem('gpt_auto_sync') === 'true') {
+    syncToCloud();
+  }
+  
   showToast('Chat gelöscht');
 }
 
@@ -1122,6 +1141,52 @@ function extractUrls(text) {
   return text.match(urlRegex) || [];
 }
 
+// Vector-Suche: Trigger-Wörter erkennen
+function shouldSearchVector(text) {
+  const triggers = [
+    /erinnerst du dich/i,
+    /erinnerst du dich an/i,
+    /erzähl mir von/i,
+    /was haben wir/i,
+    /wann habe ich/i,
+    /haben wir besprochen/i,
+    /haben wir darüber gesprochen/i,
+    /weißt du noch/i,
+    /kannst du dich erinnern/i,
+    /damals als/i,
+    /früher haben wir/i
+  ];
+  return triggers.some(pattern => pattern.test(text));
+}
+
+// Vector-Suche in Supabase memories Tabelle
+async function searchVectorMemories(query) {
+  const supabaseUrl = localStorage.getItem('gpt_supabase_url');
+  const supabaseKey = localStorage.getItem('gpt_supabase_key');
+  
+  if (!supabaseUrl || !supabaseKey) return [];
+  
+  try {
+    // Einfache Textsuche (ohne Embeddings erstmal)
+    const response = await fetch(
+      supabaseUrl + '/rest/v1/memories?select=content,source&limit=5&content=ilike.*' + encodeURIComponent(query.split(' ').slice(0, 3).join('*')) + '*',
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': 'Bearer ' + supabaseKey
+        }
+      }
+    );
+    
+    if (!response.ok) return [];
+    
+    const results = await response.json();
+    return results;
+  } catch (error) {
+    return [];
+  }
+}
+
 async function sendMessage() {
   const input = document.getElementById('inputField');
   const text = input.value.trim();
@@ -1187,6 +1252,20 @@ async function sendMessage() {
       }
     }
     
+    // Vector-Suche wenn Trigger-Wörter erkannt
+    let vectorContext = '';
+    if (shouldSearchVector(text)) {
+      showToast('Durchsuche Erinnerungen...');
+      const vectorResults = await searchVectorMemories(text);
+      if (vectorResults.length > 0) {
+        vectorContext = '\n\n--- Gefundene Erinnerungen aus früheren Gesprächen ---\n';
+        vectorContext += 'KRITISCH: Verwende diese Erinnerungen direkt. Erfinde NICHTS. Wenn du es nicht findest, sag ehrlich dass du dich nicht erinnerst.\n\n';
+        vectorResults.forEach(r => {
+          vectorContext += `[${r.source || 'Unbekannt'}]: ${r.content}\n\n`;
+        });
+      }
+    }
+    
     const apiMessages = [];
     
     // System-Prompt aufbauen
@@ -1195,6 +1274,11 @@ async function sendMessage() {
     // URL-Kontext hinzufügen wenn vorhanden
     if (urlContext) {
       fullSystemPrompt += urlContext;
+    }
+    
+    // Vector-Kontext hinzufügen wenn vorhanden
+    if (vectorContext) {
+      fullSystemPrompt += vectorContext;
     }
     
     // Angeheftete Erinnerungen (werden IMMER eingefügt)
@@ -1543,6 +1627,122 @@ function importChats(file) {
   reader.readAsText(file);
 }
 
+// ChatGPT-Verlauf in Vector-Speicher importieren
+async function importChatGPTToVector(file) {
+  if (!file) return;
+  
+  const supabaseUrl = localStorage.getItem('gpt_supabase_url');
+  const supabaseKey = localStorage.getItem('gpt_supabase_key');
+  
+  if (!supabaseUrl || !supabaseKey) {
+    showToast('Bitte erst Supabase einrichten!');
+    return;
+  }
+  
+  showToast('Lade ChatGPT-Daten...');
+  
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      let conversations = [];
+      
+      // ChatGPT Export Format erkennen
+      if (Array.isArray(data)) {
+        conversations = data;
+      } else if (data.conversations) {
+        conversations = data.conversations;
+      } else {
+        showToast('Unbekanntes Format');
+        return;
+      }
+      
+      showToast(`${conversations.length} Gespräche gefunden...`);
+      
+      let imported = 0;
+      let errors = 0;
+      
+      for (const conv of conversations) {
+        try {
+          // Titel und Nachrichten extrahieren
+          const title = conv.title || 'Unbenannt';
+          let messages = [];
+          
+          // ChatGPT Format: mapping mit Nachrichten
+          if (conv.mapping) {
+            for (const key in conv.mapping) {
+              const node = conv.mapping[key];
+              if (node.message && node.message.content && node.message.content.parts) {
+                const role = node.message.author?.role || 'unknown';
+                const content = node.message.content.parts.join('\n');
+                if (content.trim() && (role === 'user' || role === 'assistant')) {
+                  messages.push({ role, content });
+                }
+              }
+            }
+          }
+          
+          if (messages.length === 0) continue;
+          
+          // Nachrichten zu Text zusammenfassen (für Vector)
+          const fullText = messages.map(m => 
+            `${m.role === 'user' ? 'Ich' : 'KI'}: ${m.content}`
+          ).join('\n\n');
+          
+          // In Chunks aufteilen (max 400 Wörter pro Chunk)
+          const words = fullText.split(/\s+/);
+          const chunks = [];
+          for (let i = 0; i < words.length; i += 400) {
+            chunks.push(words.slice(i, i + 400).join(' '));
+          }
+          
+          // Jeden Chunk in Supabase speichern
+          for (const chunk of chunks) {
+            const response = await fetch(supabaseUrl + '/rest/v1/memories', {
+              method: 'POST',
+              headers: {
+                'apikey': supabaseKey,
+                'Authorization': 'Bearer ' + supabaseKey,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+              },
+              body: JSON.stringify({
+                content: chunk,
+                source: title,
+                metadata: {
+                  type: 'chatgpt_import',
+                  title: title,
+                  created: conv.create_time || null
+                }
+              })
+            });
+            
+            if (!response.ok) {
+              errors++;
+            }
+          }
+          
+          imported++;
+          
+          // Fortschritt zeigen
+          if (imported % 10 === 0) {
+            showToast(`${imported} von ${conversations.length} importiert...`);
+          }
+          
+        } catch (err) {
+          errors++;
+        }
+      }
+      
+      showToast(`Import fertig! ${imported} Gespräche, ${errors} Fehler`);
+      
+    } catch (err) {
+      showToast('Import fehlgeschlagen: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
 function deleteAllChats() {
   if (!confirm('ALLE Chats unwiderruflich löschen?')) return;
   if (!confirm('Wirklich ALLE Chats löschen? Das kann nicht rückgängig gemacht werden!')) return;
@@ -1565,6 +1765,12 @@ function deleteAllChatsSecure() {
   newChat();
   input.value = '';
   document.getElementById('deleteAllBtn').disabled = true;
+  
+  // Auch aus Cloud löschen wenn Sync aktiv
+  if (localStorage.getItem('gpt_auto_sync') === 'true') {
+    syncToCloud();
+  }
+  
   closeSettings();
   showToast('Alle Chats gelöscht');
 }
