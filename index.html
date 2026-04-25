@@ -1639,7 +1639,7 @@ async function importChatGPTToVector(file) {
     return;
   }
   
-  showToast('Lade ChatGPT-Daten...');
+  showToast('Lade ChatGPT-Daten... (große Datei, bitte warten)');
   
   const reader = new FileReader();
   reader.onload = async (e) => {
@@ -1647,28 +1647,43 @@ async function importChatGPTToVector(file) {
       const data = JSON.parse(e.target.result);
       let conversations = [];
       
-      // ChatGPT Export Format erkennen
+      // Verschiedene Formate erkennen
       if (Array.isArray(data)) {
+        // Direktes Array von Gesprächen
         conversations = data;
       } else if (data.conversations) {
+        // Offizielles ChatGPT Format
         conversations = data.conversations;
+      } else if (data.data && data.data.conversations) {
+        // GPT2Claude Migration Kit Format
+        conversations = data.data.conversations;
+      } else if (data.data && Array.isArray(data.data)) {
+        // Alternatives Format
+        conversations = data.data;
       } else {
-        showToast('Unbekanntes Format');
+        showToast('Unbekanntes Format - prüfe die Datei');
+        console.log('Datei-Struktur:', Object.keys(data));
         return;
       }
       
       showToast(`${conversations.length} Gespräche gefunden...`);
       
+      if (conversations.length === 0) {
+        showToast('Keine Gespräche in der Datei gefunden');
+        return;
+      }
+      
       let imported = 0;
       let errors = 0;
+      let chunks_total = 0;
       
       for (const conv of conversations) {
         try {
-          // Titel und Nachrichten extrahieren
-          const title = conv.title || 'Unbenannt';
+          // Titel extrahieren (verschiedene Formate)
+          const title = conv.title || conv.name || 'Unbenannt';
           let messages = [];
           
-          // ChatGPT Format: mapping mit Nachrichten
+          // Format 1: mapping mit Nachrichten (offizielles ChatGPT)
           if (conv.mapping) {
             for (const key in conv.mapping) {
               const node = conv.mapping[key];
@@ -1682,9 +1697,25 @@ async function importChatGPTToVector(file) {
             }
           }
           
+          // Format 2: messages Array (GPT2Claude / andere Tools)
+          if (messages.length === 0 && conv.messages && Array.isArray(conv.messages)) {
+            for (const msg of conv.messages) {
+              const role = msg.role || msg.author?.role || 'unknown';
+              const content = msg.content || msg.text || '';
+              if (content.trim() && (role === 'user' || role === 'assistant')) {
+                messages.push({ role, content });
+              }
+            }
+          }
+          
+          // Format 3: content direkt im Gespräch
+          if (messages.length === 0 && conv.content) {
+            messages.push({ role: 'assistant', content: conv.content });
+          }
+          
           if (messages.length === 0) continue;
           
-          // Nachrichten zu Text zusammenfassen (für Vector)
+          // Nachrichten zu Text zusammenfassen
           const fullText = messages.map(m => 
             `${m.role === 'user' ? 'Ich' : 'KI'}: ${m.content}`
           ).join('\n\n');
@@ -1712,21 +1743,23 @@ async function importChatGPTToVector(file) {
                 metadata: {
                   type: 'chatgpt_import',
                   title: title,
-                  created: conv.create_time || null
+                  created: conv.create_time || conv.created_at || null
                 }
               })
             });
             
-            if (!response.ok) {
+            if (response.ok) {
+              chunks_total++;
+            } else {
               errors++;
             }
           }
           
           imported++;
           
-          // Fortschritt zeigen
+          // Fortschritt zeigen alle 10 Gespräche
           if (imported % 10 === 0) {
-            showToast(`${imported} von ${conversations.length} importiert...`);
+            showToast(`${imported}/${conversations.length} Gespräche (${chunks_total} Chunks)...`);
           }
           
         } catch (err) {
@@ -1734,10 +1767,11 @@ async function importChatGPTToVector(file) {
         }
       }
       
-      showToast(`Import fertig! ${imported} Gespräche, ${errors} Fehler`);
+      showToast(`Fertig! ${imported} Gespräche, ${chunks_total} Chunks, ${errors} Fehler`);
       
     } catch (err) {
       showToast('Import fehlgeschlagen: ' + err.message);
+      console.error('Import Fehler:', err);
     }
   };
   reader.readAsText(file);
