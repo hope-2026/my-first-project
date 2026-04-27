@@ -243,7 +243,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <option value="mistralai/mistral-small-3.1-24b-instruct">Mistral Small 4</option>
       </optgroup>
     </select>
-    <button class="settings-btn" onclick="openSettings()">⚙️ Einstellungen</button>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
     <button class="chat-options-btn" onclick="toggleChatOptions(event)">⋯</button>
     <div class="chat-options-popup" id="chatOptionsPopup">
       <div class="chat-menu-item" onclick="shareCurrentChat()">Teilen</div>
@@ -271,7 +271,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div>
 </div>
 <div class="sidebar" id="sidebar">
-  <div class="sidebar-header"><h2>Gespräche</h2><button class="new-chat-btn" onclick="newChat()">+ Neu</button></div>
+  <div class="sidebar-header"><h2>Gespräche</h2><button class="new-chat-btn" onclick="newChat()">+</button></div>
   <div class="sidebar-search"><input type="text" class="search-input" id="chatSearch" placeholder="Suchen..." oninput="filterChats()"></div>
   <div class="chat-list" id="chatList"></div>
 </div>
@@ -462,6 +462,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         </div>
         <div class="settings-section-content">
           <div class="field">
+            <label>Schnell-Setup (Sync-Code)</label>
+            <input type="text" id="syncCodeInput" placeholder="Sync-Code eingeben...">
+            <button class="backup-btn" onclick="applySyncCode()" style="margin-top: 8px; width: 100%;">📲 Code anwenden</button>
+            <button class="backup-btn" onclick="generateSyncCode()" style="margin-top: 4px; width: 100%;">📤 Code generieren (zum Teilen)</button>
+            <div class="field-hint">Gib den Code von deinem anderen Gerät ein, um alle Einstellungen zu übernehmen</div>
+          </div>
+          <hr style="border: none; border-top: 1px solid #333; margin: 16px 0;">
+          <div class="field">
             <label>Supabase URL</label>
             <input type="text" id="supabaseUrlInput" placeholder="https://xxx.supabase.co">
           </div>
@@ -472,7 +480,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <div class="field">
             <label>Geräte-ID</label>
             <input type="text" id="deviceIdInput" placeholder="z.B. iphone-moni">
-            <div class="field-hint">Eindeutiger Name für dieses Gerät</div>
+            <div class="field-hint">Gleiche ID auf allen Geräten = geteilte Daten</div>
           </div>
           <div class="sync-status" id="syncStatus">Nicht verbunden</div>
           <div class="backup-buttons">
@@ -544,6 +552,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 <script>
 let chats = [], activeChatId = null, isStreaming = false, currentSpeakBtn = null;
 let pendingAttachments = [];
+let abortController = null;
 
 function init() {
   loadState();
@@ -1143,8 +1152,6 @@ async function regenerateMessage(idx) {
   } finally { isStreaming = false; abortController = null; updateSendBtn(); }
 }
 
-let abortController = null;
-
 function showTyping() {
   if (document.getElementById('typingIndicator')) return;
   const area = document.getElementById('chatArea');
@@ -1516,12 +1523,17 @@ Anzahl Nachrichten in diesem Chat: ${chat.messages.length}`;
     if (repPen !== 1) payload.repetition_penalty = repPen;
     if (webSearch) payload.plugins = [{ id: 'web' }];
     
+    // AbortController für Stopp-Funktion
+    abortController = new AbortController();
+    
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: abortController.signal
     });
     const data = await response.json();
+    abortController = null;
     hideTyping();
     const reply = data.error ? 'Fehler: ' + data.error.message : data.choices[0].message.content;
     chat.messages.push({ role: 'assistant', content: reply, time: Date.now() });
@@ -1540,9 +1552,13 @@ Anzahl Nachrichten in diesem Chat: ${chat.messages.length}`;
     saveState(); renderMessages();
   } catch(e) {
     hideTyping();
+    if (e.name === 'AbortError') {
+      // Wurde gestoppt - keine Fehlermeldung
+      return;
+    }
     chat.messages.push({ role: 'assistant', content: 'Verbindungsfehler: ' + e.message, time: Date.now() });
     saveState(); renderMessages();
-  } finally { isStreaming = false; updateSendBtn(); }
+  } finally { isStreaming = false; abortController = null; updateSendBtn(); }
 }
 
 // Gespräch in Vector-Speicher speichern
@@ -2323,15 +2339,26 @@ async function syncToCloud() {
   statusEl.className = 'sync-status';
   
   try {
-    // Aktuelle Daten hochladen
+    // Aktuelle Daten hochladen - ALLE Einstellungen!
     const data = {
       user_id: config.deviceId,
       data: {
         chats: chats,
         settings: {
+          apiKey: localStorage.getItem('gpt_api_key'),
           systemPrompt: localStorage.getItem('gpt_system_prompt'),
           pinnedMemories: localStorage.getItem('gpt_pinned_memories'),
-          keywordMemories: localStorage.getItem('gpt_keyword_memories')
+          keywordMemories: localStorage.getItem('gpt_keyword_memories'),
+          supabaseUrl: localStorage.getItem('gpt_supabase_url'),
+          supabaseKey: localStorage.getItem('gpt_supabase_key'),
+          deviceId: localStorage.getItem('gpt_device_id'),
+          selectedModel: localStorage.getItem('gpt_selected_model'),
+          temperature: localStorage.getItem('gpt_temperature'),
+          maxTokens: localStorage.getItem('gpt_max_tokens'),
+          contextMessages: localStorage.getItem('gpt_context_messages'),
+          selectedVoice: localStorage.getItem('gpt_selected_voice'),
+          autoSync: localStorage.getItem('gpt_auto_sync'),
+          webSearch: localStorage.getItem('gpt_web_search')
         }
       },
       updated_at: new Date().toISOString()
@@ -2369,9 +2396,27 @@ async function syncFromCloud() {
     if (result && result.length > 0 && result[0].data) {
       const cloudData = result[0].data;
       
-      // Merge Chats (Cloud gewinnt bei Konflikten)
+      // Einstellungen wiederherstellen
+      if (cloudData.settings) {
+        const s = cloudData.settings;
+        if (s.apiKey) localStorage.setItem('gpt_api_key', s.apiKey);
+        if (s.systemPrompt) localStorage.setItem('gpt_system_prompt', s.systemPrompt);
+        if (s.pinnedMemories) localStorage.setItem('gpt_pinned_memories', s.pinnedMemories);
+        if (s.keywordMemories) localStorage.setItem('gpt_keyword_memories', s.keywordMemories);
+        if (s.supabaseUrl) localStorage.setItem('gpt_supabase_url', s.supabaseUrl);
+        if (s.supabaseKey) localStorage.setItem('gpt_supabase_key', s.supabaseKey);
+        if (s.deviceId) localStorage.setItem('gpt_device_id', s.deviceId);
+        if (s.selectedModel) localStorage.setItem('gpt_selected_model', s.selectedModel);
+        if (s.temperature) localStorage.setItem('gpt_temperature', s.temperature);
+        if (s.maxTokens) localStorage.setItem('gpt_max_tokens', s.maxTokens);
+        if (s.contextMessages) localStorage.setItem('gpt_context_messages', s.contextMessages);
+        if (s.selectedVoice) localStorage.setItem('gpt_selected_voice', s.selectedVoice);
+        if (s.autoSync) localStorage.setItem('gpt_auto_sync', s.autoSync);
+        if (s.webSearch) localStorage.setItem('gpt_web_search', s.webSearch);
+      }
+      
+      // Chats wiederherstellen
       if (cloudData.chats && cloudData.chats.length > 0) {
-        // Einfaches Merge: Alle Cloud-Chats übernehmen
         const cloudChatIds = new Set(cloudData.chats.map(c => c.id));
         const localOnlyChats = chats.filter(c => !cloudChatIds.has(c.id));
         chats = [...cloudData.chats, ...localOnlyChats];
@@ -2390,6 +2435,67 @@ async function syncFromCloud() {
 // Auto-Sync beim Start wenn aktiviert
 if (localStorage.getItem('gpt_auto_sync') === 'true') {
   setTimeout(syncFromCloud, 2000);
+}
+
+// Sync-Code generieren (zum Teilen mit anderem Gerät)
+function generateSyncCode() {
+  const syncData = {
+    apiKey: localStorage.getItem('gpt_api_key'),
+    supabaseUrl: localStorage.getItem('gpt_supabase_url'),
+    supabaseKey: localStorage.getItem('gpt_supabase_key'),
+    deviceId: localStorage.getItem('gpt_device_id'),
+    systemPrompt: localStorage.getItem('gpt_system_prompt'),
+    pinnedMemories: localStorage.getItem('gpt_pinned_memories')
+  };
+  
+  const code = btoa(JSON.stringify(syncData));
+  
+  // In Zwischenablage kopieren
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('📋 Sync-Code kopiert! Gib ihn auf dem anderen Gerät ein.');
+  }).catch(() => {
+    // Fallback: Zeige den Code an
+    prompt('Kopiere diesen Code:', code);
+  });
+}
+
+// Sync-Code anwenden (von anderem Gerät)
+function applySyncCode() {
+  const code = document.getElementById('syncCodeInput').value.trim();
+  if (!code) {
+    showToast('Bitte Sync-Code eingeben');
+    return;
+  }
+  
+  try {
+    const syncData = JSON.parse(atob(code));
+    
+    // Einstellungen übernehmen
+    if (syncData.apiKey) localStorage.setItem('gpt_api_key', syncData.apiKey);
+    if (syncData.supabaseUrl) localStorage.setItem('gpt_supabase_url', syncData.supabaseUrl);
+    if (syncData.supabaseKey) localStorage.setItem('gpt_supabase_key', syncData.supabaseKey);
+    if (syncData.deviceId) localStorage.setItem('gpt_device_id', syncData.deviceId);
+    if (syncData.systemPrompt) localStorage.setItem('gpt_system_prompt', syncData.systemPrompt);
+    if (syncData.pinnedMemories) localStorage.setItem('gpt_pinned_memories', syncData.pinnedMemories);
+    
+    // Felder aktualisieren
+    document.getElementById('apiKeyInput').value = syncData.apiKey || '';
+    document.getElementById('supabaseUrlInput').value = syncData.supabaseUrl || '';
+    document.getElementById('supabaseKeyInput').value = syncData.supabaseKey || '';
+    document.getElementById('deviceIdInput').value = syncData.deviceId || '';
+    document.getElementById('systemPromptInput').value = syncData.systemPrompt || '';
+    document.getElementById('pinnedMemoriesInput').value = syncData.pinnedMemories || '';
+    
+    showToast('✅ Einstellungen übernommen! Synchronisiere jetzt...');
+    
+    // Automatisch synchronisieren
+    setTimeout(() => {
+      syncFromCloud();
+    }, 500);
+    
+  } catch (e) {
+    showToast('❌ Ungültiger Sync-Code');
+  }
 }
 
 // Service Worker für Offline-Funktionalität registrieren
