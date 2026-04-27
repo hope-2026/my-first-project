@@ -1142,24 +1142,7 @@ function extractUrls(text) {
 }
 
 // Vector-Suche: Trigger-Wörter erkennen
-function shouldSearchVector(text) {
-  const triggers = [
-    /erinnerst du dich/i,
-    /erinnerst du dich an/i,
-    /erzähl mir von/i,
-    /was haben wir/i,
-    /wann habe ich/i,
-    /haben wir besprochen/i,
-    /haben wir darüber gesprochen/i,
-    /weißt du noch/i,
-    /kannst du dich erinnern/i,
-    /damals als/i,
-    /früher haben wir/i
-  ];
-  return triggers.some(pattern => pattern.test(text));
-}
-
-// Vector-Suche in Supabase memories Tabelle
+// Vector-Suche in Supabase memories Tabelle - läuft IMMER automatisch
 async function searchVectorMemories(query) {
   const supabaseUrl = localStorage.getItem('gpt_supabase_url');
   const supabaseKey = localStorage.getItem('gpt_supabase_key');
@@ -1167,9 +1150,22 @@ async function searchVectorMemories(query) {
   if (!supabaseUrl || !supabaseKey) return [];
   
   try {
-    // Einfache Textsuche (ohne Embeddings erstmal)
+    // Wichtige Wörter extrahieren (keine Füllwörter)
+    const stopWords = ['ich', 'du', 'wir', 'und', 'oder', 'aber', 'der', 'die', 'das', 'ein', 'eine', 'ist', 'sind', 'war', 'hat', 'haben', 'mit', 'für', 'von', 'zu', 'an', 'auf', 'in', 'nicht', 'auch', 'noch', 'mal', 'mir', 'dir', 'mich', 'dich', 'uns', 'was', 'wie', 'wenn', 'dann', 'so', 'es', 'sie', 'er', 'ja', 'nein', 'sehr', 'schon', 'nur', 'kann', 'will', 'muss', 'soll', 'gerade', 'heute', 'jetzt', 'hier', 'dass', 'weil', 'denn', 'als', 'nach', 'bei', 'über', 'unter', 'durch', 'ohne', 'gegen', 'bis', 'seit', 'vor', 'hinter', 'neben', 'zwischen'];
+    
+    const words = query.toLowerCase()
+      .replace(/[^\wäöüß\s]/g, '')
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !stopWords.includes(w))
+      .slice(0, 4);
+    
+    if (words.length === 0) return [];
+    
+    // Suche nach jedem wichtigen Wort
+    const searchQuery = words.map(w => `content.ilike.*${w}*`).join(',');
+    
     const response = await fetch(
-      supabaseUrl + '/rest/v1/memories?select=content,source&limit=5&content=ilike.*' + encodeURIComponent(query.split(' ').slice(0, 3).join('*')) + '*',
+      supabaseUrl + `/rest/v1/memories?select=content,source&or=(${searchQuery})&limit=3`,
       {
         headers: {
           'apikey': supabaseKey,
@@ -1183,6 +1179,7 @@ async function searchVectorMemories(query) {
     const results = await response.json();
     return results;
   } catch (error) {
+    console.log('Vector-Suche Fehler:', error);
     return [];
   }
 }
@@ -1252,18 +1249,15 @@ async function sendMessage() {
       }
     }
     
-    // Vector-Suche wenn Trigger-Wörter erkannt
+    // Vector-Suche läuft IMMER automatisch im Hintergrund
     let vectorContext = '';
-    if (shouldSearchVector(text)) {
-      showToast('Durchsuche Erinnerungen...');
-      const vectorResults = await searchVectorMemories(text);
-      if (vectorResults.length > 0) {
-        vectorContext = '\n\n--- Gefundene Erinnerungen aus früheren Gesprächen ---\n';
-        vectorContext += 'KRITISCH: Verwende diese Erinnerungen direkt. Erfinde NICHTS. Wenn du es nicht findest, sag ehrlich dass du dich nicht erinnerst.\n\n';
-        vectorResults.forEach(r => {
-          vectorContext += `[${r.source || 'Unbekannt'}]: ${r.content}\n\n`;
-        });
-      }
+    const vectorResults = await searchVectorMemories(text);
+    if (vectorResults.length > 0) {
+      vectorContext = '\n\n--- Relevante Erinnerungen aus früheren Gesprächen ---\n';
+      vectorContext += 'Nutze diese Erinnerungen natürlich im Gespräch wenn sie passen. Erfinde nichts.\n\n';
+      vectorResults.forEach(r => {
+        vectorContext += `[${r.source || 'Früher'}]: ${r.content}\n\n`;
+      });
     }
     
     const apiMessages = [];
@@ -1360,12 +1354,56 @@ async function sendMessage() {
       generateAutoTitle(chat, apiKey);
     }
     
+    // Automatisch in Vector-Speicher speichern (alle 4 Nachrichten)
+    if (chat.messages.length % 4 === 0) {
+      saveToVectorMemory(chat);
+    }
+    
     saveState(); renderMessages();
   } catch(e) {
     hideTyping();
     chat.messages.push({ role: 'assistant', content: 'Verbindungsfehler: ' + e.message, time: Date.now() });
     saveState(); renderMessages();
   } finally { isStreaming = false; updateSendBtn(); }
+}
+
+// Gespräch in Vector-Speicher speichern
+async function saveToVectorMemory(chat) {
+  const supabaseUrl = localStorage.getItem('gpt_supabase_url');
+  const supabaseKey = localStorage.getItem('gpt_supabase_key');
+  
+  if (!supabaseUrl || !supabaseKey) return;
+  
+  try {
+    // Letzte 4 Nachrichten als Chunk speichern
+    const recentMessages = chat.messages.slice(-4);
+    const content = recentMessages.map(m => 
+      `${m.role === 'user' ? 'Moni' : 'Tatjana'}: ${m.content}`
+    ).join('\n\n');
+    
+    const title = chat.title || 'Gespräch';
+    
+    await fetch(supabaseUrl + '/rest/v1/memories', {
+      method: 'POST',
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': 'Bearer ' + supabaseKey,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        content: content,
+        source: title,
+        metadata: {
+          type: 'live_chat',
+          chat_id: chat.id,
+          created: Date.now()
+        }
+      })
+    });
+  } catch(e) {
+    console.log('Vector-Speicher Fehler:', e);
+  }
 }
 
 // Auto-Titel mit 4o-Mini generieren (günstig!)
