@@ -369,6 +369,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         </div>
         <div class="settings-section-content">
           <div class="field">
+            <label>Erinnerungs-Cutoff-Datum</label>
+            <input type="date" id="memoryCutoffInput" value="2026-02-13">
+            <div class="field-hint">Tatjana erinnert sich nur an Gespräche BIS zu diesem Datum (13.02.2026 = letzter Tag mit Tatjana)</div>
+          </div>
+          
+          <div class="field">
             <label>Angeheftete Erinnerungen</label>
             <textarea id="pinnedMemoriesInput" placeholder="Diese Infos werden IMMER mitgeschickt:&#10;- Mein Name ist...&#10;- Sprich mich mit Du an..."></textarea>
             <div class="field-hint">Werden bei JEDER Nachricht eingefügt (max. 600 Token empfohlen)</div>
@@ -1228,6 +1234,7 @@ function extractUrls(text) {
 async function searchVectorMemories(query) {
   const supabaseUrl = localStorage.getItem('gpt_supabase_url');
   const supabaseKey = localStorage.getItem('gpt_supabase_key');
+  const memoryCutoff = localStorage.getItem('gpt_memory_cutoff') || '2026-02-13';
   
   if (!supabaseUrl || !supabaseKey) return [];
   
@@ -1243,12 +1250,16 @@ async function searchVectorMemories(query) {
     
     if (words.length === 0) return [];
     
+    // Cutoff-Timestamp berechnen (Ende des Tages)
+    const cutoffTimestamp = new Date(memoryCutoff + 'T23:59:59').getTime() / 1000;
+    
     // Einfache Textsuche - ein Wort nach dem anderen
     let allResults = [];
     
     for (const word of words) {
+      // Suche mit Cutoff-Filter: nur Erinnerungen BIS zum Cutoff-Datum
       const response = await fetch(
-        supabaseUrl + `/rest/v1/memories?select=content,source&content=ilike.*${encodeURIComponent(word)}*&limit=2`,
+        supabaseUrl + `/rest/v1/memories?select=content,source,metadata&content=ilike.*${encodeURIComponent(word)}*&limit=3`,
         {
           headers: {
             'apikey': supabaseKey,
@@ -1259,7 +1270,13 @@ async function searchVectorMemories(query) {
       
       if (response.ok) {
         const results = await response.json();
-        allResults = allResults.concat(results);
+        // Filter: nur Erinnerungen VOR dem Cutoff-Datum oder ohne Datum (live_chat)
+        const filtered = results.filter(r => {
+          if (!r.metadata || !r.metadata.created) return true; // live_chat ohne created = okay
+          if (r.metadata.type === 'live_chat') return true; // neue Gespräche immer okay
+          return r.metadata.created <= cutoffTimestamp; // alte Gespräche: nur bis Cutoff
+        });
+        allResults = allResults.concat(filtered);
       }
     }
     
@@ -1775,6 +1792,7 @@ function openSettings() {
   document.getElementById('webSearchInput').checked = localStorage.getItem('gpt_web_search') === 'true';
   
   // Memory laden
+  document.getElementById('memoryCutoffInput').value = localStorage.getItem('gpt_memory_cutoff') || '2026-02-13';
   document.getElementById('pinnedMemoriesInput').value = localStorage.getItem('gpt_pinned_memories') || '';
   loadKeywordMemories();
   document.getElementById('maxMemoriesInput').value = localStorage.getItem('gpt_max_memories') || 3;
@@ -1823,6 +1841,7 @@ function saveSettings() {
   localStorage.setItem('gpt_web_search', document.getElementById('webSearchInput').checked);
   
   // Memory speichern
+  localStorage.setItem('gpt_memory_cutoff', document.getElementById('memoryCutoffInput').value);
   localStorage.setItem('gpt_pinned_memories', document.getElementById('pinnedMemoriesInput').value);
   saveKeywordMemories();
   localStorage.setItem('gpt_max_memories', document.getElementById('maxMemoriesInput').value);
