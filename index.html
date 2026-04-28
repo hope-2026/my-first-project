@@ -374,15 +374,67 @@ async function sendMessage() {
   chat.updatedAt = Date.now();
   input.value = ''; autoResize(input); updateSendBtn();
   saveState(); renderMessages(); renderChatList();
-  await callAPI();
+
+  let memoryContext = '';
+  if (shouldSearchMemory(text)) {
+    showToast('Durchsuche Erinnerungen...');
+    const memories = await searchMemory(text);
+    if (memories.length > 0) {
+      memoryContext = memories
+        .map(r => r.content?.map(c => c.text).join(' ') || '')
+        .filter(t => t)
+        .join('\n\n---\n\n');
+    }
+  }
+
+  await callAPI(memoryContext);
 }
 
-async function callAPI() {
+function shouldSearchMemory(msg) {
+  const triggers = [
+    /erinnerst du dich/i,
+    /weißt du noch/i,
+    /erzähl mir von/i,
+    /was haben wir/i,
+    /wann habe ich/i,
+    /haben wir (besprochen|geredet|gesprochen|diskutiert|erwähnt)/i,
+    /ich habe (dir|dich) (damals|mal|einmal|früher)/i,
+    /du hast (mir|mich) (damals|mal|einmal|früher)/i,
+    /damals (als|haben|war|habe|haben wir)/i,
+    /letzte (woche|monat|year|woche)/i,
+    /vor (einigen|ein paar|mehreren) (tagen|wochen|monaten)/i,
+    /remember/i,
+    /do you remember/i,
+    /recall/i,
+  ];
+  return triggers.some(p => p.test(msg));
+}
+
+async function searchMemory(query) {
+  try {
+    const response = await fetch('/.netlify/functions/search-memory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, max_results: 5 })
+    });
+    const data = await response.json();
+    return data.data || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+async function callAPI(memoryContext = '') {
   const chat = getActiveChat();
   if (!chat) return;
   showTyping(); isStreaming = true; updateSendBtn();
   try {
-    const systemPrompt = localStorage.getItem('gpt_system_prompt') || '';
+    const basePrompt = localStorage.getItem('gpt_system_prompt') || '';
+    let systemPrompt = basePrompt;
+    if (memoryContext) {
+      systemPrompt += (systemPrompt ? '\n\n' : '') +
+        'KRITISCH: Die folgenden Erinnerungen wurden aus dem Vektorspeicher abgerufen. Nutze sie direkt und genau. Erfinde niemals Erinnerungen. Wenn du etwas nicht weißt oder nicht abrufen konntest, sage es offen.\n\nABGERUFENE ERINNERUNGEN:\n' + memoryContext;
+    }
     const apiMessages = [];
     if (systemPrompt) apiMessages.push({ role: 'system', content: systemPrompt });
     chat.messages.forEach(m => apiMessages.push({ role: m.role, content: m.content }));
