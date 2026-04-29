@@ -14,6 +14,7 @@ exports.handler = async (event) => {
         'HTTP-Referer': process.env.URL || 'https://localhost',
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(24000),
     });
 
     const data = await response.json();
@@ -24,10 +25,13 @@ exports.handler = async (event) => {
       body: JSON.stringify(data),
     };
   } catch (e) {
+    const isTimeout = e.name === 'TimeoutError' || e.name === 'AbortError';
     return {
-      statusCode: 500,
+      statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: { message: e.message } }),
+      body: JSON.stringify({
+        error: { message: isTimeout ? 'Zeitüberschreitung - bitte nochmal versuchen' : e.message }
+      }),
     };
   }
 };

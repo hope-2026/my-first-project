@@ -10,9 +10,9 @@ exports.handler = async (event) => {
 
     if (!vectorStoreId) {
       return {
-        statusCode: 503,
+        statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: { message: 'Memory nicht konfiguriert' } }),
+        body: JSON.stringify({ data: [] }),
       };
     }
 
@@ -26,6 +26,7 @@ exports.handler = async (event) => {
           'OpenAI-Beta': 'assistants=v2',
         },
         body: JSON.stringify({ query, max_num_results: max_results }),
+        signal: AbortSignal.timeout(8000),
       }
     );
 
@@ -38,9 +39,9 @@ exports.handler = async (event) => {
     };
   } catch (e) {
     return {
-      statusCode: 500,
+      statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: { message: e.message } }),
+      body: JSON.stringify({ data: [] }),
     };
   }
 };
