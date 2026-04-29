@@ -5,19 +5,45 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body);
+    // Force non-streaming to avoid OpenRouter stream idle timeout
+    const requestBody = { ...body, stream: false };
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
-        'HTTP-Referer': process.env.URL || 'https://localhost',
-      },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(24000),
-    });
+    let data;
+    let lastError;
 
-    const data = await response.json();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
+            'HTTP-Referer': process.env.URL || 'https://localhost',
+          },
+          body: JSON.stringify(requestBody),
+          signal: AbortSignal.timeout(22000),
+        });
+
+        data = await response.json();
+
+        // Retry on stream idle timeout error
+        const errMsg = data.error && data.error.message ? data.error.message : '';
+        if (errMsg.toLowerCase().includes('stream idle timeout') || errMsg.toLowerCase().includes('partial response')) {
+          lastError = errMsg;
+          continue;
+        }
+
+        break;
+      } catch (fetchErr) {
+        lastError = fetchErr.message;
+        if (attempt < 2) continue;
+        throw fetchErr;
+      }
+    }
+
+    if (!data) {
+      data = { error: { message: lastError || 'Unbekannter Fehler' } };
+    }
 
     return {
       statusCode: 200,
