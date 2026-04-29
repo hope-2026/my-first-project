@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mm-chat-v3';
+const CACHE_NAME = 'mm-chat-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -33,6 +33,7 @@ self.addEventListener('fetch', event => {
 
   // Netlify Functions und externe APIs immer direkt übers Netzwerk
   if (url.pathname.startsWith('/.netlify/') ||
+      url.pathname.startsWith('/api/') ||
       url.hostname === 'openrouter.ai' ||
       url.hostname.includes('openai.com')) {
     event.respondWith(
